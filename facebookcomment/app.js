@@ -161,13 +161,7 @@ async function restoreLastSession() {
     const connectionModeSelector = document.getElementById("connectionMode");
     if (connectionModeSelector && session.connectionMode) {
         connectionModeSelector.value = session.connectionMode;
-        connectionMode = session.connectionMode;
-        
-        // Show/hide refresh interval
-        const refreshGroup = document.getElementById("refreshIntervalGroup");
-        if (refreshGroup) {
-            refreshGroup.style.display = session.connectionMode === "stream" ? "none" : "flex";
-        }
+        connectionMode = session.connectionMode; // Update global variable
     }
     
     // Set refresh interval
@@ -223,10 +217,11 @@ async function loadVideosForPage(pageId) {
 }
 
 // ===== SEARCH FUNCTIONS (Only for index.html) =====
-function initializeIndexPage() {
+async function initializeIndexPage() {
     const searchBox = document.getElementById("searchBox");
     const clearSearch = document.getElementById("clearSearch");
     const searchStats = document.getElementById("searchStats");
+    const refreshGroup = document.getElementById("refreshIntervalGroup"); // Get this element
 
     searchBox.addEventListener("input", function (e) {
         currentSearchTerm = e.target.value.toLowerCase().trim();
@@ -254,10 +249,10 @@ function initializeIndexPage() {
     TPOS_API.loadToken();
 
     // Load accounts on page load
-    loadAccounts().then(() => {
-        // After accounts loaded, restore last session
-        restoreLastSession();
-    });
+    await loadAccounts(); // Await accounts to be loaded
+
+    // After accounts loaded, restore last session
+    await restoreLastSession(); // Await session restoration
 
     // Load printers and template settings for printing
     loadPrintersForPrinting();
@@ -266,8 +261,7 @@ function initializeIndexPage() {
     // Connection mode change handler
     document.getElementById("connectionMode").addEventListener("change", function (e) {
         connectionMode = e.target.value;
-        const refreshGroup = document.getElementById("refreshIntervalGroup");
-
+        
         if (connectionMode === "stream") {
             refreshGroup.style.display = "none";
         } else {
@@ -301,8 +295,10 @@ function initializeIndexPage() {
         saveLastSession();
     });
 
-    // Initialize - hide refresh interval for stream mode
-    document.getElementById("refreshIntervalGroup").style.display = "none";
+    // Set initial display for refresh interval group based on current connectionMode
+    if (refreshGroup) {
+        refreshGroup.style.display = connectionMode === "stream" ? "none" : "flex";
+    }
 }
 
 function normalizeVietnamese(str) {
