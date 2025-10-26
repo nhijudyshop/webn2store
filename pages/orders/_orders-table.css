@@ -25,11 +25,12 @@
     padding: 16px 12px;
     color: #334155;
     border-bottom: 1px solid #f1f5f9;
-    vertical-align: top;
+    vertical-align: middle;
+    text-align: center;
 }
 
-.orders-table tbody tr:hover {
-    background: #f8fafc;
+.orders-table tbody td.align-left {
+    text-align: left;
 }
 
 /* Table specific styles */
@@ -38,6 +39,7 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
+    justify-content: center;
 }
 
 .order-date i {
@@ -61,6 +63,7 @@
 .invoice-info {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 
@@ -118,6 +121,7 @@
 .price-cell {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 4px;
 }
 
@@ -176,6 +180,7 @@
 .action-buttons {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 
