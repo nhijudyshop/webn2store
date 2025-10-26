@@ -205,12 +205,7 @@ async function loadVideosForPage(pageId) {
     videoSelector.innerHTML = '<option value="">Đang tải videos...</option>';
 
     try {
-        const response = await fetch(`/api/videos?pageid=${pageId}&limit=${limit}`);
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await TPOS_API.tposRequest(`/api/videos?pageid=${pageId}&limit=${limit}`);
         videosData = data.data || [];
 
         if (videosData.length === 0) {
@@ -223,6 +218,7 @@ async function loadVideosForPage(pageId) {
     } catch (error) {
         console.error("Error loading videos:", error);
         videoSelector.innerHTML = '<option value="">Lỗi tải videos</option>';
+        showNotification(`Lỗi tải videos: ${error.message}`, "error");
     }
 }
 
@@ -253,6 +249,9 @@ function initializeIndexPage() {
         renderAllComments();
         searchBox.focus();
     });
+
+    // Load token from localStorage using TPOS_API
+    TPOS_API.loadToken();
 
     // Load accounts on page load
     loadAccounts().then(() => {
@@ -434,12 +433,7 @@ async function loadAccounts() {
         '<option value="">Đang tải danh sách pages...</option>';
 
     try {
-        const response = await fetch("/api/accounts");
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await TPOS_API.tposRequest("CRMTeam/ODataService.GetAllFacebook?$expand=Childs");
         accountsData = data.value || [];
 
         if (accountsData.length === 0) {
@@ -453,6 +447,7 @@ async function loadAccounts() {
     catch (error) {
         console.error("Error loading accounts:", error);
         selector.innerHTML = '<option value="">Lỗi tải pages</option>';
+        showNotification(`Lỗi tải pages: ${error.message}`, "error");
     }
 }
 
@@ -507,16 +502,9 @@ async function loadVideos(event) {
     videoSelector.innerHTML = '<option value="">Đang tải videos...</option>';
 
     try {
-        const response = await fetch(
+        const data = await TPOS_API.tposRequest(
             `/api/videos?pageid=${pageId}&limit=${limit}`,
         );
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const errorMessage = errorData.error || `HTTP Error: ${response.status} ${response.statusText}`;
-            throw new Error(errorMessage);
-        }
-
-        const data = await response.json();
         videosData = data.data || [];
 
         if (videosData.length === 0) {
@@ -588,22 +576,17 @@ async function fetchOrders(postId) {
         console.log("📦 Fetching detailed orders mapping...");
         const startTime = Date.now();
 
-        const response = await fetch(`/api/orders-detail?postId=${postId}`);
+        const data = await TPOS_API.tposRequest(`/api/orders-detail?postId=${postId}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
         const fetchTime = Date.now() - startTime;
 
         if (data._cached) {
             console.log(
-                `💾 Using cached data (age: ${data._cacheAge}s, fetch time: ${fetchTime}ms)`,
+                `💾 Using cached orders data (age: ${data._cacheAge}s, fetch time: ${fetchTime}ms)`,
             );
         } else {
             console.log(
-                `🌐 Fresh data fetched from API (fetch time: ${fetchTime}ms)`,
+                `🌐 Fresh orders data fetched from API (fetch time: ${fetchTime}ms)`,
             );
         }
 
@@ -649,6 +632,7 @@ async function fetchOrders(postId) {
         }
     } catch (error) {
         console.error("❌ Error fetching orders:", error);
+        showNotification(`Lỗi tải orders: ${error.message}`, "error");
     }
 }
 
@@ -1179,7 +1163,17 @@ function connectStream() {
     const pageId = videoId.split("_")[0];
     const postId = videoId;
 
-    const url = `/api/stream?pageid=${pageId}&postId=${postId}`;
+    // The SSE URL needs the token directly in the query param,
+    // so we need to get it from TPOS_API.getToken()
+    const token = TPOS_API.getToken();
+    if (!token) {
+        errorContainer.innerHTML = '<div class="error">⚠️ Vui lòng nhập Bearer Token trước khi kết nối stream!</div>';
+        stopFetching();
+        showNotification("Vui lòng nhập Bearer Token trước khi kết nối stream!", "error");
+        return;
+    }
+
+    const url = `/api/stream?pageid=${pageId}&postId=${postId}&token=${token}`; // Pass token to server for SSE
 
     console.log("🌊 Connecting to stream...");
     refreshIndicator.classList.add("active");
@@ -1261,21 +1255,13 @@ async function fetchComments() {
     refreshStatus.innerHTML = '<span class="pulse"></span> Đang tải...';
 
     try {
-        const url = `/api/comments?pageid=${pageId}&postId=${postId}`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(
-                `HTTP Error: ${response.status} ${response.statusText}`,
-            );
-        }
-
-        const data = await response.json();
+        const data = await TPOS_API.tposRequest(`/api/comments?pageid=${pageId}&postId=${postId}`);
         processComments(data);
         refreshStatus.textContent = "Đang theo dõi (Polling)...";
     } catch (error) {
         errorContainer.innerHTML = `<div class="error">❌ Lỗi: ${error.message}</div>`;
         refreshStatus.textContent = "Lỗi kết nối";
+        showNotification(`Lỗi tải comments: ${error.message}`, "error");
     } finally {
         refreshIndicator.classList.remove("active");
     }
@@ -1391,8 +1377,9 @@ async function refreshOrders() {
     const refreshBtn = document.getElementById("refreshOrdersBtn");
 
     refreshBtn.disabled = true;
-    refreshBtn.textContent = "⏳ Đang làm mới...";
-
+    refreshBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Đang làm mới...';
+    lucide.createIcons();
+    
     try {
         console.log("🔄 Force refreshing orders from API...");
         errorContainer.innerHTML =
@@ -1400,15 +1387,10 @@ async function refreshOrders() {
 
         const startTime = Date.now();
 
-        const response = await fetch(
+        const data = await TPOS_API.tposRequest(
             `/api/orders-detail?postId=${postId}&forceRefresh=true`,
         );
 
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
         const fetchTime = Date.now() - startTime;
 
         ordersMap.clear();
@@ -1475,9 +1457,11 @@ async function refreshOrders() {
     } catch (error) {
         console.error("❌ Error refreshing orders:", error);
         errorContainer.innerHTML = `<div class="error">❌ Lỗi làm mới orders: ${error.message}</div>`;
+        showNotification(`Lỗi làm mới orders: ${error.message}`, "error");
     } finally {
         refreshBtn.disabled = false;
-        refreshBtn.textContent = "🔄 Refresh Orders";
+        refreshBtn.innerHTML = '<i data-lucide="refresh-cw"></i> Refresh Orders';
+        lucide.createIcons();
     }
 }
 

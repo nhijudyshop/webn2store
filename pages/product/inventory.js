@@ -286,38 +286,8 @@ function autoLoadSavedData() {
 }
 
 // ===== TOKEN MANAGEMENT =====
-function saveToken() {
-    const token = document.getElementById("bearerToken").value.trim();
-
-    if (!token) {
-        showNotification("Vui lòng nhập Bearer Token", "error");
-        return;
-    }
-
-    // Save to localStorage
-    localStorage.setItem("tpos_bearer_token", token);
-    showNotification("Đã lưu token thành công!", "success");
-}
-
-function loadToken() {
-    const token = localStorage.getItem("tpos_bearer_token");
-    if (token) {
-        document.getElementById("bearerToken").value = token;
-        return token;
-    }
-    return null;
-}
-
-function getToken() {
-    let token = document.getElementById("bearerToken").value.trim();
-    if (!token) {
-        token = localStorage.getItem("tpos_bearer_token");
-        if (token) {
-            document.getElementById("bearerToken").value = token;
-        }
-    }
-    return token;
-}
+// Removed saveToken, loadToken, getToken, loadTokenFromFile, handleTokenFile
+// Now using TPOS_API.saveToken() and TPOS_API.loadToken() directly
 
 function toggleTokenVisibility() {
     const input = document.getElementById("bearerToken");
@@ -333,158 +303,6 @@ function toggleTokenVisibility() {
     lucide.createIcons();
 }
 
-function loadTokenFromFile() {
-    document.getElementById("tokenFileInput").click();
-}
-
-function handleTokenFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            const content = e.target.result;
-            let token = null;
-
-            // Try to parse as JSON first
-            if (file.name.endsWith(".json")) {
-                const json = JSON.parse(content);
-                token =
-                    json.token ||
-                    json.bearerToken ||
-                    json.authorization ||
-                    json.bearer;
-            } else {
-                // Plain text file
-                token = content.trim();
-            }
-
-            if (token) {
-                // Remove "Bearer " prefix if exists
-                token = token.replace(/^Bearer\s+/i, "");
-                document.getElementById("bearerToken").value = token;
-                localStorage.setItem("tpos_bearer_token", token);
-                showNotification("Đã tải token từ file thành công!", "success");
-            } else {
-                showNotification("Không tìm thấy token trong file", "error");
-            }
-        } catch (error) {
-            showNotification("Lỗi khi đọc file: " + error.message, "error");
-        }
-    };
-    reader.readAsText(file);
-
-    // Reset input
-    event.target.value = "";
-}
-
-// ===== API HEADERS =====
-function generateRequestId() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
-}
-
-function getHeaders() {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("Vui lòng nhập Bearer Token trước khi tìm kiếm");
-    }
-
-    return {
-        accept: "application/json, text/plain, */*",
-        "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json;charset=UTF-8",
-        priority: "u=1, i",
-        "sec-ch-ua":
-            '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Windows"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "cross-site",
-        "sec-fetch-storage-access": "active",
-        tposappversion: "5.9.10.1",
-        "x-request-id": generateRequestId(),
-    };
-}
-
-// ===== SIDEBAR FUNCTIONS =====
-function toggleSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const body = document.body;
-    const toggle = document.getElementById("sidebarToggle");
-
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-    body.classList.toggle("sidebar-open");
-    toggle.classList.toggle("active");
-}
-
-function closeSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const body = document.body;
-    const toggle = document.getElementById("sidebarToggle");
-
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-    body.classList.remove("sidebar-open");
-    toggle.classList.remove("active");
-}
-
-// ===== NOTIFICATION FUNCTION =====
-function showNotification(message, type = "info") {
-    const notification = document.createElement("div");
-    notification.className = `notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === "error" ? "#ef4444" : type === "success" ? "#10b981" : "#3b82f6"};
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.style.animation = "slideOut 0.3s ease";
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// ===== TAB FUNCTIONS =====
-function switchTab(tab) {
-    // Update tab buttons
-    const tabBtns = document.querySelectorAll(".tab-btn");
-    tabBtns.forEach((btn) => btn.classList.remove("active"));
-    event.target.closest(".tab-btn").classList.add("active");
-
-    // Update tab content
-    const tabContents = document.querySelectorAll(".tab-content");
-    tabContents.forEach((content) => content.classList.remove("active"));
-
-    if (tab === "parent") {
-        document.getElementById("parentTab").classList.add("active");
-    } else {
-        document.getElementById("variantsTab").classList.add("active");
-    }
-}
-
 // ===== SEARCH PRODUCT =====
 async function searchProduct(event) {
     event.preventDefault();
@@ -497,72 +315,12 @@ async function searchProduct(event) {
     }
 
     try {
-        // Get headers with token
-        const headers = getHeaders();
-
         // Show loading
         showLoading("parentTableWrapper");
         showLoading("variantsTableWrapper");
 
-        // Step 1: Search for product by DefaultCode
-        const searchUrl = `https://tomato.tpos.vn/odata/ProductTemplate/OdataService.GetViewV2?Active=true&DefaultCode=${productCode}&$top=50&$orderby=DateCreated+desc&$filter=Active+eq+true&$count=true`;
-
-        console.log("Fetching search results...", searchUrl);
-        const searchResponse = await fetch(searchUrl, {
-            method: "GET",
-            headers: headers,
-            body: null,
-        });
-
-        if (!searchResponse.ok) {
-            if (searchResponse.status === 401) {
-                throw new Error(
-                    "Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.",
-                );
-            }
-            throw new Error(
-                `HTTP Error: ${searchResponse.status} - ${searchResponse.statusText}`,
-            );
-        }
-
-        const searchData = await searchResponse.json();
-        console.log("Search results:", searchData);
-
-        // Find product with exact DefaultCode
-        const product = searchData.value.find(
-            (p) => p.DefaultCode === productCode,
-        );
-
-        if (!product) {
-            throw new Error(`Không tìm thấy sản phẩm với mã: ${productCode}`);
-        }
-
-        const productId = product.Id;
-        console.log("Found product ID:", productId);
-
-        // Step 2: Get product details with variants
-        const detailUrl = `https://tomato.tpos.vn/odata/ProductTemplate(${productId})?$expand=UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)`;
-
-        console.log("Fetching product details...", detailUrl);
-        const detailResponse = await fetch(detailUrl, {
-            method: "GET",
-            headers: headers,
-            body: null,
-        });
-
-        if (!detailResponse.ok) {
-            if (detailResponse.status === 401) {
-                throw new Error(
-                    "Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.",
-                );
-            }
-            throw new Error(
-                `HTTP Error: ${detailResponse.status} - ${detailResponse.statusText}`,
-            );
-        }
-
-        const detailData = await detailResponse.json();
-        console.log("Product details:", detailData);
+        // Use TPOS_API.getProductByCode
+        const detailData = await TPOS_API.getProductByCode(productCode);
 
         // Store current data
         currentProduct = detailData;
@@ -603,9 +361,9 @@ function displayProductInfo(product) {
     );
     const variantCount = document.getElementById("productInfoVariantCount");
 
-    image.src = product.ImageUrl || "https://via.placeholder.com/120";
+    image.src = product.ImageUrl || "../../shared/assets/placeholder.png";
     image.onerror = () => {
-        image.src = "https://via.placeholder.com/120";
+        image.src = "../../shared/assets/placeholder.png";
     };
     name.textContent = product.Name || "-";
     code.textContent = product.DefaultCode || "-";
@@ -640,9 +398,9 @@ function displayParentProduct(product) {
                 <tr>
                     <td>${product.Id}</td>
                     <td>
-                        <img src="${product.ImageUrl || "https://via.placeholder.com/60"}" 
+                        <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
                              class="product-image" 
-                             onerror="this.src='https://via.placeholder.com/60'"
+                             onerror="this.src='../../shared/assets/placeholder.png'"
                              alt="${product.Name}">
                     </td>
                     <td><strong>${product.Name || "-"}</strong></td>
@@ -690,9 +448,9 @@ function displayVariants(variants) {
                     <tr>
                         <td>${variant.Id}</td>
                         <td>
-                            <img src="${currentProduct.ImageUrl || "https://via.placeholder.com/60"}" 
+                            <img src="${currentProduct.ImageUrl || "../../shared/assets/placeholder.png"}" 
                                  class="product-image" 
-                                 onerror="this.src='https://via.placeholder.com/60'"
+                                 onerror="this.src='../../shared/assets/placeholder.png'"
                                  alt="${variant.NameTemplate}">
                         </td>
                         <td><strong>${variant.NameTemplate || "-"}</strong></td>
@@ -806,8 +564,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Load saved token
-    loadToken();
+    // Load saved token using TPOS_API
+    TPOS_API.loadToken();
 
     // AUTO-LOAD: Tự động load dữ liệu đã lưu (nếu có)
     setTimeout(() => {
@@ -831,7 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Inventory page initialized");
 
     // Check if token is saved
-    const savedToken = localStorage.getItem("tpos_bearer_token");
+    const savedToken = TPOS_API.getToken();
     if (savedToken) {
         console.log("Token loaded from localStorage");
     } else {

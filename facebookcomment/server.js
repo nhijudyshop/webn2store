@@ -525,17 +525,16 @@ app.get("/api/avatar/:psid", async (req, res) => {
 
 // Proxy endpoint for EventStream (SSE)
 app.get("/api/stream", async (req, res) => {
-    const { pageid, postId } = req.query;
+    const { pageid, postId, token } = req.query; // Get token from query parameter
 
-    if (!pageid || !postId) {
+    if (!pageid || !postId || !token) {
         return res.status(400).json({
-            error: "Missing required parameters: pageid and postId",
+            error: "Missing required parameters: pageid, postId, or token",
         });
     }
 
     try {
-        const authHeader = getAuthHeader(req);
-        const token = authHeader.replace("Bearer ", ""); // Extract token for URL param
+        const authHeader = `Bearer ${token}`; // Construct auth header from query token
 
         const url = `https://tomato.tpos.vn/api/facebook-graph/comment/stream?pageId=${pageid}&facebook_Type=Page&postId=${postId}&access_token=${token}`;
 
