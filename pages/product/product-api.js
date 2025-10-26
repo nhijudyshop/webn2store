@@ -2,9 +2,9 @@
 
 import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats, renderAllSavedProductsTable } from './product-display.js'; // Import renderAllSavedProductsTable
+import { displayProductInfo, displayParentProduct, displayVariants, updateStats, renderAllSavedProductsTable } from './product-display.js';
 import { showLoading, showEmptyState } from './product-utils.js';
-import { saveProductData, loadAllSavedProducts } from './product-storage.js'; // Import loadAllSavedProducts
+import { saveProductData, loadAllSavedProducts } from './product-storage.js';
 
 export async function searchProduct(event) {
     event.preventDefault();
@@ -30,8 +30,8 @@ export async function searchProduct(event) {
         displayVariants(detailData.ProductVariants || []);
         updateStats(detailData);
 
-        saveProductData(detailData); // Auto-save after successful search
-        renderAllSavedProductsTable(loadAllSavedProducts()); // Update the list of all saved products
+        await saveProductData(detailData); // Auto-save after successful search
+        renderAllSavedProductsTable(await loadAllSavedProducts()); // Update the list of all saved products
 
         window.showNotification("Tải dữ liệu thành công!", "success");
     } catch (error) {

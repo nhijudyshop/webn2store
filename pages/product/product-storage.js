@@ -1,12 +1,31 @@
 // pages/product/product-storage.js
 
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayParentProduct, displayVariants, updateStats, renderAllSavedProductsTable } from './product-display.js';
 import { showEmptyState } from './product-utils.js';
 
-const STORAGE_KEY = "tpos_saved_products_list";
+/**
+ * Saves the entire list of products to the server.
+ * @param {Array<Object>} products - The full array of products to save.
+ * @returns {Promise<boolean>} True if successful, false otherwise.
+ */
+async function saveAllProducts(products) {
+    try {
+        const response = await fetch('/api/inventory/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(products)
+        });
+        const result = await response.json();
+        return result.success;
+    } catch (error) {
+        console.error("❌ Error saving products to server:", error);
+        window.showNotification("Lỗi lưu sản phẩm vào server", "error");
+        return false;
+    }
+}
 
-export function saveProductData(product) {
+export async function saveProductData(product) {
     const dataToSave = {
         id: product.Id,
         timestamp: new Date().toISOString(),
@@ -16,7 +35,7 @@ export function saveProductData(product) {
         savedAt: new Date().toLocaleString("vi-VN"),
     };
 
-    let savedProducts = loadAllSavedProducts();
+    let savedProducts = await loadAllSavedProducts();
 
     const existingIndex = savedProducts.findIndex(
         (p) => p.productCode === product.DefaultCode,
@@ -24,48 +43,50 @@ export function saveProductData(product) {
 
     if (existingIndex >= 0) {
         savedProducts[existingIndex] = dataToSave;
-        console.log("🔄 Đã cập nhật sản phẩm:", product.DefaultCode);
+        console.log("🔄 Đã cập nhật sản phẩm trên server:", product.DefaultCode);
     } else {
         savedProducts.unshift(dataToSave);
-        console.log("✅ Đã thêm sản phẩm mới:", product.DefaultCode);
+        console.log("✅ Đã thêm sản phẩm mới vào server:", product.DefaultCode);
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedProducts));
-    // updateSavedDataList(); // This function is no longer needed for UI rendering
+    await saveAllProducts(savedProducts);
 }
 
-export function loadAllSavedProducts() {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (!savedData) {
-        return [];
-    }
-
+export async function loadAllSavedProducts() {
     try {
-        const data = JSON.parse(savedData);
-        return Array.isArray(data) ? data : [];
+        const response = await fetch('/api/inventory/products');
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data)) {
+            return result.data;
+        }
+        console.error("Lỗi khi load dữ liệu từ server:", result.error);
+        return [];
     } catch (error) {
         console.error("Lỗi khi load dữ liệu:", error);
         return [];
     }
 }
 
-export function loadSavedProduct(productCode) {
-    const savedProducts = loadAllSavedProducts();
+export async function loadSavedProduct(productCode) {
+    const savedProducts = await loadAllSavedProducts();
     return savedProducts.find((p) => p.productCode === productCode);
 }
 
-export function clearSavedData() {
-    if (!confirm("Bạn có chắc muốn xóa TẤT CẢ sản phẩm đã lưu?")) {
+export async function clearSavedData() {
+    if (!confirm("Bạn có chắc muốn xóa TẤT CẢ sản phẩm đã lưu trên server?")) {
         return;
     }
-    localStorage.removeItem(STORAGE_KEY);
-    // updateSavedDataList(); // This function is no longer needed for UI rendering
-    window.showNotification("Đã xóa tất cả dữ liệu đã lưu", "info");
-    console.log("🗑️ Đã xóa tất cả dữ liệu đã lưu");
+    const success = await saveAllProducts([]);
+    if (success) {
+        window.showNotification("Đã xóa tất cả dữ liệu đã lưu trên server", "info");
+        console.log("🗑️ Đã xóa tất cả dữ liệu đã lưu trên server");
+        // Re-render the table to show it's empty
+        renderAllSavedProductsTable([]);
+    }
 }
 
-export function exportToJSON() {
-    const savedProducts = loadAllSavedProducts();
+export async function exportToJSON() {
+    const savedProducts = await loadAllSavedProducts();
     if (savedProducts.length === 0) {
         window.showNotification("Không có dữ liệu để export", "error");
         return;
@@ -89,12 +110,12 @@ export function importFromJSON() {
     document.getElementById("dataFileInput").click();
 }
 
-export function handleDataFile(event) {
+export async function handleDataFile(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
         try {
             const data = JSON.parse(e.target.result);
             let productsToImport = [];
@@ -120,7 +141,7 @@ export function handleDataFile(event) {
                 return;
             }
 
-            let existingProducts = loadAllSavedProducts();
+            let existingProducts = await loadAllSavedProducts();
 
             productsToImport.forEach((newProduct) => {
                 if (newProduct.product && newProduct.productCode) {
@@ -135,10 +156,12 @@ export function handleDataFile(event) {
                 }
             });
 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(existingProducts));
-            // updateSavedDataList(); // This function is no longer needed for UI rendering
+            const success = await saveAllProducts(existingProducts);
+            if (success) {
+                renderAllSavedProductsTable(existingProducts);
+                window.showNotification(`Đã import và lưu ${importCount} sản phẩm!`, "success");
+            }
 
-            window.showNotification(`Đã import ${importCount} sản phẩm!`, "success");
         } catch (error) {
             window.showNotification("Lỗi khi đọc file: " + error.message, "error");
         }
@@ -148,55 +171,8 @@ export function handleDataFile(event) {
     event.target.value = "";
 }
 
-// This function is no longer used for UI rendering, but kept for potential future use or debugging.
-export function updateSavedDataList() {
-    const infoDiv = document.getElementById("savedDataInfo");
-    const savedDataWrapper = document.getElementById("savedDataWrapper"); 
-    if (!infoDiv || !savedDataWrapper) return;
-
-    const savedProducts = loadAllSavedProducts();
-
-    if (savedProducts.length === 0) {
-        savedDataWrapper.style.display = 'none'; 
-        infoDiv.innerHTML = `
-            <div class="saved-data-empty">
-                <i data-lucide="inbox"></i>
-                <span>Chưa có sản phẩm nào được lưu</span>
-            </div>
-        `; 
-        window.lucide.createIcons();
-        return;
-    }
-
-    savedDataWrapper.style.display = 'block'; 
-
-    infoDiv.innerHTML = `
-        <div class="saved-products-list">
-            ${savedProducts
-                .map(
-                    (data) => `
-                <div class="saved-product-item" data-code="${data.productCode}">
-                    <div class="saved-product-info" onclick="window.loadProductFromList('${data.productCode}')">
-                        <div class="saved-product-main">
-                            <i data-lucide="box"></i>
-                            <div>
-                                <div class="saved-product-name">${data.productName}</div>
-                                <div class="saved-product-code">${data.productCode}</div>
-                            </div>
-                        </div>
-                        <div class="saved-product-time">${data.savedAt}</div>
-                    </div>
-                </div>
-            `,
-                )
-                .join("")}
-        </div>
-    `;
-    window.lucide.createIcons();
-}
-
-export function loadProductFromList(productCode) {
-    const savedData = loadSavedProduct(productCode);
+export async function loadProductFromList(productCode) {
+    const savedData = await loadSavedProduct(productCode);
     if (!savedData) {
         window.showNotification("Không tìm thấy sản phẩm", "error");
         return;
@@ -212,20 +188,11 @@ export function loadProductFromList(productCode) {
 
     document.getElementById("productCode").value = savedData.productCode;
 
-    // No longer highlighting items in the removed 'saved-data-section'
-    // document.querySelectorAll(".saved-product-item").forEach((item) => {
-    //     item.classList.remove("active");
-    // });
-    // document
-    //     .querySelector(`.saved-product-item[data-code="${productCode}"]`)
-    //     ?.classList.add("active");
-
     window.showNotification(`Đã load sản phẩm ${productCode}`, "success");
 }
 
-export function autoLoadSavedData() {
-    const savedProducts = loadAllSavedProducts();
-    // updateSavedDataList(); // This function is no longer needed for UI rendering
+export async function autoLoadSavedData() {
+    const savedProducts = await loadAllSavedProducts();
 
     if (savedProducts.length === 0) {
         return;
@@ -242,15 +209,6 @@ export function autoLoadSavedData() {
     updateStats(latestProduct.product);
 
     document.getElementById("productCode").value = latestProduct.productCode;
-
-    // No longer highlighting items in the removed 'saved-data-section'
-    // setTimeout(() => {
-    //     document
-    //         .querySelector(
-    //             `.saved-product-item[data-code="${latestProduct.productCode}"]`,
-    //         )
-    //         ?.classList.add("active");
-    // }, 100);
 
     window.showNotification(
         `✅ Đã tự động tải sản phẩm gần nhất: ${latestProduct.productCode}`,

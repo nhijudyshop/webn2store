@@ -108,21 +108,19 @@ function updateSuggestions(event) {
 
 
 // ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     window.lucide.createIcons();
 
     loadToken();
-    loadProductSuggestions(); // Load suggestions into memory on page load
+    await loadProductSuggestions(); // Load suggestions into memory on page load
 
     const productCodeInput = document.getElementById('productCode');
     if (productCodeInput) {
         productCodeInput.addEventListener('input', updateSuggestions);
     }
 
-    setTimeout(() => {
-        autoLoadSavedData();
-        renderAllSavedProductsTable(loadAllSavedProducts()); // Render all saved products on load
-    }, 500);
+    await autoLoadSavedData();
+    renderAllSavedProductsTable(await loadAllSavedProducts()); // Render all saved products on load
 
     // Add CSS animations (if not already in common.css)
     const style = document.createElement("style");

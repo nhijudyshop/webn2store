@@ -6,6 +6,7 @@ const path = require("path");
 const settingsRoutes = require("./routes/settings-routes");
 const facebookProxyRoutes = require("./routes/facebook-proxy-routes");
 const productSuggestionsRoutes = require("./routes/product-suggestions-routes");
+const inventoryRoutes = require("./routes/inventory-routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use(express.static(projectRoot));
 app.use("/api", settingsRoutes);
 app.use("/api", facebookProxyRoutes);
 app.use("/api", productSuggestionsRoutes);
+app.use("/api", inventoryRoutes);
 
 // Redirect root to the main page for consistency
 app.get('/', (req, res) => {
