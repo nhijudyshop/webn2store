@@ -51,8 +51,8 @@ export function addProductRow() {
 
     newRow.innerHTML = `
         <td>${rowIndex}</td>
-        <td><input type="text" placeholder="Nhập tên sản phẩm"></td>
         <td><input type="text" placeholder="Mã SP" list="productSuggestionsModal" oninput="window.updateProductCodeSuggestions(event)"></td>
+        <td><input type="text" placeholder="Nhập tên sản phẩm"></td>
         <td><input type="number" value="1" style="width: 60px;" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0"></td>
