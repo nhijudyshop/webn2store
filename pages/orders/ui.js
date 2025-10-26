@@ -52,17 +52,19 @@ export function displayOrders(ordersToDisplay = orders) {
             <div class="price">${order.salePrice}</div>
         `;
         
-        const invoiceImageHtml = order.invoiceImageUrl
-            ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
-            : `<div class="image-placeholder">Chưa có hình</div>`;
-        
-        const invoiceValueHtml = `<div class="invoice-value">${order.invoice}</div>`;
+        const invoiceHtml = `
+            ${order.invoiceImageUrl
+                ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
+                : `<div class="image-placeholder">Chưa có hình</div>`
+            }
+            <div class="invoice-value">${order.invoice}</div>
+        `;
 
         return `
         <tr data-order-id="${order.id}">
             <td><div class="order-date"><i data-lucide="calendar"></i><div><div>${order.date}</div><div style="font-size: 12px; color: #64748b;">(${order.time})</div></div></div></td>
             <td class="align-left"><div class="supplier-info">${order.supplier}</div><div class="supplier-qty">Tổng SL: ${order.totalQty}</div></td>
-            <td><div class="invoice-info">${invoiceImageHtml}${invoiceValueHtml}</div></td>
+            <td><div class="price-cell">${invoiceHtml}</div></td>
             <td class="align-left"><div class="product-name">${order.productName}</div></td>
             <td><span class="product-code">${order.productCode}</span></td>
             <td><div class="variant">${order.variant}</div></td>
