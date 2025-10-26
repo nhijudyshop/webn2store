@@ -1,11 +1,12 @@
 // pages/orders/orders.js
 
-import { loadOrders, loadInventoryProducts } from './api.js';
+import { loadOrders, loadInventoryProducts, loadProductSuggestions } from './api.js';
 import { setupEventListeners } from './events.js';
 
 // ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     window.lucide.createIcons();
+    await loadProductSuggestions();
     loadOrders();
     loadInventoryProducts();
     setupEventListeners();

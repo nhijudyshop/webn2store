@@ -1,7 +1,20 @@
 // pages/orders/api.js
 
-import { setOrders, setInventoryProducts } from './state.js';
+import { setOrders, setInventoryProducts, setProductSuggestions } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
+
+export async function loadProductSuggestions() {
+    try {
+        const response = await fetch('/api/products/suggestions');
+        const result = await response.json();
+        if (result.success) {
+            setProductSuggestions(result.data);
+            console.log(`✅ Loaded ${result.data.length} product suggestions for order modal.`);
+        }
+    } catch (error) {
+        console.error('Error loading product suggestions:', error);
+    }
+}
 
 export async function loadInventoryProducts() {
     try {

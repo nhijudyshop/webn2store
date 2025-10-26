@@ -204,6 +204,7 @@
 
         <!-- Create Order Modal -->
         <div id="createOrderModal" class="modal-overlay" style="display: none;">
+            <datalist id="productSuggestionsModal"></datalist>
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Tạo đơn đặt hàng mới</h2>
@@ -290,11 +291,11 @@
                         </div>
                         <div class="summary-row">
                             <label>Giảm giá:</label>
-                            <input type="number" value="0" class="form-control">
+                            <input type="number" value="0" class="form-control" oninput="window.updateTotals()">
                         </div>
                         <div class="summary-row">
                             <label><i data-lucide="truck"></i> Thêm tiền ship</label>
-                            <input type="number" value="0" class="form-control">
+                            <input type="number" value="0" class="form-control" oninput="window.updateTotals()">
                         </div>
                         <div class="summary-row total">
                             <label>Thành tiền:</label>
