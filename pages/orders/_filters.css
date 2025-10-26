@@ -1,0 +1,135 @@
+/* Filters Section */
+.filters-section {
+    padding: 24px 0; /* Adjusted padding */
+    border-bottom: 1px solid #e2e8f0;
+    background: white; /* Inherits from main-content-area */
+}
+
+.date-filters {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.date-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date-input label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.date-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f1f5f9; /* Changed background */
+    border: none; /* Removed border */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.date-picker:hover {
+    border-color: #3b82f6;
+}
+
+.date-picker i {
+    color: #6b7280;
+    width: 16px;
+    height: 16px;
+}
+
+.date-picker button {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.quick-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quick-filter label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.quick-filter select {
+    padding: 8px 12px;
+    border: none; /* Removed border */
+    border-radius: 6px;
+    font-size: 14px;
+    background: #f1f5f9; /* Changed background */
+    cursor: pointer;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    width: 16px;
+    height: 16px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: none; /* Removed border */
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f1f5f9; /* Changed background */
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.status-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-filter i {
+    color: #6b7280;
+    width: 16px;
+    height: 16px;
+}
+
+.status-filter select {
+    padding: 8px 12px;
+    border: none; /* Removed border */
+    border-radius: 6px;
+    font-size: 14px;
+    background: #f1f5f9; /* Changed background */
+    cursor: pointer;
+}

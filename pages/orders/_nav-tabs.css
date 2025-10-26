@@ -1,0 +1,47 @@
+/* Navigation Tabs */
+.nav-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: none; /* Removed border-bottom */
+    background: #f8fafc; /* Added background */
+    padding: 10px; /* Added padding */
+    border-radius: 10px; /* Added border-radius */
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: none; /* Removed border-bottom */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px; /* Added border-radius */
+}
+
+.tab-btn:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.tab-btn.active {
+    color: #3b82f6;
+    border-bottom-color: none; /* Removed border-bottom-color */
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1); /* Added subtle shadow */
+}
+
+.badge {
+    background: #ef4444;
+    color: white;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 4px;
+}

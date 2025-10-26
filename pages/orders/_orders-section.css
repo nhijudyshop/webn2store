@@ -1,0 +1,58 @@
+/* Orders Section */
+.orders-section {
+    background: white; /* Inherits from main-content-area, but keep for clarity */
+    border-radius: 12px;
+    box-shadow: none; /* Removed shadow as it's on main-content-area */
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 24px 0; /* Adjusted padding */
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.section-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.section-title p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-export {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-export:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
