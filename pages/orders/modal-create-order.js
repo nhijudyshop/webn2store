@@ -102,14 +102,14 @@ export function addProductRow() {
     newRow.innerHTML = `
         <td></td>
         <td><input type="text" placeholder="Mã SP" list="productSuggestionsModal" oninput="window.updateProductCodeSuggestions(event)"></td>
-        <td><input type="text" placeholder="Nhập tên sản phẩm" class="tooltip-host" oninput="this.dataset.tooltip = this.value"></td>
+        <td><div class="tooltip-host" data-tooltip=""><input type="text" placeholder="Nhập tên sản phẩm" oninput="this.parentElement.dataset.tooltip = this.value"></div></td>
         <td><input type="number" value="1" style="width: 60px;" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0"></td>
         <td>0 ₫</td>
         <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
         <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
-        <td><select class="tooltip-host"><option>Chọn biến thể...</option></select></td>
+        <td><div class="tooltip-host" data-tooltip=""><select onchange="this.parentElement.dataset.tooltip = this.options[this.selectedIndex].text"><option>Chọn biến thể...</option></select></div></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
             <button class="btn-action delete" title="Xóa" onclick="window.deleteProductRow(event)"><i data-lucide="trash-2"></i></button>
@@ -198,10 +198,12 @@ export async function fetchProductAndPopulateRow(event) {
     const btn = event.currentTarget;
     const row = btn.closest('tr');
     const codeInput = row.querySelector('input[placeholder="Mã SP"]');
-    const nameInput = row.querySelector('input[placeholder="Nhập tên sản phẩm"]');
+    const nameInput = row.querySelector('td:nth-child(3) input');
+    const nameTooltipHost = nameInput.parentElement;
     const purchasePriceInput = row.querySelector('td:nth-child(5) input');
     const salePriceInput = row.querySelector('td:nth-child(6) input');
     const variantSelect = row.querySelector('td:nth-child(10) select');
+    const variantTooltipHost = variantSelect.parentElement;
     const imageDropzone = row.querySelector('td:nth-child(8) .image-dropzone');
 
     const productCode = codeInput.value.trim();
@@ -217,7 +219,7 @@ export async function fetchProductAndPopulateRow(event) {
         const product = await getProductByCode(productCode);
         
         nameInput.value = product.Name;
-        nameInput.dataset.tooltip = product.Name;
+        nameTooltipHost.dataset.tooltip = product.Name;
         purchasePriceInput.value = product.PurchasePrice || 0;
         salePriceInput.value = product.ListPrice || 0;
 
@@ -238,16 +240,16 @@ export async function fetchProductAndPopulateRow(event) {
 
             variantSelect.onchange = (e) => {
                 const selectedOption = e.target.options[e.target.selectedIndex];
-                variantSelect.dataset.tooltip = selectedOption.textContent;
+                variantTooltipHost.dataset.tooltip = selectedOption.textContent;
                 if (selectedOption.value) {
                     purchasePriceInput.value = selectedOption.dataset.purchasePrice;
                     salePriceInput.value = selectedOption.dataset.salePrice;
                     nameInput.value = selectedOption.textContent;
-                    nameInput.dataset.tooltip = selectedOption.textContent;
+                    nameTooltipHost.dataset.tooltip = selectedOption.textContent;
                     codeInput.value = selectedOption.value;
                 } else {
                     nameInput.value = product.Name;
-                    nameInput.dataset.tooltip = product.Name;
+                    nameTooltipHost.dataset.tooltip = product.Name;
                     purchasePriceInput.value = product.PurchasePrice || 0;
                     salePriceInput.value = product.ListPrice || 0;
                     codeInput.value = product.DefaultCode;
