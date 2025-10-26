@@ -20,9 +20,11 @@
         <div class="container">
             <div class="header">
                 <h1>📦 Quản Lý Kho Sản Phẩm</h1>
+            </div>
 
+            <div class="main-content-area">
                 <form class="search-form" onsubmit="searchProduct(event)">
-                    <div class="form-input-group">
+                    <div class="form-group search-input-group">
                         <label for="productCode"
                             >Mã sản phẩm (DefaultCode):</label
                         >
@@ -37,7 +39,6 @@
                         <i data-lucide="plus"></i>
                         Thêm
                     </button>
-                    <!-- Nút 'Xóa' đã được loại bỏ theo yêu cầu -->
                 </form>
 
                 <!-- Saved Data Management -->
@@ -110,119 +111,119 @@
                         <div class="stat-label">Tổng giá trị</div>
                     </div>
                 </div>
-            </div>
 
-            <div id="errorContainer"></div>
+                <div id="errorContainer"></div>
 
-            <!-- Product Info Card -->
-            <div class="product-info-card" id="productInfoCard">
-                <img
-                    id="productInfoImage"
-                    class="product-info-image"
-                    src=""
-                    alt="Product"
-                />
-                <div class="product-info-details">
-                    <div class="product-info-name" id="productInfoName"></div>
-                    <div class="product-code" id="productInfoCode"></div>
-                    <div class="product-info-meta">
-                        <div class="meta-item">
-                            <div class="meta-label">Giá bán</div>
-                            <div
-                                class="meta-value price-cell"
-                                id="productInfoListPrice"
-                            >
-                                -
+                <!-- Product Info Card -->
+                <div class="product-info-card" id="productInfoCard">
+                    <img
+                        id="productInfoImage"
+                        class="product-info-image"
+                        src=""
+                        alt="Product"
+                    />
+                    <div class="product-info-details">
+                        <div class="product-info-name" id="productInfoName"></div>
+                        <div class="product-code" id="productInfoCode"></div>
+                        <div class="product-info-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Giá bán</div>
+                                <div
+                                    class="meta-value price-cell"
+                                    id="productInfoListPrice"
+                                >
+                                    -
+                                </div>
                             </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Giá mua</div>
-                            <div
-                                class="meta-value"
-                                id="productInfoPurchasePrice"
-                            >
-                                -
+                            <div class="meta-item">
+                                <div class="meta-label">Giá mua</div>
+                                <div
+                                    class="meta-value"
+                                    id="productInfoPurchasePrice"
+                                >
+                                    -
+                                </div>
                             </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Số lượng thực tế</div>
-                            <div
-                                class="meta-value qty-available"
-                                id="productInfoQtyAvailable"
-                            >
-                                -
+                            <div class="meta-item">
+                                <div class="meta-label">Số lượng thực tế</div>
+                                <div
+                                    class="meta-value qty-available"
+                                    id="productInfoQtyAvailable"
+                                >
+                                    -
+                                </div>
                             </div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Số lượng dự báo</div>
-                            <div
-                                class="meta-value qty-forecast"
-                                id="productInfoVirtualAvailable"
-                            >
-                                -
+                            <div class="meta-item">
+                                <div class="meta-label">Số lượng dự báo</div>
+                                <div
+                                    class="meta-value qty-forecast"
+                                    id="productInfoVirtualAvailable"
+                                >
+                                    -
+                                </div>
                             </div>
-                        </div>
-                        <div class="meta-item">
-                            <div
-                                class="meta-value"
-                                id="productInfoVariantCount"
-                            >
-                                -
+                            <div class="meta-item">
+                                <div
+                                    class="meta-value"
+                                    id="productInfoVariantCount"
+                                >
+                                    -
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('parent')">
-                    <i data-lucide="box"></i>
-                    Thông Tin Chính
-                </button>
-                <button class="tab-btn" onclick="switchTab('variants')">
-                    <i data-lucide="layers"></i>
-                    Các Biến Thể
-                </button>
-            </div>
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('parent')">
+                        <i data-lucide="box"></i>
+                        Thông Tin Chính
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('variants')">
+                        <i data-lucide="layers"></i>
+                        Các Biến Thể
+                    </button>
+                </div>
 
-            <!-- Parent Product Tab -->
-            <div class="tab-content active" id="parentTab">
-                <div class="product-table">
-                    <div class="table-header">
-                        <div class="table-title">
-                            <i data-lucide="box"></i>
-                            Thông Tin Sản Phẩm
+                <!-- Parent Product Tab -->
+                <div class="tab-content active" id="parentTab">
+                    <div class="product-table">
+                        <div class="table-header">
+                            <div class="table-title">
+                                <i data-lucide="box"></i>
+                                Thông Tin Sản Phẩm
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-wrapper" id="parentTableWrapper">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📦</div>
-                            <p>
-                                Nhập mã sản phẩm và nhấn "Thêm" để xem thông
-                                tin
-                            </p>
+                        <div class="table-wrapper" id="parentTableWrapper">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📦</div>
+                                <p>
+                                    Nhập mã sản phẩm và nhấn "Thêm" để xem thông
+                                    tin
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Variants Tab -->
-            <div class="tab-content" id="variantsTab">
-                <div class="product-table">
-                    <div class="table-header">
-                        <div class="table-title">
-                            <i data-lucide="layers"></i>
-                            Danh Sách Các Biến Thể
+                <!-- Variants Tab -->
+                <div class="tab-content" id="variantsTab">
+                    <div class="product-table">
+                        <div class="table-header">
+                            <div class="table-title">
+                                <i data-lucide="layers"></i>
+                                Danh Sách Các Biến Thể
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-wrapper" id="variantsTableWrapper">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📦</div>
-                            <p>
-                                Nhập mã sản phẩm và nhấn "Thêm" để xem danh
-                                sách biến thể
-                            </p>
+                        <div class="table-wrapper" id="variantsTableWrapper">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📦</div>
+                                <p>
+                                    Nhập mã sản phẩm và nhấn "Thêm" để xem danh
+                                    sách biến thể
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
