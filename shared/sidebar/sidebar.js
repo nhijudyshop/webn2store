@@ -59,8 +59,8 @@ function calculateRelativePath(targetPath) {
         commonIndex++;
     }
     
-    // Calculate how many levels to go up
-    const levelsUp = currentParts.length - 1 - commonIndex;
+    // Calculate how many levels to go up, ensuring it's not negative
+    const levelsUp = Math.max(0, currentParts.length - 1 - commonIndex);
     
     // Build relative path
     let relativePath = '';
@@ -159,7 +159,8 @@ async function initSidebar() {
     try {
         // Calculate path to sidebar.html based on current location
         const currentPath = window.location.pathname;
-        const depth = currentPath.split('/').filter(p => p).length - 1;
+        // Ensure depth is non-negative
+        const depth = Math.max(0, currentPath.split('/').filter(p => p).length - 1);
         const prefix = '../'.repeat(depth);
         const sidebarPath = `${prefix}shared/sidebar/sidebar.html`;
         
