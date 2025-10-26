@@ -3,54 +3,7 @@ let orders = [];
 let currentTab = 'orders';
 
 // ===== SIDEBAR FUNCTIONS =====
-function toggleSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const body = document.body;
-    const toggle = document.getElementById("sidebarToggle");
-
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-    body.classList.toggle("sidebar-open");
-    toggle.classList.toggle("active");
-}
-
-function closeSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const body = document.body;
-    const toggle = document.getElementById("sidebarToggle");
-
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-    body.classList.remove("sidebar-open");
-    toggle.classList.remove("active");
-}
-
-// ===== NOTIFICATION FUNCTION =====
-function showNotification(message, type = "info") {
-    const notification = document.createElement("div");
-    notification.className = `notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === "error" ? "#ef4444" : type === "success" ? "#10b981" : "#3b82f6"};
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.style.animation = "slideOut 0.3s ease";
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
+// Note: The functions toggleSidebar, closeSidebar, and showNotification are now globally available from sidebar.js
 
 // ===== TAB FUNCTIONS =====
 function switchTab(tab) {
@@ -190,8 +143,8 @@ function displayOrders() {
             <td>
                 <div class="invoice-info">
                     <div class="invoice-images">
-                        <img src="https://via.placeholder.com/24" class="invoice-image" alt="Product">
-                        <img src="https://via.placeholder.com/24" class="invoice-image" alt="Product">
+                        <img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">
+                        <img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">
                     </div>
                     <div class="invoice-value">${order.invoice}</div>
                 </div>
@@ -216,7 +169,7 @@ function displayOrders() {
             </td>
             <td>
                 <div class="price-cell">
-                    <img src="https://via.placeholder.com/20" class="price-image" alt="Product">
+                    <img src="../../shared/assets/placeholder.png" class="price-image" alt="Product">
                     <div class="price">${order.salePrice}</div>
                 </div>
             </td>
@@ -406,8 +359,8 @@ function displayFilteredOrders(filteredOrders) {
             <td>
                 <div class="invoice-info">
                     <div class="invoice-images">
-                        <img src="https://via.placeholder.com/24" class="invoice-image" alt="Product">
-                        <img src="https://via.placeholder.com/24" class="invoice-image" alt="Product">
+                        <img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">
+                        <img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">
                     </div>
                     <div class="invoice-value">${order.invoice}</div>
                 </div>
@@ -432,7 +385,7 @@ function displayFilteredOrders(filteredOrders) {
             </td>
             <td>
                 <div class="price-cell">
-                    <img src="https://via.placeholder.com/20" class="price-image" alt="Product">
+                    <img src="../../shared/assets/placeholder.png" class="price-image" alt="Product">
                     <div class="price">${order.salePrice}</div>
                 </div>
             </td>
