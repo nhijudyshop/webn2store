@@ -56,30 +56,18 @@ export function populatePageSelector(appState) {
 }
 
 /**
- * Loads videos/posts for a selected Facebook page from the TPOS API.
- * @param {Event} event - The event object (optional, to prevent default form submission).
+ * Loads videos/posts for a given pageId and limit, then populates the selector.
+ * This function can be called directly with pageId and limit.
+ * @param {string} pageId - The ID of the Facebook page.
+ * @param {number} limit - The number of videos to fetch.
  * @param {object} appState - The global application state object.
  */
-export async function loadVideos(event, appState) {
-    if (event) {
-        event.preventDefault(); // Prevent default form submission if any
-    }
-
-    const pageSelector = document.getElementById("selectedPageId");
-    const limitInput = document.getElementById("videoLimit");
+export async function loadVideosForPageId(pageId, limit, appState) {
     const videoSelector = document.getElementById("selectedVideoId");
 
-    if (!pageSelector || !limitInput || !videoSelector) {
-        console.error("Missing one or more required DOM elements for loading videos.");
-        window.showNotification("Lỗi: Không tìm thấy các phần tử UI cần thiết.", "error");
-        return;
-    }
-
-    const pageId = pageSelector.value;
-    const limit = limitInput.value;
-
-    if (!pageId) {
-        window.showNotification("Vui lòng chọn page trước!", "error");
+    if (!videoSelector) {
+        console.error("Missing selectedVideoId DOM element for loading videos.");
+        window.showNotification("Lỗi: Không tìm thấy phần tử UI chọn video.", "error");
         return;
     }
 
@@ -106,6 +94,35 @@ export async function loadVideos(event, appState) {
         videoSelector.innerHTML = `<option value="">Lỗi tải videos</option>`;
         window.showNotification(`Lỗi tải videos: ${error.message}`, "error");
     }
+}
+
+/**
+ * Event handler to load videos/posts for a selected Facebook page from the TPOS API.
+ * This function is called from the UI button click.
+ * @param {Event} event - The event object.
+ * @param {object} appState - The global application state object.
+ */
+export async function loadVideos(event, appState) {
+    event.preventDefault(); // Prevent default form submission
+
+    const pageSelector = document.getElementById("selectedPageId");
+    const limitInput = document.getElementById("videoLimit");
+
+    if (!pageSelector || !limitInput) {
+        console.error("Missing one or more required DOM elements for loading videos (pageSelector or limitInput).");
+        window.showNotification("Lỗi: Không tìm thấy các phần tử UI cần thiết.", "error");
+        return;
+    }
+
+    const pageId = pageSelector.value;
+    const limit = limitInput.value;
+
+    if (!pageId) {
+        window.showNotification("Vui lòng chọn page trước!", "error");
+        return;
+    }
+
+    await loadVideosForPageId(pageId, limit, appState);
 }
 
 /**

@@ -1,5 +1,7 @@
 // facebookcomment/utils/session-manager.js
 
+import { loadVideosForPageId } from './facebook-ui-manager.js'; // Import the new function
+
 /**
  * Loads the last saved session from the server.
  * @param {object} appState - The global application state object.
@@ -85,10 +87,9 @@ export async function clearLastSession(appState) {
 /**
  * Restores the UI state based on the last saved session.
  * @param {object} appState - The global application state object.
- * @param {function} loadVideosForPage - Function to load videos for a selected page.
  * @param {function} startFetching - Function to start fetching comments.
  */
-export async function restoreLastSession(appState, loadVideosForPage, startFetching) {
+export async function restoreLastSession(appState, startFetching) {
     const session = await loadLastSession(appState);
     
     if (!session || !session.pageId || !session.videoId) {
@@ -103,8 +104,10 @@ export async function restoreLastSession(appState, loadVideosForPage, startFetch
     if (pageSelector && session.pageId) {
         pageSelector.value = session.pageId;
         
-        // Load videos for this page
-        await loadVideosForPage(session.pageId, appState);
+        // Load videos for this page using the new function
+        // Need to get the limit from the UI or a default value
+        const videoLimit = document.getElementById("videoLimit")?.value || 10;
+        await loadVideosForPageId(session.pageId, videoLimit, appState);
         
         // Set video
         const videoSelector = document.getElementById("selectedVideoId");

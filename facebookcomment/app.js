@@ -28,12 +28,12 @@ const appState = {
 
 // ===== IMPORT MODULES =====
 import { loadLastSession, saveLastSession, clearLastSession, restoreLastSession } from './utils/session-manager.js';
-import { loadAccounts, loadVideos, populateVideoSelector } from './utils/facebook-ui-manager.js';
-import { renderAllComments } from './utils/comment-display.js'; // renderAllComments is from comment-display.js
+import { loadAccounts, loadVideos, populateVideoSelector, loadVideosForPageId } from './utils/facebook-ui-manager.js'; // Added loadVideosForPageId
+import { renderAllComments } from './utils/comment-display.js';
 import { fetchOrders, refreshOrders } from './utils/order-data-manager.js';
 import { loadPrintersForPrinting, loadTemplateSettingsForPrinting, handleCreateOrder, handleViewInfo } from './utils/printer-template-manager.js';
-import { processComments, connectStream, fetchComments, renderPaginationControls, goToPage, filterAndDisplayComments } from './utils/search-pagination-manager.js'; // filterAndDisplayComments is from search-pagination-manager.js
-import { initializeSettingsPage } from './utils/settings-page-initializer.js'; // New import for settings page
+import { processComments, connectStream, fetchComments, renderPaginationControls, goToPage, filterAndDisplayComments } from './utils/search-pagination-manager.js';
+import { initializeSettingsPage } from './utils/settings-page-initializer.js';
 
 // ===== GLOBAL EXPORTS (for HTML onclicks and shared access) =====
 window.clearLastSession = () => clearLastSession(appState);
@@ -83,7 +83,7 @@ async function initializeIndexPage() {
     window.TPOS_API.loadToken(); // Load token from localStorage
 
     await loadAccounts(appState); // Load accounts
-    await restoreLastSession(appState, loadVideos, startFetching); // Restore last session
+    await restoreLastSession(appState, startFetching); // Removed loadVideos argument
 
     loadPrintersForPrinting(appState); // Load printers for printing
     loadTemplateSettingsForPrinting(appState); // Load template settings for printing
@@ -227,7 +227,7 @@ function clearComments(appState) {
     const searchBox = document.getElementById("searchBox");
     if (searchBox) searchBox.value = "";
     const clearSearch = document.getElementById("clearSearch");
-    if (clearSearch) clearSearch.classList.remove("show");
+    if (clearSearch) clear.classList.remove("show");
     const searchStats = document.getElementById("searchStats");
     if (searchStats) searchStats.classList.remove("show");
 
