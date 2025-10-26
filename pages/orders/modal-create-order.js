@@ -136,6 +136,7 @@ export async function fetchProductAndPopulateRow(event) {
     const purchasePriceInput = row.querySelector('td:nth-child(5) input');
     const salePriceInput = row.querySelector('td:nth-child(6) input');
     const variantSelect = row.querySelector('td:nth-child(10) select');
+    const imageDropzone = row.querySelector('td:nth-child(8) .image-dropzone');
 
     const productCode = codeInput.value.trim();
     if (!productCode) {
@@ -152,6 +153,10 @@ export async function fetchProductAndPopulateRow(event) {
         nameInput.value = product.Name;
         purchasePriceInput.value = product.PurchasePrice || 0;
         salePriceInput.value = product.ListPrice || 0;
+
+        if (imageDropzone && product.ImageUrl) {
+            imageDropzone.innerHTML = `<img src="${product.ImageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="${product.Name}" onerror="this.parentElement.innerHTML = '<i data-lucide=\\'image-off\\'></i>'; window.lucide.createIcons();">`;
+        }
 
         if (variantSelect && product.ProductVariants && product.ProductVariants.length > 0) {
             variantSelect.innerHTML = '<option value="">Chọn biến thể...</option>';
