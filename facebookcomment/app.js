@@ -242,13 +242,17 @@ async function restoreLastSession() {
     if (session.autoStart && session.pageId && session.videoId) {
         console.log('▶️ Auto-starting session...');
         showNotification('🔄 Đang khôi phục session và tự động bắt đầu...', 'info');
+
+        // Immediately disable autoStart in the session file to prevent loops on page refresh
+        lastSession.autoStart = false;
+        await saveLastSession(); // Await to ensure the file is updated before proceeding
+
+        // Start fetching after a short delay
         setTimeout(() => {
             startFetching();
-        }, 2000); // Give more time for UI to settle
-    }
-    
-    if (session.pageId && session.videoId) {
-        showNotification('✅ Đã khôi phục session trước đó - sẵn sàng tự động bắt đầu!', 'success');
+        }, 1000);
+    } else if (session.pageId && session.videoId) {
+        showNotification('✅ Đã khôi phục session trước đó. Nhấn "Bắt Đầu" để chạy.', 'success');
     } else {
         showNotification('✅ Đã khôi phục một phần session trước đó', 'info');
     }
