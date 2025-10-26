@@ -167,10 +167,7 @@ export function updateSavedDataList() {
 
     infoDiv.innerHTML = `
         <div class="saved-products-list">
-            <div class="saved-products-count">
-                <i data-lucide="database"></i>
-                <span>Đã lưu ${savedProducts.length} sản phẩm</span>
-            </div>
+            <!-- Phần hiển thị tổng số sản phẩm đã lưu đã được loại bỏ -->
             ${savedProducts
                 .map(
                     (data) => `
