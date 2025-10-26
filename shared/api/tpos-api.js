@@ -292,9 +292,14 @@ async function tposRequest(endpoint, options = {}) {
     const { method = "GET", body = null, token = null } = options;
 
     const headers = getTPOSHeaders(token);
-    const url = endpoint.startsWith("http")
-        ? endpoint
-        : `${TPOS_CONFIG.baseUrl}/${endpoint}`;
+    let url;
+    if (endpoint.startsWith("http")) {
+        url = endpoint;
+    } else {
+        // Remove leading slash from endpoint if it exists, to avoid double slashes
+        const cleanedEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+        url = `${TPOS_CONFIG.baseUrl}/${cleanedEndpoint}`;
+    }
 
     console.log(`🌐 TPOS API Request: ${method} ${url}`);
 
