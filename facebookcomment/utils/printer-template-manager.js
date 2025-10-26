@@ -1,6 +1,6 @@
 // facebookcomment/utils/printer-template-manager.js
 
-import { generateBillHTML } from './settings/template-management.js'; // Import generateBillHTML
+import { generateBillHTML } from '../../shared/utils/printer-template-generator.js'; // Import generateBillHTML from shared utils
 import { tposRequest } from '../../shared/api/tpos-api.js'; // Import tposRequest directly
 
 /**

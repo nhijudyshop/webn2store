@@ -1,10 +1,11 @@
 // facebookcomment/utils/settings-page-initializer.js
 
 import { loadPrinters, addPrinter, deletePrinter, setActivePrinter, testPrinterConnection } from './settings/printer-management.js';
-import { loadTemplateSettings, populateTemplateForm, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate, generateBillHTML } from './settings/template-management.js';
+import { loadTemplateSettings, populateTemplateForm, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate } from './settings/template-management.js';
 import { checkServerStatus } from './settings/server-status.js';
 import { toggleTokenVisibilitySettings, saveTokenSettings } from './settings/token-management.js';
 import { loadToken, saveToken } from '../../shared/api/tpos-api.js'; // Import loadToken and saveToken directly
+import { generateBillHTML } from '../../shared/utils/printer-template-generator.js'; // Import generateBillHTML from shared utils
 
 /**
  * Initiates a test print using the active printer and current template settings.
