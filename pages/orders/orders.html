@@ -251,7 +251,7 @@
                     <div class="product-list-section">
                         <div class="product-list-header">
                             <h3>Danh sách sản phẩm</h3>
-                            <button class="btn-select-from-inventory">
+                            <button class="btn-select-from-inventory" onclick="openSelectProductModal()">
                                 <i data-lucide="archive"></i> Chọn từ Kho SP
                             </button>
                         </div>
@@ -315,6 +315,52 @@
                     <button class="btn-secondary" onclick="closeCreateOrderModal()">Hủy</button>
                     <button class="btn-tertiary">Lưu nháp</button>
                     <button class="btn-primary">Tạo đơn hàng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Select Product Modal -->
+        <div id="selectProductModal" class="modal-overlay" style="display: none; z-index: 2001;">
+            <div class="modal-content" style="max-width: 1000px; height: 85vh;">
+                <div class="modal-header">
+                    <h2>Chọn sản phẩm từ kho</h2>
+                    <button class="btn-close" onclick="closeSelectProductModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-box" style="margin-bottom: 16px;">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Tìm kiếm theo mã SP, tên, variant (tối thiểu 2 ký tự)..." id="productSearchInput">
+                    </div>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Hiển thị 50 sản phẩm mới nhất</p>
+                    <div class="product-table-wrapper" style="max-height: calc(85vh - 250px); overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Mã SP</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Variant</th>
+                                    <th>Giá mua</th>
+                                    <th>Giá bán</th>
+                                    <th><input type="checkbox"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryProductList">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px;">
+                                        <div class="loading-spinner" style="margin: 0 auto 10px;"></div>
+                                        Đang tải sản phẩm...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeSelectProductModal()">Hủy</button>
+                    <button class="btn-primary">Thêm sản phẩm</button>
                 </div>
             </div>
         </div>

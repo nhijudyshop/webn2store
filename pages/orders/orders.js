@@ -488,11 +488,33 @@ function updateTotals() {
     document.getElementById("modalTotalQuantity").textContent = document.getElementById("modalProductList").children.length;
 }
 
+function openSelectProductModal() {
+    const modal = document.getElementById("selectProductModal");
+    if (modal) {
+        modal.style.display = "flex";
+        lucide.createIcons();
+        // Placeholder for loading products
+        setTimeout(() => {
+            const tbody = document.getElementById("inventoryProductList");
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">Chức năng đang được phát triển.</td></tr>`;
+        }, 1000);
+    }
+}
+
+function closeSelectProductModal() {
+    const modal = document.getElementById("selectProductModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
 // Expose functions to global scope for onclick handlers
 window.createOrder = createOrder;
 window.closeCreateOrderModal = closeCreateOrderModal;
 window.clearOrderForm = clearOrderForm;
 window.addProductRow = addProductRow;
+window.openSelectProductModal = openSelectProductModal;
+window.closeSelectProductModal = closeSelectProductModal;
 
 
 // ===== INIT =====
