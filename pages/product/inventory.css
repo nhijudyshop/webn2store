@@ -1,5 +1,19 @@
 /* ===== INVENTORY PAGE STYLES ===== */
 
+/* Header */
+.inventory-header {
+    padding: 24px 0;
+    margin-bottom: 32px;
+}
+
+.inventory-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-align: left; /* Align header text to left */
+}
+
 /* Main Content Area - The white card */
 .main-content-area {
     background: white;
@@ -68,6 +82,38 @@
 
 .btn-search:active {
     transform: translateY(0);
+}
+
+/* Stats Bar */
+.stats-bar {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px; /* Added margin-bottom */
+    padding: 15px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
 }
 
 /* Tabs */
