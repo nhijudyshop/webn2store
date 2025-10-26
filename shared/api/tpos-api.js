@@ -293,9 +293,16 @@ async function tposRequest(endpoint, options = {}) {
 
     const headers = getTPOSHeaders(token);
     let url;
+
     if (endpoint.startsWith("http")) {
+        // Absolute URL provided, use as is
         url = endpoint;
+    } else if (endpoint.startsWith("/api/")) {
+        // Local proxy endpoint, use relative path to current origin
+        // The server.js is configured to handle /api routes directly.
+        url = endpoint; 
     } else {
+        // TPOS OData API endpoint, prepend TPOS_CONFIG.baseUrl
         // Remove leading slash from endpoint if it exists, to avoid double slashes
         const cleanedEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
         url = `${TPOS_CONFIG.baseUrl}/${cleanedEndpoint}`;
