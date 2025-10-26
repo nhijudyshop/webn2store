@@ -23,9 +23,9 @@ app.use("/api", settingsRoutes);
 app.use("/api", facebookProxyRoutes);
 app.use("/api", productSuggestionsRoutes);
 
-// Default route to serve the main page
+// Redirect root to the main page for consistency
 app.get('/', (req, res) => {
-    res.sendFile(path.join(projectRoot, 'facebookcomment', 'index.html'));
+    res.redirect('/facebookcomment/index.html');
 });
 
 // Start the server

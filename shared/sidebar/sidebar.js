@@ -40,66 +40,24 @@ function closeSidebar() {
 }
 
 /**
- * Calculate relative path from current file to target file
- * @param {string} targetPath - Target file path from project root
- * @returns {string} Relative path
- */
-function calculateRelativePath(targetPath) {
-    const currentPath = window.location.pathname;
-    
-    // Get current directory depth
-    const currentParts = currentPath.split('/').filter(p => p);
-    const targetParts = targetPath.split('/').filter(p => p);
-    
-    // Find common base
-    let commonIndex = 0;
-    while (commonIndex < currentParts.length - 1 && 
-           commonIndex < targetParts.length &&
-           currentParts[commonIndex] === targetParts[commonIndex]) {
-        commonIndex++;
-    }
-    
-    // Calculate how many levels to go up, ensuring it's not negative
-    const levelsUp = Math.max(0, currentParts.length - 1 - commonIndex);
-    
-    // Build relative path
-    let relativePath = '';
-    for (let i = 0; i < levelsUp; i++) {
-        relativePath += '../';
-    }
-    
-    // Add remaining target path
-    relativePath += targetParts.slice(commonIndex).join('/');
-    
-    return relativePath || targetPath;
-}
-
-/**
  * Highlight active menu item based on current page
  */
 function highlightActiveMenuItem() {
     const currentPath = window.location.pathname;
-    const navItems = document.querySelectorAll(".nav-item[data-page]");
+    const navItems = document.querySelectorAll(".nav-item[data-path]");
 
     navItems.forEach((item) => {
         const targetPath = item.getAttribute("data-path");
         
-        // Check if current page matches this nav item
-        if (targetPath && currentPath.includes(targetPath.replace(/\\/g, '/'))) {
+        // Check if current page path is exactly the target path
+        if (targetPath && currentPath === targetPath) {
             item.classList.add("active");
-        } else if (targetPath) {
-            // Also check by filename
-            const currentFile = currentPath.split('/').pop();
-            const targetFile = targetPath.split('/').pop();
-            if (currentFile === targetFile) {
-                item.classList.add("active");
-            }
         }
     });
 }
 
 /**
- * Setup navigation links with correct relative paths
+ * Setup navigation links with correct absolute paths
  */
 function setupNavigationLinks() {
     const navItems = document.querySelectorAll(".nav-item[data-path]");
@@ -107,8 +65,7 @@ function setupNavigationLinks() {
     navItems.forEach((item) => {
         const targetPath = item.getAttribute("data-path");
         if (targetPath) {
-            const relativePath = calculateRelativePath(targetPath);
-            item.setAttribute("href", relativePath);
+            item.setAttribute("href", targetPath); // Use the absolute path directly
         }
     });
 }
@@ -157,12 +114,8 @@ function showNotification(message, type = "info") {
  */
 async function initSidebar() {
     try {
-        // Calculate path to sidebar.html based on current location
-        const currentPath = window.location.pathname;
-        // Ensure depth is non-negative
-        const depth = Math.max(0, currentPath.split('/').filter(p => p).length - 1);
-        const prefix = '../'.repeat(depth);
-        const sidebarPath = `${prefix}shared/sidebar/sidebar.html`;
+        // Always fetch sidebar from the absolute path
+        const sidebarPath = '/shared/sidebar/sidebar.html';
         
         // Load sidebar HTML
         const response = await fetch(sidebarPath);
