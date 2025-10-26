@@ -5,6 +5,34 @@ import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { productSuggestions } from './state.js';
 import { formatCurrency } from './ui.js';
 
+/**
+ * Handles pasting an image from the clipboard into a dropzone.
+ * @param {ClipboardEvent} event - The paste event.
+ */
+function handlePaste(event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    const dropzone = event.currentTarget;
+
+    for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                
+                dropzone.innerHTML = '';
+                dropzone.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+            
+            event.preventDefault();
+            break; 
+        }
+    }
+}
+
 export function createOrder() {
     const modal = document.getElementById("createOrderModal");
     if (modal) {
@@ -14,6 +42,14 @@ export function createOrder() {
         if (document.getElementById("modalProductList").children.length === 0) {
             addProductRow();
         }
+
+        // Add paste listener to the main invoice dropzone
+        const mainDropzone = modal.querySelector('.order-info-grid .image-dropzone');
+        if (mainDropzone && !mainDropzone.dataset.pasteListenerAdded) {
+            mainDropzone.addEventListener('paste', handlePaste);
+            mainDropzone.dataset.pasteListenerAdded = 'true';
+        }
+
         window.lucide.createIcons();
     }
 }
@@ -67,6 +103,11 @@ export function addProductRow() {
         </td>
     `;
     tbody.appendChild(newRow);
+
+    // Add paste listeners to the new dropzones
+    const dropzones = newRow.querySelectorAll('.image-dropzone');
+    dropzones.forEach(dz => dz.addEventListener('paste', handlePaste));
+
     window.lucide.createIcons();
     updateTotals();
 }
@@ -155,7 +196,7 @@ export async function fetchProductAndPopulateRow(event) {
         salePriceInput.value = product.ListPrice || 0;
 
         if (imageDropzone && product.ImageUrl) {
-            imageDropzone.innerHTML = `<img src="${product.ImageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="${product.Name}" onerror="this.parentElement.innerHTML = '<i data-lucide=\\'image-off\\'></i>'; window.lucide.createIcons();">`;
+            imageDropzone.innerHTML = `<img src="${product.ImageUrl}" alt="${product.Name}" onerror="this.parentElement.innerHTML = '<i data-lucide=\\'image-off\\'></i>'; window.lucide.createIcons();">`;
         }
 
         if (variantSelect && product.ProductVariants && product.ProductVariants.length > 0) {
