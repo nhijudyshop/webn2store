@@ -2,7 +2,8 @@
 
 import { appState } from './app-state.js';
 import { loadAccounts, loadVideos } from './facebook-ui-manager.js';
-import { filterAndDisplayComments, renderAllComments, renderPaginationControls, goToPage } from './search-pagination-manager.js';
+import { filterAndDisplayComments, renderPaginationControls, goToPage } from './search-pagination-manager.js';
+import { renderAllComments } from './comment-display.js'; // Corrected import for renderAllComments
 import { restoreLastSession, clearLastSession } from './session-manager.js';
 import { refreshOrders } from './order-data-manager.js';
 import { handleCreateOrder, handleViewInfo } from './printer-template-manager.js';
