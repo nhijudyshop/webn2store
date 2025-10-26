@@ -5,11 +5,20 @@ import { displayOrders, updateStats } from './ui.js';
 
 export async function loadInventoryProducts() {
     try {
-        const response = await fetch('/api/products/suggestions');
+        // Thay đổi endpoint để lấy dữ liệu từ kho sản phẩm đã lưu
+        const response = await fetch('/api/inventory/products');
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
-            setInventoryProducts(result.data);
-            console.log(`✅ Loaded ${result.data.length} inventory products.`);
+            // Chuyển đổi dữ liệu để phù hợp với cấu trúc hiển thị
+            const mappedProducts = result.data.map(item => ({
+                code: item.product.DefaultCode,
+                name: item.product.Name,
+                imageUrl: item.product.ImageUrl,
+                purchasePrice: item.product.PurchasePrice,
+                salePrice: item.product.ListPrice,
+            }));
+            setInventoryProducts(mappedProducts);
+            console.log(`✅ Loaded ${mappedProducts.length} inventory products from server.`);
         } else {
             console.error('❌ Failed to load inventory products.');
             const tbody = document.getElementById("inventoryProductList");

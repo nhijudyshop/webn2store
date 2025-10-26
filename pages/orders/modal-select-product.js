@@ -1,12 +1,14 @@
 // pages/orders/modal-select-product.js
 
 import { inventoryProducts } from './state.js';
+import { formatCurrency } from './ui.js';
 
 export function openSelectProductModal() {
     const modal = document.getElementById("selectProductModal");
     if (modal) {
         modal.style.display = "flex";
         window.lucide.createIcons();
+        // Hiển thị 50 sản phẩm đầu tiên khi mở modal
         displayInventoryProducts(inventoryProducts.slice(0, 50));
     }
 }
@@ -27,12 +29,12 @@ export function displayInventoryProducts(productsToDisplay) {
 
     const html = productsToDisplay.map(product => `
         <tr>
-            <td><img src="../../shared/assets/placeholder.png" class="price-image" alt="Product"></td>
+            <td><img src="${product.imageUrl || '../../shared/assets/placeholder.png'}" class="price-image" alt="Product" onerror="this.src='../../shared/assets/placeholder.png'"></td>
             <td><span class="product-code">${product.code}</span></td>
             <td>${product.name}</td>
             <td>-</td>
-            <td>0 ₫</td>
-            <td>0 ₫</td>
+            <td>${formatCurrency(product.purchasePrice)}</td>
+            <td>${formatCurrency(product.salePrice)}</td>
             <td><input type="checkbox" class="checkbox" data-product-code="${product.code}"></td>
         </tr>
     `).join('');
