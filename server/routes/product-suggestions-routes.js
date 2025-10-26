@@ -1,7 +1,6 @@
 const express = require("express");
 const fs = require("fs");
-const XLSX = require("xlsx");
-const { PRODUCT_EXCEL_FILE } = require("../config");
+const { PRODUCT_SUGGESTIONS_FILE } = require("../config");
 
 const router = express.Router();
 
@@ -9,37 +8,30 @@ const router = express.Router();
 let productSuggestionsCache = null;
 
 /**
- * Reads product data from the Excel file and caches it.
+ * Reads product data from the JSON file and caches it.
  * @returns {Array<Object>} An array of product suggestions.
  */
-function loadProductSuggestionsFromExcel() {
+function loadProductSuggestionsFromJSON() {
     if (productSuggestionsCache) {
         console.log("💾 Returning cached product suggestions.");
         return productSuggestionsCache;
     }
 
-    console.log("📊 Loading product suggestions from Excel...");
+    console.log("📊 Loading product suggestions from JSON...");
     try {
-        if (!fs.existsSync(PRODUCT_EXCEL_FILE)) {
-            console.warn(`⚠️ Product Excel file not found: ${PRODUCT_EXCEL_FILE}`);
+        if (!fs.existsSync(PRODUCT_SUGGESTIONS_FILE)) {
+            console.warn(`⚠️ Product suggestions file not found: ${PRODUCT_SUGGESTIONS_FILE}`);
             return [];
         }
 
-        const workbook = XLSX.readFile(PRODUCT_EXCEL_FILE);
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet);
-
-        const suggestions = json.map(row => ({
-            code: row.DefaultCode ? String(row.DefaultCode).toUpperCase() : '',
-            name: row.Name || ''
-        })).filter(item => item.code); // Filter out items without a code
+        const data = fs.readFileSync(PRODUCT_SUGGESTIONS_FILE, "utf8");
+        const suggestions = JSON.parse(data);
 
         productSuggestionsCache = suggestions;
-        console.log(`✅ Loaded ${suggestions.length} product suggestions from Excel.`);
+        console.log(`✅ Loaded ${suggestions.length} product suggestions from JSON.`);
         return suggestions;
     } catch (error) {
-        console.error("❌ Error loading product suggestions from Excel:", error);
+        console.error("❌ Error loading product suggestions from JSON:", error);
         return [];
     }
 }
@@ -47,7 +39,7 @@ function loadProductSuggestionsFromExcel() {
 // Endpoint for product suggestions
 router.get("/products/suggestions", (req, res) => {
     try {
-        const suggestions = loadProductSuggestionsFromExcel();
+        const suggestions = loadProductSuggestionsFromJSON();
         res.json({ success: true, data: suggestions });
     } catch (error) {
         console.error("❌ Error serving product suggestions:", error);
