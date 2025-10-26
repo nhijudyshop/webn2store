@@ -36,12 +36,12 @@ export function displayOrders(ordersToDisplay = orders) {
     }
 
     const html = ordersToDisplay.map(order => {
-        const purchasePriceImageHtml = order.purchasePriceImageUrl
-            ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image">`
+        const purchasePriceHtml = order.purchasePriceImageUrl
+            ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image"><div class="price">${order.purchasePrice}</div>`
             : `<div class="image-placeholder">Chưa có hình</div>`;
 
-        const salePriceImageHtml = order.productImageUrl
-            ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image">`
+        const salePriceHtml = order.productImageUrl
+            ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image"><div class="price">${order.salePrice}</div>`
             : `<div class="image-placeholder">Chưa có hình</div>`;
         
         const invoiceImageHtml = order.invoiceImageUrl
@@ -59,8 +59,8 @@ export function displayOrders(ordersToDisplay = orders) {
             <td><span class="product-code">${order.productCode}</span></td>
             <td><div class="variant">${order.variant}</div></td>
             <td><div class="quantity">${order.quantity}</div></td>
-            <td><div class="price-cell">${purchasePriceImageHtml}<div class="price">${order.purchasePrice}</div></div></td>
-            <td><div class="price-cell">${salePriceImageHtml}<div class="price">${order.salePrice}</div></div></td>
+            <td><div class="price-cell">${purchasePriceHtml}</div></td>
+            <td><div class="price-cell">${salePriceHtml}</div></td>
             <td class="align-left"><div style="color: #64748b; font-size: 14px;">${order.note || '-'}</div></td>
             <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
             <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
