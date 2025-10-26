@@ -38,11 +38,42 @@ function clearData() {
     window.showNotification("Đã xóa dữ liệu", "info");
 }
 
+/**
+ * Loads product suggestions from the server and populates the datalist.
+ */
+async function loadProductSuggestions() {
+    try {
+        const response = await fetch('/api/products/suggestions');
+        const result = await response.json();
+
+        if (result.success && Array.isArray(result.data)) {
+            const datalist = document.getElementById('productSuggestions');
+            if (datalist) {
+                datalist.innerHTML = ''; // Clear existing options
+                result.data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.code;
+                    option.textContent = `${item.code} - ${item.name}`;
+                    datalist.appendChild(option);
+                });
+                console.log(`✅ Loaded ${result.data.length} product suggestions.`);
+            }
+        } else {
+            console.error('❌ Failed to load product suggestions:', result.error);
+            window.showNotification('Lỗi tải gợi ý sản phẩm', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error fetching product suggestions:', error);
+        window.showNotification('Lỗi kết nối để tải gợi ý sản phẩm', 'error');
+    }
+}
+
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
     window.lucide.createIcons();
 
     loadToken();
+    loadProductSuggestions(); // Load suggestions on page load
 
     setTimeout(() => {
         autoLoadSavedData();

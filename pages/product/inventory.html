@@ -35,7 +35,9 @@
                             placeholder="Nhập mã sản phẩm (VD: N1191)"
                             required
                             oninput="this.value = this.value.toUpperCase()"
+                            list="productSuggestions"
                         />
+                        <datalist id="productSuggestions"></datalist>
                     </div>
                     <button type="submit" class="btn-search">
                         <i data-lucide="plus"></i>
