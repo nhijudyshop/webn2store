@@ -172,19 +172,21 @@
 .image-dropzone {
     border: 2px dashed #cbd5e1;
     border-radius: 8px;
-    padding: 16px;
+    padding: 4px;
     text-align: center;
     color: #94a3b8;
     font-size: 14px;
     background: white;
-    height: 100%;
+    height: 80px;
+    width: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    overflow: hidden; /* Added for zoom effect */
+    overflow: hidden;
+    flex-shrink: 0;
 }
 .image-dropzone:hover {
     border-color: #3b82f6;
@@ -197,11 +199,11 @@
     height: 100%;
     object-fit: cover;
     border-radius: 4px;
-    transition: transform 0.3s ease; /* Added for zoom effect */
+    transition: transform 0.3s ease;
 }
 
 .image-dropzone:hover img {
-    transform: scale(1.1); /* Added for zoom effect */
+    transform: scale(1.1);
 }
 
 /* Product List */
@@ -275,11 +277,11 @@
 }
 
 .product-table-wrapper .image-dropzone {
-    height: 40px;
+    height: 80px;
+    width: 80px;
     padding: 4px;
     font-size: 12px;
-    min-width: 60px;
-    overflow: hidden; /* Added for zoom effect */
+    overflow: hidden;
 }
 
 .product-table-wrapper .action-cell {

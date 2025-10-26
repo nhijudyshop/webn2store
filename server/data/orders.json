@@ -18,5 +18,25 @@
     "status": "waiting",
     "productImageUrl": "https://img1.tpos.vn/OgYrwuxTmj7smpKGa609J64bYtwrkNgIhjfZQwjkJuM/rs::::1/g:no/plain/tpos/tomato.tpos.vn/2025/10/06/product_107787_82b91388-23cb-482f-8a1b-053ab20f9b46.png",
     "purchasePriceImageUrl": null
+  },
+  {
+    "id": 1761508553974.5237,
+    "date": "26/10/2025",
+    "time": "02:55",
+    "rawDate": "2025-10-25T19:55:00.000Z",
+    "supplier": "NCC",
+    "totalQty": 1,
+    "invoice": "2 ₫",
+    "invoiceImageUrl": null,
+    "productName": "1910 A23 SET 2DQĐ BÈO - CHÓ SỌC HỒNG",
+    "productCode": "N490",
+    "variant": "1910 A23 SET 2DQĐ BÈO - CHÓ SỌC HỒNG",
+    "quantity": 1,
+    "purchasePrice": "140.000 ₫",
+    "salePrice": "210.000 ₫",
+    "note": "",
+    "status": "waiting",
+    "productImageUrl": "https://img1.tpos.vn/uaojfhkgx7M4tChqvvnwv-Xeu8qZ-_59QX3c1m_NIV8/rs::::1/g:no/plain/tpos/tomato.tpos.vn/2025/10/19/product_108510_537a9fcb-29cc-405e-b5ab-a1a820876544.png",
+    "purchasePriceImageUrl": null
   }
 ]
