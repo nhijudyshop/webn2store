@@ -23,6 +23,7 @@ const appState = {
     currentPage: 1,
     commentsPerPage: 50,
     totalCommentsCount: 0,
+    serverOnline: false, // Added for settings page
 };
 
 // ===== IMPORT MODULES =====
@@ -32,6 +33,7 @@ import { renderAllComments, filterAndDisplayComments } from './utils/comment-dis
 import { fetchOrders, refreshOrders } from './utils/order-data-manager.js';
 import { loadPrintersForPrinting, loadTemplateSettingsForPrinting, handleCreateOrder, handleViewInfo } from './utils/printer-template-manager.js';
 import { processComments, connectStream, fetchComments, renderPaginationControls, goToPage } from './utils/search-pagination-manager.js';
+import { initializeSettingsPage } from './utils/settings-page-initializer.js'; // New import for settings page
 
 // ===== GLOBAL EXPORTS (for HTML onclicks and shared access) =====
 window.clearLastSession = () => clearLastSession(appState);
@@ -257,8 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
         initializeIndexPage();
     } else if (document.querySelector(".settings-container")) {
         // This is settings.html, import and initialize its specific manager
-        import('./utils/settings-page-manager.js').then(module => {
-            module.initializeSettingsPage(appState);
-        });
+        initializeSettingsPage(appState);
     }
 });
