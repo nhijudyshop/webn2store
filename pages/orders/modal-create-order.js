@@ -102,7 +102,7 @@ export function addProductRow() {
     newRow.innerHTML = `
         <td></td>
         <td><input type="text" placeholder="Mã SP" list="productSuggestionsModal" oninput="window.updateProductCodeSuggestions(event)"></td>
-        <td><input type="text" placeholder="Nhập tên sản phẩm"></td>
+        <td><input type="text" placeholder="Nhập tên sản phẩm" oninput="this.title = this.value"></td>
         <td><input type="number" value="1" style="width: 60px;" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0" oninput="window.updateTotals()"></td>
         <td><input type="number" value="0"></td>
@@ -217,6 +217,7 @@ export async function fetchProductAndPopulateRow(event) {
         const product = await getProductByCode(productCode);
         
         nameInput.value = product.Name;
+        nameInput.title = product.Name;
         purchasePriceInput.value = product.PurchasePrice || 0;
         salePriceInput.value = product.ListPrice || 0;
 
@@ -230,6 +231,7 @@ export async function fetchProductAndPopulateRow(event) {
                 const option = document.createElement('option');
                 option.value = variant.DefaultCode;
                 option.textContent = variant.Name;
+                option.title = variant.Name;
                 option.dataset.purchasePrice = variant.StandardPrice || product.PurchasePrice || 0;
                 option.dataset.salePrice = variant.PriceVariant || product.ListPrice || 0;
                 variantSelect.appendChild(option);
@@ -237,13 +239,16 @@ export async function fetchProductAndPopulateRow(event) {
 
             variantSelect.onchange = (e) => {
                 const selectedOption = e.target.options[e.target.selectedIndex];
+                variantSelect.title = selectedOption.textContent;
                 if (selectedOption.value) {
                     purchasePriceInput.value = selectedOption.dataset.purchasePrice;
                     salePriceInput.value = selectedOption.dataset.salePrice;
                     nameInput.value = selectedOption.textContent;
+                    nameInput.title = selectedOption.textContent;
                     codeInput.value = selectedOption.value;
                 } else {
                     nameInput.value = product.Name;
+                    nameInput.title = product.Name;
                     purchasePriceInput.value = product.PurchasePrice || 0;
                     salePriceInput.value = product.ListPrice || 0;
                     codeInput.value = product.DefaultCode;
