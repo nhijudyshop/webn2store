@@ -75,6 +75,27 @@ if (!fs.existsSync(LAST_SESSION_FILE)) {
     console.log("📄 Created last-session.json");
 }
 
+// Helper function to get Authorization header from client request
+function getAuthHeader(req) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new Error("Authorization header with Bearer token is required.");
+    }
+    return authHeader;
+}
+
+// Generate GUID
+function generateGuid() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+            var r = (Math.random() * 16) | 0,
+                v = c == "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        },
+    );
+}
+
 // ===== SETTINGS ENDPOINTS =====
 
 // Get printers
@@ -150,6 +171,7 @@ app.post("/api/settings/last-session", (req, res) => {
         console.error("❌ Error saving last session:", error);
         res.status(500).json({ success: false, error: error.message });
     }
+    
 });
 
 // Delete last session
@@ -169,21 +191,11 @@ app.delete("/api/settings/last-session", (req, res) => {
     }
 });
 
-// Generate GUID
-function generateGuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
-}
 
 // Proxy endpoint for getting Facebook accounts/pages
 app.get("/api/accounts", async (req, res) => {
     try {
+        const authHeader = getAuthHeader(req);
         const url = `https://tomato.tpos.vn/odata/CRMTeam/ODataService.GetAllFacebook?$expand=Childs`;
 
         console.log(`📡 Fetching accounts: ${url}`);
@@ -191,8 +203,7 @@ app.get("/api/accounts", async (req, res) => {
         const response = await axios.get(url, {
             headers: {
                 accept: "application/json, text/plain, */*",
-                authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6Ijc3MTY0ZWIyLWUwZTUtNDBkZS04OTE5LWU4YjBkNjBkYjQ0OCIsImlhdCI6IjE3NjEyMTQwNjIiLCJuYmYiOjE3NjEyMTQwNjIsImV4cCI6MTc2MjUxMDA2MiwiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.YXH6yydrdR5goQ-jD7P-h1hN3cNA0tgy7VHOFwxGe7I",
+                authorization: authHeader,
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
                 "content-type": "application/json;charset=UTF-8",
@@ -207,6 +218,10 @@ app.get("/api/accounts", async (req, res) => {
         res.json(response.data);
     } catch (error) {
         console.error("❌ Error fetching accounts:", error.message);
+
+        if (error.message.includes("Authorization header")) {
+            return res.status(401).json({ error: error.message });
+        }
 
         if (error.response) {
             res.status(error.response.status).json({
@@ -224,6 +239,7 @@ app.get("/api/accounts", async (req, res) => {
 // Proxy endpoint for getting videos from a page
 app.get("/api/videos", async (req, res) => {
     try {
+        const authHeader = getAuthHeader(req);
         const { pageid, limit = 10 } = req.query;
 
         if (!pageid) {
@@ -239,8 +255,7 @@ app.get("/api/videos", async (req, res) => {
         const response = await axios.get(url, {
             headers: {
                 accept: "application/json, text/plain, */*",
-                authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6Ijc3MTY0ZWIyLWUwZTUtNDBkZS04OTE5LWU4YjBkNjBkYjQ0OCIsImlhdCI6IjE3NjEyMTQwNjIiLCJuYmYiOjE3NjEyMTQwNjIsImV4cCI6MTc2MjUxMDA2MiwiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.YXH6yydrdR5goQ-jD7P-h1hN3cNA0tgy7VHOFwxGe7I",
+                authorization: authHeader,
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
                 "content-type": "application/json;charset=UTF-8",
@@ -265,6 +280,10 @@ app.get("/api/videos", async (req, res) => {
     } catch (error) {
         console.error("❌ Error fetching videos:", error.message);
 
+        if (error.message.includes("Authorization header")) {
+            return res.status(401).json({ error: error.message });
+        }
+
         if (error.response) {
             res.status(error.response.status).json({
                 error: error.message,
@@ -281,6 +300,7 @@ app.get("/api/videos", async (req, res) => {
 // Proxy endpoint for regular polling
 app.get("/api/comments", async (req, res) => {
     try {
+        const authHeader = getAuthHeader(req);
         const { pageid, postId } = req.query;
 
         if (!pageid || !postId) {
@@ -296,8 +316,7 @@ app.get("/api/comments", async (req, res) => {
         const response = await axios.get(url, {
             headers: {
                 accept: "application/json, text/plain, */*",
-                authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6Ijc3MTY0ZWIyLWUwZTUtNDBkZS04OTE5LWU4YjBkNjBkYjQ0OCIsImlhdCI6IjE3NjEyMTQwNjIiLCJuYmYiOjE3NjEyMTQwNjIsImV4cCI6MTc2MjUxMDA2MiwiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.YXH6yydrdR5goQ-jD7P-h1hN3cNA0tgy7VHOFwxGe7I",
+                authorization: authHeader,
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
                 "content-type": "application/json;charset=UTF-8",
@@ -322,6 +341,10 @@ app.get("/api/comments", async (req, res) => {
     } catch (error) {
         console.error("❌ Error:", error.message);
 
+        if (error.message.includes("Authorization header")) {
+            return res.status(401).json({ error: error.message });
+        }
+
         if (error.response) {
             // API returned error
             res.status(error.response.status).json({
@@ -345,6 +368,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 // Optimized with caching to prevent spam requests
 app.get("/api/orders-detail", async (req, res) => {
     try {
+        const authHeader = getAuthHeader(req);
         const { postId, top = 500, forceRefresh = false } = req.query;
 
         if (!postId) {
@@ -382,8 +406,7 @@ app.get("/api/orders-detail", async (req, res) => {
         const response = await axios.get(url, {
             headers: {
                 accept: "application/json, text/plain, */*",
-                authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6Ijc3MTY0ZWIyLWUwZTUtNDBkZS04OTE5LWU4YjBkNjBkYjQ0OCIsImlhdCI6IjE3NjEyMTQwNjIiLCJuYmYiOjE3NjEyMTQwNjIsImV4cCI6MTc2MjUxMDA2MiwiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.YXH6yydrdR5goQ-jD7P-h1hN3cNA0tgy7VHOFwxGe7I",
+                authorization: authHeader,
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
                 "content-type": "application/json;charset=UTF-8",
@@ -411,6 +434,10 @@ app.get("/api/orders-detail", async (req, res) => {
         });
     } catch (error) {
         console.error("❌ Error fetching detailed orders:", error.message);
+
+        if (error.message.includes("Authorization header")) {
+            return res.status(401).json({ error: error.message });
+        }
 
         if (error.response) {
             res.status(error.response.status).json({
@@ -506,13 +533,14 @@ app.get("/api/stream", async (req, res) => {
         });
     }
 
-    const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6Ijc3MTY0ZWIyLWUwZTUtNDBkZS04OTE5LWU4YjBkNjBkYjQ0OCIsImlhdCI6IjE3NjEyMTQwNjIiLCJuYmYiOjE3NjEyMTQwNjIsImV4cCI6MTc2MjUxMDA2MiwiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.YXH6yydrdR5goQ-jD7P-h1hN3cNA0tgy7VHOFwxGe7I";
-    const url = `https://tomato.tpos.vn/api/facebook-graph/comment/stream?pageId=${pageid}&facebook_Type=Page&postId=${postId}&access_token=${token}`;
-
-    console.log(`🌊 Streaming: ${url}`);
-
     try {
+        const authHeader = getAuthHeader(req);
+        const token = authHeader.replace("Bearer ", ""); // Extract token for URL param
+
+        const url = `https://tomato.tpos.vn/api/facebook-graph/comment/stream?pageId=${pageid}&facebook_Type=Page&postId=${postId}&access_token=${token}`;
+
+        console.log(`🌊 Streaming: ${url}`);
+
         // Set SSE headers
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
@@ -522,6 +550,7 @@ app.get("/api/stream", async (req, res) => {
             responseType: "stream",
             headers: {
                 accept: "text/event-stream",
+                authorization: authHeader, // Use full auth header for stream
                 "accept-encoding": "gzip, deflate, br",
                 "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
                 origin: "https://tomato.tpos.vn",
@@ -548,7 +577,11 @@ app.get("/api/stream", async (req, res) => {
         });
     } catch (error) {
         console.error("❌ Stream Error:", error.message);
-        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        if (error.message.includes("Authorization header")) {
+            res.status(401).write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        } else {
+            res.status(500).write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        }
         res.end();
     }
 });
