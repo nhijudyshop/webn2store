@@ -9,7 +9,6 @@ let eventSource = null;
 let knownCommentIds = new Set();
 let isFirstLoad = true;
 let connectionMode = "stream";
-let sidebarOpen = false;
 
 // Orders mapping
 let ordersMap = new Map();
@@ -53,73 +52,12 @@ let lastSession = {
     autoStart: false
 };
 
-// ===== SIDEBAR FUNCTIONS =====
-function toggleSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const toggleBtn = document.getElementById("sidebarToggle");
-
-    sidebarOpen = !sidebarOpen;
-
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("show");
-    toggleBtn.classList.toggle("open");
-    document.body.classList.toggle("sidebar-open");
-}
-
-function closeSidebar() {
-    const sidebar = document.querySelector(".sidebar");
-    const overlay = document.querySelector(".sidebar-overlay");
-    const toggleBtn = document.getElementById("sidebarToggle");
-
-    sidebarOpen = false;
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-    toggleBtn.classList.remove("open");
-    document.body.classList.remove("sidebar-open");
-}
-
-function showNotification(message, type = "info") {
-    const notification = document.createElement("div");
-    notification.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: ${type === "info" ? "#2196f3" : type === "success" ? "#4caf50" : "#f44336"};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        z-index: 1002;
-        font-weight: 500;
-        animation: slideInRight 0.3s ease;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.style.animation = "slideOutRight 0.3s ease";
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// Add animation styles
-const animationStyles = document.createElement("style");
-animationStyles.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(animationStyles);
+// ===== SIDEBAR FUNCTIONS (Now handled by shared/sidebar/sidebar.js) =====
+// Note: The functions toggleSidebar, closeSidebar, and showNotification are now globally available from sidebar.js
 
 // Close sidebar on escape key
 document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && sidebarOpen) {
+    if (e.key === "Escape") { 
         closeSidebar();
     }
 });
@@ -511,7 +449,8 @@ async function loadAccounts() {
 
         populatePageSelector(accountsData);
         console.log(`✅ Loaded ${accountsData.length} accounts`);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error loading accounts:", error);
         selector.innerHTML = '<option value="">Lỗi tải pages</option>';
     }
