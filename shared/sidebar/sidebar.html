@@ -1,0 +1,62 @@
+<!-- ===== SIDEBAR COMPONENT ===== -->
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle">
+    <i data-lucide="menu" class="menu-icon"></i>
+    <i data-lucide="x" class="close-icon"></i>
+</button>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-title">
+            <i data-lucide="facebook"></i>
+            FB Manager
+        </div>
+        <div class="sidebar-subtitle">Quản lý Facebook</div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Chính</div>
+            <a href="#" class="nav-item" data-page="comments" data-path="facebookcomment/index.html">
+                <i data-lucide="message-circle"></i>
+                <span>Comments Viewer</span>
+            </a>
+            <a href="#" class="nav-item" data-page="inventory" data-path="pages/product/inventory.html">
+                <i data-lucide="package"></i>
+                <span>Kho Sản Phẩm</span>
+            </a>
+            <a href="#" class="nav-item" data-page="orders" data-path="pages/orders/orders.html">
+                <i data-lucide="shopping-cart"></i>
+                <span>Quản Lý Đặt Hàng</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Công cụ</div>
+            <a href="#" class="nav-item" data-page="settings" data-path="facebookcomment/settings.html">
+                <i data-lucide="settings"></i>
+                <span>Cài đặt</span>
+            </a>
+            <div class="nav-item" onclick="showNotification('Đang phát triển', 'info')">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Thống kê</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Hỗ trợ</div>
+            <div class="nav-item" onclick="showNotification('Liên hệ: support@example.com', 'info')">
+                <i data-lucide="help-circle"></i>
+                <span>Trợ giúp</span>
+            </div>
+            <div class="nav-item" onclick="showNotification('Version 2.2.0', 'info')">
+                <i data-lucide="info"></i>
+                <span>Thông tin</span>
+            </div>
+        </div>
+    </nav>
+</div>

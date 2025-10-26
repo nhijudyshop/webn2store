@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cài đặt - FB Manager</title>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS -->
+    <!-- Shared Common CSS -->
+    <link rel="stylesheet" href="../shared/styles/common.css" />
+    
+    <!-- Page-specific CSS -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <!-- Sidebar sẽ tự động load bởi sidebar.js -->
+
+    <div class="container settings-container">
+        <div class="header">
+            <h1>⚙️ Cài đặt</h1>
+            <div class="tabs-nav">
+                <button class="tab-button active" data-tab="printers">
+                    <i data-lucide="printer"></i> Máy in
+                </button>
+                <button class="tab-button" data-tab="template">
+                    <i data-lucide="file-text"></i> Template In
+                </button>
+                <button class="tab-button" data-tab="general" onclick="showNotification('Đang phát triển', 'info')">
+                    <i data-lucide="settings-2"></i> Chung
+                </button>
+            </div>
+        </div>
+
+        <!-- Printers Tab -->
+        <div class="tab-content active" id="printers">
+            <!-- Server Status -->
+            <div class="content-section">
+                <div class="flex items-center justify-between mb-4">
+                    <h2>🌐 Trạng thái Server</h2>
+                    <div id="serverStatus" class="server-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Đang kiểm tra...</span>
+                    </div>
+                </div>
+                <div class="server-info">
+                    <p><strong>Bridge URL:</strong> <code id="bridgeUrl">http://localhost:3001</code></p>
+                    <p><strong>Chế độ:</strong> Full Width & Bold (80mm)</p>
+                    <p class="text-sm text-gray-600 mt-2">
+                        💡 Đảm bảo server đang chạy: <code>node server.js</code>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Add Printer Form -->
+            <div class="content-section">
+                <h2>➕ Thêm máy in mới</h2>
+                <form id="addPrinterForm" class="printer-form">
+                    <div class="form-group">
+                        <label for="printerName">Tên máy in:</label>
+                        <input type="text" id="printerName" placeholder="Ví dụ: Máy in kho A" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="printerIp">IP Address:</label>
+                        <input type="text" id="printerIp" placeholder="192.168.1.100" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="printerPort">Port:</label>
+                        <input type="number" id="printerPort" placeholder="9100" value="9100" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="printerBridge">Bridge URL:</label>
+                        <input type="text" id="printerBridge" placeholder="http://localhost:3001" value="http://localhost:3001" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="plus"></i> Thêm máy in
+                    </button>
+                </form>
+            </div>
+
+            <!-- Printer List -->
+            <div class="content-section">
+                <h2>🖨️ Danh sách máy in</h2>
+                <div id="printerList" class="printer-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🖨️</div>
+                        <p>Chưa có máy in nào được thêm.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Print Section -->
+            <div class="content-section">
+                <h2>🧪 Test In Bill</h2>
+                <div class="test-print-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="testSessionIndex">Session Index:</label>
+                            <input type="text" id="testSessionIndex" value="001" />
+                        </div>
+                        <div class="form-group">
+                            <label for="testPhone">Số điện thoại:</label>
+                            <input type="text" id="testPhone" value="0901234567" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="testCustomerName">Tên khách hàng:</label>
+                            <input type="text" id="testCustomerName" value="Nguyễn Văn A" />
+                        </div>
+                        <div class="form-group">
+                            <label for="testProductCode">Mã sản phẩm:</label>
+                            <input type="text" id="testProductCode" value="SP001" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="testProductName">Tên sản phẩm:</label>
+                        <input type="text" id="testProductName" value="Cà phê sữa đá" />
+                    </div>
+                    <div class="form-group">
+                        <label for="testComment">Ghi chú:</label>
+                        <input type="text" id="testComment" value="Ít đường" />
+                    </div>
+                    <button onclick="testPrint()" id="testPrintBtn" class="btn btn-primary btn-large">
+                        <i data-lucide="printer"></i> Test In Bill
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Tab -->
+        <div class="tab-content" id="template">
+            <!-- Format Settings -->
+            <div class="content-section">
+                <h2>⚙️ Tùy chỉnh Format</h2>
+                <div class="template-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="templateWidth">
+                                <i data-lucide="maximize-2"></i> Width (px)
+                            </label>
+                            <select id="templateWidth">
+                                <option value="1024">1024px (72mm)</option>
+                                <option value="1152" selected>1152px (80mm)</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="templateHeight">
+                                <i data-lucide="move-vertical"></i> Height
+                            </label>
+                            <select id="templateHeight">
+                                <option value="auto" selected>Auto</option>
+                                <option value="550">550</option>
+                                <option value="600">600</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="templateThreshold">
+                                <i data-lucide="circle"></i> Threshold
+                            </label>
+                            <select id="templateThreshold">
+                                <option value="85">85</option>
+                                <option value="90">90</option>
+                                <option value="95" selected>95 - Đậm ⭐</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="templateScale">
+                                <i data-lucide="zoom-in"></i> Scale
+                            </label>
+                            <select id="templateScale">
+                                <option value="1">1x</option>
+                                <option value="2" selected>2x ⭐</option>
+                                <option value="3">3x</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Font Sizes -->
+            <div class="content-section">
+                <h2>🔤 Font Sizes</h2>
+                <div class="template-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fontSession">Session (#001)</label>
+                            <input type="number" id="fontSession" value="72" min="20" max="120" />
+                        </div>
+                        <div class="form-group">
+                            <label for="fontPhone">Phone</label>
+                            <input type="number" id="fontPhone" value="52" min="10" max="80" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fontCustomer">Customer Name</label>
+                            <input type="number" id="fontCustomer" value="52" min="10" max="80" />
+                        </div>
+                        <div class="form-group">
+                            <label for="fontProduct">Product</label>
+                            <input type="number" id="fontProduct" value="36" min="10" max="80" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fontComment">Comment</label>
+                            <input type="number" id="fontComment" value="32" min="10" max="80" />
+                        </div>
+                        <div class="form-group">
+                            <label for="fontTime">Time</label>
+                            <input type="number" id="fontTime" value="28" min="10" max="60" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alignment -->
+            <div class="content-section">
+                <h2>📍 Căn chỉnh</h2>
+                <div class="alignment-buttons">
+                    <button class="align-btn" data-align="left" onclick="setAlignment('left')">
+                        <i data-lucide="align-left"></i> Trái
+                    </button>
+                    <button class="align-btn active" data-align="center" onclick="setAlignment('center')">
+                        <i data-lucide="align-center"></i> Giữa
+                    </button>
+                    <button class="align-btn" data-align="right" onclick="setAlignment('right')">
+                        <i data-lucide="align-right"></i> Phải
+                    </button>
+                </div>
+            </div>
+
+            <!-- Font Style -->
+            <div class="content-section">
+                <h2>✏️ Kiểu chữ</h2>
+                <div class="font-style-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="fontBold" checked />
+                        <span>In đậm (Bold)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="fontItalic" />
+                        <span>In nghiêng (Italic)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Spacing -->
+            <div class="content-section">
+                <h2>📏 Khoảng cách</h2>
+                <div class="template-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="templatePadding">Padding (px)</label>
+                            <input type="number" id="templatePadding" value="20" min="0" max="50" />
+                        </div>
+                        <div class="form-group">
+                            <label for="templateLineSpacing">Line Spacing</label>
+                            <input type="number" id="templateLineSpacing" value="12" min="0" max="30" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save & Preview -->
+            <div class="content-section">
+                <div class="action-buttons">
+                    <button onclick="saveTemplateSettings()" class="btn btn-primary btn-large">
+                        <i data-lucide="save"></i> Lưu cài đặt
+                    </button>
+                    <button onclick="resetTemplateSettings()" class="btn btn-secondary btn-large">
+                        <i data-lucide="rotate-ccw"></i> Đặt lại mặc định
+                    </button>
+                    <button onclick="previewTemplate()" class="btn btn-info btn-large">
+                        <i data-lucide="eye"></i> Xem trước
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- General Tab -->
+        <div class="tab-content" id="general">
+            <div class="empty-state">
+                <div class="empty-state-icon">🚧</div>
+                <p>Tính năng này đang được phát triển.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Shared Sidebar JS -->
+    <script src="../shared/sidebar/sidebar.js"></script>
+    
+    <!-- Page JS -->
+    <script src="app.js"></script>
+</body>
+</html>

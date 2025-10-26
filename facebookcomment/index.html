@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facebook Comments Viewer - Real-time</title>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Shared Common CSS -->
+    <link rel="stylesheet" href="../shared/styles/common.css" />
+    
+    <!-- Page-specific CSS -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <!-- Sidebar sẽ tự động load bởi sidebar.js -->
+
+    <div class="container">
+        <div class="header">
+            <h1>💬 Facebook Comments - Real-time Viewer</h1>
+
+            <form id="videoLoadForm" onsubmit="return false;">
+                <div class="controls">
+                    <div class="form-group">
+                        <label for="selectedPageId">Chọn Page:</label>
+                        <select id="selectedPageId">
+                            <option value="">Đang tải danh sách pages...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoLimit">Số video:</label>
+                        <input type="number" id="videoLimit" value="10" min="1" max="50" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn btn-primary" onclick="loadVideos(event)">
+                            🎥 Tải Video
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="controls" style="margin-top: 15px">
+                <div class="form-group" style="grid-column: 1 / -1">
+                    <label for="selectedVideoId">Chọn Video/Post:</label>
+                    <select id="selectedVideoId">
+                        <option value="">Chọn page và nhấn "Tải Video" trước...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="form-group">
+                    <label for="connectionMode">Chế độ kết nối:</label>
+                    <select id="connectionMode">
+                        <option value="stream">🌊 EventStream (Real-time, khuyên dùng)</option>
+                        <option value="polling">🔄 Polling (Auto-refresh)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="refreshIntervalGroup">
+                    <label for="refreshInterval">Auto-refresh (giây):</label>
+                    <input type="number" id="refreshInterval" placeholder="VD: 10" value="10" min="5" max="300" />
+                </div>
+
+                <div class="form-group button-container">
+                    <label>&nbsp;</label>
+                    <div class="button-group">
+                        <button id="startBtn" onclick="startFetching()">▶️ Bắt Đầu</button>
+                        <button id="stopBtn" onclick="stopFetching()" disabled>⏸️ Dừng</button>
+                        <button id="refreshOrdersBtn" onclick="refreshOrders()">🔄 Refresh Orders</button>
+                        <button id="clearBtn" onclick="clearComments()">🗑️ Xóa</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls" style="margin-top: 15px">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <button id="clearSessionBtn" onclick="clearLastSession()" class="btn-clear-session">
+                        <i data-lucide="save"></i> Xóa Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="controls" style="margin-top: 15px">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input
+                        type="text"
+                        id="searchBox"
+                        class="search-box"
+                        placeholder="🔍 Tìm kiếm theo tên, comment, số điện thoại, địa chỉ, session, code..."
+                    />
+                    <button class="clear-search" id="clearSearch">
+                        <i data-lucide="x"></i>
+                    </button>
+                    <div class="search-stats" id="searchStats"></div>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalComments">0</div>
+                    <div class="stat-label">Tổng comments</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="newComments">0</div>
+                    <div class="stat-label">Comments mới</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="filteredComments">0</div>
+                    <div class="stat-label">Kết quả tìm kiếm</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="lastUpdate">--:--:--</div>
+                    <div class="stat-label">Cập nhật lần cuối</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorContainer"></div>
+
+        <div class="comments-container">
+            <div class="comments-header">
+                <div class="comments-title">💬 Danh sách Comments</div>
+                <div class="refresh-indicator" id="refreshIndicator">
+                    <span id="refreshStatus">Chưa bắt đầu</span>
+                </div>
+            </div>
+
+            <div class="comments-list" id="commentsList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <p>Nhấn "Bắt Đầu" để xem comments real-time</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Shared Sidebar JS -->
+    <script src="../shared/sidebar/sidebar.js"></script>
+    
+    <!-- Page JS -->
+    <script src="app.js"></script>
+</body>
+</html>

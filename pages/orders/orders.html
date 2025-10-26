@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quản Lý Đặt Hàng - Order Management</title>
+
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+
+        <!-- Shared Common CSS -->
+        <link rel="stylesheet" href="../../shared/styles/common.css" />
+        
+        <!-- Page-specific CSS -->
+        <link rel="stylesheet" href="orders.css" />
+    </head>
+    <body>
+        <!-- Sidebar sẽ tự động load bởi sidebar.js -->
+
+        <div class="container">
+            <!-- Header -->
+            <div class="orders-header">
+                <div class="header-content">
+                    <h1>Quản lý đặt hàng</h1>
+                    <p>Theo dõi và quản lý đơn đặt hàng với các nhà cung cấp</p>
+                </div>
+                <button class="btn-create-order" onclick="createOrder()">
+                    <i data-lucide="plus"></i>
+                    Tạo đơn đặt hàng
+                </button>
+            </div>
+
+            <div class="main-content-area">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="file-text"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalOrders">47</div>
+                            <div class="stat-label">Tổng đơn hàng</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalValue">
+                                143.307.000 ₫
+                            </div>
+                            <div class="stat-label">Tổng giá trị</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="todayOrders">9</div>
+                            <div class="stat-label">Đơn hôm nay</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="todayValue">
+                                48.132.000 ₫
+                            </div>
+                            <div class="stat-label">Giá trị hôm nay</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="refresh-cw"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="syncStatus">0/328</div>
+                            <div class="stat-label">Đồng bộ TPOS</div>
+                            <div class="stat-sublabel">0.0% đã upload</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="nav-tabs">
+                    <button
+                        class="tab-btn active"
+                        onclick="switchTab('orders')"
+                    >
+                        Đơn hàng
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('drafts')">
+                        Nháp <span class="badge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('products')">
+                        <i data-lucide="package"></i>
+                        Sản phẩm đã đặt
+                    </button>
+                </div>
+
+                <!-- Orders Section -->
+                <div class="orders-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h2>Danh sách đơn đặt hàng</h2>
+                            <p>
+                                Xem và quản lý tất cả đơn đặt hàng với nhà cung
+                                cấp
+                            </p>
+                        </div>
+                        <div class="export-buttons">
+                            <button
+                                class="btn-export"
+                                onclick="exportExcel('purchase')"
+                            >
+                                <i data-lucide="shopping-cart"></i>
+                                Xuất Excel mua hàng
+                            </button>
+                            <button
+                                class="btn-export"
+                                onclick="exportExcel('products')"
+                            >
+                                <i data-lucide="download"></i>
+                                Xuất Excel Thêm SP
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-section">
+                        <div class="date-filters">
+                            <div class="date-input">
+                                <label>Từ ngày:</label>
+                                <div class="date-picker">
+                                    <i data-lucide="calendar"></i>
+                                    <button onclick="selectDate('from')">
+                                        Chọn ngày
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="date-input">
+                                <label>Đến ngày:</label>
+                                <div class="date-picker">
+                                    <i data-lucide="calendar"></i>
+                                    <button onclick="selectDate('to')">
+                                        Chọn ngày
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter-controls">
+                            <div class="quick-filter">
+                                <label>Lọc nhanh:</label>
+                                <select id="quickFilter">
+                                    <option value="all">Tất cả</option>
+                                    <option value="today">Hôm nay</option>
+                                    <option value="week">Tuần này</option>
+                                    <option value="month">Tháng này</option>
+                                </select>
+                            </div>
+                            <div class="search-box">
+                                <i data-lucide="search"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm nhà cung cấp, tên/mã sản phẩm, ngày (dd/mm)..."
+                                    id="searchInput"
+                                />
+                            </div>
+                            <div class="status-filter">
+                                <i data-lucide="filter"></i>
+                                <select id="statusFilter">
+                                    <option value="waiting">Chờ Hàng</option>
+                                    <option value="delivered">Đã giao</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders Table -->
+                    <div class="orders-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ngày đặt</th>
+                                    <th>Nhà cung cấp</th>
+                                    <th>Hóa đơn (VND)</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Biến thể</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá mua (VND)</th>
+                                    <th>Giá bán (VND)</th>
+                                    <th>Ghi chú</th>
+                                    <th>Trạng thái</th>
+                                    <th>Chỉnh sửa ĐH</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <!-- Sample data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
+        <!-- Shared Sidebar JS -->
+        <script src="../../shared/sidebar/sidebar.js"></script>
+        
+        <!-- Page JS -->
+        <script src="orders.js"></script>
+    </body>
+</html>

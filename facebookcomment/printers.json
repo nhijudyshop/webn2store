@@ -1,0 +1,11 @@
+[
+  {
+    "id": "1761376420188",
+    "name": "Máy in bill TEST",
+    "ipAddress": "192.168.1.222",
+    "port": 9100,
+    "bridgeUrl": "http://localhost:3001",
+    "isActive": true,
+    "createdAt": "2025-10-25T07:13:40.188Z"
+  }
+]

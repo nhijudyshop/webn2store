@@ -1,0 +1,19 @@
+{
+  "width": 1024,
+  "height": 550,
+  "threshold": 95,
+  "scale": 2,
+  "fonts": {
+    "session": 72,
+    "phone": 52,
+    "customer": 52,
+    "product": 36,
+    "comment": 32,
+    "time": 28
+  },
+  "alignment": "center",
+  "bold": true,
+  "italic": false,
+  "padding": 20,
+  "lineSpacing": 12
+}

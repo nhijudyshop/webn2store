@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kho Sản Phẩm - Product Inventory</title>
+
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+
+        <!-- Shared Common CSS -->
+        <link rel="stylesheet" href="../../shared/styles/common.css" />
+        
+        <!-- Page-specific CSS -->
+        <link rel="stylesheet" href="inventory.css" />
+    </head>
+    <body>
+        <!-- Sidebar sẽ tự động load bởi sidebar.js -->
+
+        <div class="container">
+            <div class="header">
+                <h1>📦 Quản Lý Kho Sản Phẩm</h1>
+
+                <!-- Token Configuration -->
+                <div
+                    class="controls"
+                    style="
+                        margin-bottom: 20px;
+                        background: white;
+                        padding: 20px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    "
+                >
+                    <div class="form-group" style="grid-column: 1 / -1">
+                        <label for="bearerToken">
+                            <i data-lucide="key"></i>
+                            Bearer Token (bắt buộc):
+                        </label>
+                        <div
+                            style="
+                                display: flex;
+                                gap: 12px;
+                                align-items: flex-end;
+                            "
+                        >
+                            <input
+                                type="password"
+                                id="bearerToken"
+                                placeholder="Nhập Bearer Token từ TPOS..."
+                                style="flex: 1"
+                            />
+                            <button
+                                type="button"
+                                class="btn-search"
+                                onclick="toggleTokenVisibility()"
+                                style="padding: 12px 20px"
+                            >
+                                <i data-lucide="eye" id="eyeIcon"></i>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-search"
+                                onclick="saveToken()"
+                                style="
+                                    background: linear-gradient(
+                                        135deg,
+                                        #10b981 0%,
+                                        #059669 100%
+                                    );
+                                "
+                            >
+                                <i data-lucide="save"></i>
+                                Lưu Token
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-search"
+                                onclick="loadTokenFromFile()"
+                                style="
+                                    background: linear-gradient(
+                                        135deg,
+                                        #f59e0b 0%,
+                                        #d97706 100%
+                                    );
+                                "
+                            >
+                                <i data-lucide="upload"></i>
+                                Tải từ File
+                            </button>
+                        </div>
+                        <input
+                            type="file"
+                            id="tokenFileInput"
+                            accept=".json,.txt"
+                            style="display: none"
+                            onchange="handleTokenFile(event)"
+                        />
+                        <small
+                            style="
+                                color: #64748b;
+                                margin-top: 8px;
+                                display: block;
+                            "
+                        >
+                            Token sẽ được lưu trong trình duyệt. Hoặc tạo file
+                            <strong>config.json</strong> chứa token.
+                        </small>
+                    </div>
+                </div>
+
+                <form class="search-form" onsubmit="searchProduct(event)">
+                    <div class="form-input-group">
+                        <label for="productCode"
+                            >Mã sản phẩm (DefaultCode):</label
+                        >
+                        <input
+                            type="text"
+                            id="productCode"
+                            placeholder="Nhập mã sản phẩm (VD: N1191)"
+                            required
+                        />
+                    </div>
+                    <button type="submit" class="btn-search">
+                        <i data-lucide="search"></i>
+                        Tìm kiếm
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-clear"
+                        onclick="clearData()"
+                    >
+                        <i data-lucide="trash-2"></i>
+                        Xóa
+                    </button>
+                </form>
+
+                <!-- Saved Data Management -->
+                <div class="saved-data-section">
+                    <div class="saved-data-header">
+                        <div class="saved-data-title">
+                            <i data-lucide="database"></i>
+                            <span>Dữ Liệu Đã Lưu</span>
+                        </div>
+                        <div class="saved-data-actions">
+                            <button
+                                type="button"
+                                class="btn-saved-data btn-export"
+                                onclick="exportToJSON()"
+                                title="Export sang file JSON"
+                            >
+                                <i data-lucide="download"></i>
+                                Export JSON
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-saved-data btn-import"
+                                onclick="importFromJSON()"
+                                title="Import từ file JSON"
+                            >
+                                <i data-lucide="upload"></i>
+                                Import JSON
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-saved-data btn-delete"
+                                onclick="clearSavedData()"
+                                title="Xóa dữ liệu đã lưu"
+                            >
+                                <i data-lucide="trash-2"></i>
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                    <div id="savedDataInfo" class="saved-data-info">
+                        <div class="saved-data-empty">
+                            <i data-lucide="inbox"></i>
+                            <span>Chưa có dữ liệu đã lưu</span>
+                        </div>
+                    </div>
+                </div>
+                <input
+                    type="file"
+                    id="dataFileInput"
+                    accept=".json"
+                    style="display: none"
+                    onchange="handleDataFile(event)"
+                />
+
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalProducts">0</div>
+                        <div class="stat-label">Sản phẩm</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalVariants">0</div>
+                        <div class="stat-label">Biến thể</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalQty">0</div>
+                        <div class="stat-label">Tổng số lượng</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalValue">0đ</div>
+                        <div class="stat-label">Tổng giá trị</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorContainer"></div>
+
+            <!-- Product Info Card -->
+            <div class="product-info-card" id="productInfoCard">
+                <img
+                    id="productInfoImage"
+                    class="product-info-image"
+                    src=""
+                    alt="Product"
+                />
+                <div class="product-info-details">
+                    <div class="product-info-name" id="productInfoName"></div>
+                    <div class="product-code" id="productInfoCode"></div>
+                    <div class="product-info-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Giá bán</div>
+                            <div
+                                class="meta-value price-cell"
+                                id="productInfoListPrice"
+                            >
+                                -
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Giá mua</div>
+                            <div
+                                class="meta-value"
+                                id="productInfoPurchasePrice"
+                            >
+                                -
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Số lượng thực tế</div>
+                            <div
+                                class="meta-value qty-available"
+                                id="productInfoQtyAvailable"
+                            >
+                                -
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Số lượng dự báo</div>
+                            <div
+                                class="meta-value qty-forecast"
+                                id="productInfoVirtualAvailable"
+                            >
+                                -
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Số biến thể</div>
+                            <div
+                                class="meta-value"
+                                id="productInfoVariantCount"
+                            >
+                                -
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('parent')">
+                    <i data-lucide="box"></i>
+                    Thông Tin Chính
+                </button>
+                <button class="tab-btn" onclick="switchTab('variants')">
+                    <i data-lucide="layers"></i>
+                    Các Biến Thể
+                </button>
+            </div>
+
+            <!-- Parent Product Tab -->
+            <div class="tab-content active" id="parentTab">
+                <div class="product-table">
+                    <div class="table-header">
+                        <div class="table-title">
+                            <i data-lucide="box"></i>
+                            Thông Tin Sản Phẩm
+                        </div>
+                    </div>
+                    <div class="table-wrapper" id="parentTableWrapper">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <p>
+                                Nhập mã sản phẩm và nhấn "Tìm kiếm" để xem thông
+                                tin
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Variants Tab -->
+            <div class="tab-content" id="variantsTab">
+                <div class="product-table">
+                    <div class="table-header">
+                        <div class="table-title">
+                            <i data-lucide="layers"></i>
+                            Danh Sách Các Biến Thể
+                        </div>
+                    </div>
+                    <div class="table-wrapper" id="variantsTableWrapper">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <p>
+                                Nhập mã sản phẩm và nhấn "Tìm kiếm" để xem danh
+                                sách biến thể
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
+        <!-- Shared Sidebar JS -->
+        <script src="../../shared/sidebar/sidebar.js"></script>
+        
+        <!-- Shared API Service (for TPOS) -->
+        <script src="../../shared/api/tpos-api.js"></script>
+        
+        <!-- Page JS -->
+        <script src="inventory.js"></script>
+    </body>
+</html>
