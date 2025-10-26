@@ -31,7 +31,7 @@ export function saveProductData(product) {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedProducts));
-    updateSavedDataList();
+    // updateSavedDataList(); // This function is no longer needed for UI rendering
 }
 
 export function loadAllSavedProducts() {
@@ -59,7 +59,7 @@ export function clearSavedData() {
         return;
     }
     localStorage.removeItem(STORAGE_KEY);
-    updateSavedDataList();
+    // updateSavedDataList(); // This function is no longer needed for UI rendering
     window.showNotification("Đã xóa tất cả dữ liệu đã lưu", "info");
     console.log("🗑️ Đã xóa tất cả dữ liệu đã lưu");
 }
@@ -136,7 +136,7 @@ export function handleDataFile(event) {
             });
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(existingProducts));
-            updateSavedDataList();
+            // updateSavedDataList(); // This function is no longer needed for UI rendering
 
             window.showNotification(`Đã import ${importCount} sản phẩm!`, "success");
         } catch (error) {
@@ -148,26 +148,27 @@ export function handleDataFile(event) {
     event.target.value = "";
 }
 
+// This function is no longer used for UI rendering, but kept for potential future use or debugging.
 export function updateSavedDataList() {
     const infoDiv = document.getElementById("savedDataInfo");
-    const savedDataWrapper = document.getElementById("savedDataWrapper"); // Get the wrapper element
+    const savedDataWrapper = document.getElementById("savedDataWrapper"); 
     if (!infoDiv || !savedDataWrapper) return;
 
     const savedProducts = loadAllSavedProducts();
 
     if (savedProducts.length === 0) {
-        savedDataWrapper.style.display = 'none'; // Hide the entire section
+        savedDataWrapper.style.display = 'none'; 
         infoDiv.innerHTML = `
             <div class="saved-data-empty">
                 <i data-lucide="inbox"></i>
                 <span>Chưa có sản phẩm nào được lưu</span>
             </div>
-        `; // Keep the empty state message for when it's shown again
+        `; 
         window.lucide.createIcons();
         return;
     }
 
-    savedDataWrapper.style.display = 'block'; // Show the section if there are products
+    savedDataWrapper.style.display = 'block'; 
 
     infoDiv.innerHTML = `
         <div class="saved-products-list">
@@ -211,19 +212,20 @@ export function loadProductFromList(productCode) {
 
     document.getElementById("productCode").value = savedData.productCode;
 
-    document.querySelectorAll(".saved-product-item").forEach((item) => {
-        item.classList.remove("active");
-    });
-    document
-        .querySelector(`.saved-product-item[data-code="${productCode}"]`)
-        ?.classList.add("active");
+    // No longer highlighting items in the removed 'saved-data-section'
+    // document.querySelectorAll(".saved-product-item").forEach((item) => {
+    //     item.classList.remove("active");
+    // });
+    // document
+    //     .querySelector(`.saved-product-item[data-code="${productCode}"]`)
+    //     ?.classList.add("active");
 
     window.showNotification(`Đã load sản phẩm ${productCode}`, "success");
 }
 
 export function autoLoadSavedData() {
     const savedProducts = loadAllSavedProducts();
-    updateSavedDataList(); // Call this first to handle visibility
+    // updateSavedDataList(); // This function is no longer needed for UI rendering
 
     if (savedProducts.length === 0) {
         return;
@@ -241,13 +243,14 @@ export function autoLoadSavedData() {
 
     document.getElementById("productCode").value = latestProduct.productCode;
 
-    setTimeout(() => {
-        document
-            .querySelector(
-                `.saved-product-item[data-code="${latestProduct.productCode}"]`,
-            )
-            ?.classList.add("active");
-    }, 100);
+    // No longer highlighting items in the removed 'saved-data-section'
+    // setTimeout(() => {
+    //     document
+    //         .querySelector(
+    //             `.saved-product-item[data-code="${latestProduct.productCode}"]`,
+    //         )
+    //         ?.classList.add("active");
+    // }, 100);
 
     window.showNotification(
         `✅ Đã tự động tải sản phẩm gần nhất: ${latestProduct.productCode}`,
