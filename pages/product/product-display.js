@@ -176,7 +176,7 @@ export function switchTab(tab) {
 }
 
 /**
- * Renders a table of all saved products.
+ * Renders a table of all saved products, including their variants.
  * @param {Array<Object>} savedProducts - An array of saved product objects.
  */
 export function renderAllSavedProductsTable(savedProducts) {
@@ -187,6 +187,53 @@ export function renderAllSavedProductsTable(savedProducts) {
         showEmptyState(wrapper.id, "Chưa có sản phẩm nào được thêm.");
         return;
     }
+
+    const allRows = savedProducts.flatMap(data => {
+        const product = data.product;
+        const variants = product.ProductVariants || [];
+
+        // Parent product row
+        const parentRow = `
+            <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer; background-color: #f8fafc;">
+                <td>${product.Id}</td>
+                <td>
+                    <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                         class="product-image" 
+                         onerror="this.src='../../shared/assets/placeholder.png'"
+                         alt="${product.Name}">
+                </td>
+                <td><strong>${product.Name || "-"}</strong></td>
+                <td><span class="product-code">${product.DefaultCode || "-"}</span></td>
+                <td class="price-cell">${formatCurrency(product.ListPrice)}</td>
+                <td>${formatCurrency(product.PurchasePrice)}</td>
+                <td class="qty-cell qty-available">${product.QtyAvailable || 0}</td>
+                <td class="qty-cell qty-forecast">${product.VirtualAvailable || 0}</td>
+                <td>${data.savedAt}</td>
+            </tr>
+        `;
+
+        // Variant rows
+        const variantRows = variants.map(variant => `
+            <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer;">
+                <td>${variant.Id}</td>
+                <td>
+                    <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                         class="product-image" 
+                         onerror="this.src='../../shared/assets/placeholder.png'"
+                         alt="${variant.NameTemplate}">
+                </td>
+                <td style="padding-left: 30px;">${variant.NameTemplate || "-"}</td>
+                <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>
+                <td class="price-cell">${formatCurrency(product.ListPrice)}</td>
+                <td>${formatCurrency(product.PurchasePrice)}</td>
+                <td class="qty-cell qty-available">${variant.QtyAvailable || 0}</td>
+                <td class="qty-cell qty-forecast">${variant.VirtualAvailable || 0}</td>
+                <td></td>
+            </tr>
+        `).join('');
+
+        return parentRow + variantRows;
+    }).join('');
 
     const html = `
         <table>
@@ -204,28 +251,7 @@ export function renderAllSavedProductsTable(savedProducts) {
                 </tr>
             </thead>
             <tbody>
-                ${savedProducts
-                    .map(
-                        (data) => `
-                    <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer;">
-                        <td>${data.product.Id}</td>
-                        <td>
-                            <img src="${data.product.ImageUrl || "../../shared/assets/placeholder.png"}" 
-                                 class="product-image" 
-                                 onerror="this.src='../../shared/assets/placeholder.png'"
-                                 alt="${data.product.Name}">
-                        </td>
-                        <td><strong>${data.product.Name || "-"}</strong></td>
-                        <td><span class="product-code">${data.product.DefaultCode || "-"}</span></td>
-                        <td class="price-cell">${formatCurrency(data.product.ListPrice)}</td>
-                        <td>${formatCurrency(data.product.PurchasePrice)}</td>
-                        <td class="qty-cell qty-available">${data.product.QtyAvailable || 0}</td>
-                        <td class="qty-cell qty-forecast">${data.product.VirtualAvailable || 0}</td>
-                        <td>${data.savedAt}</td>
-                    </tr>
-                `,
-                    )
-                    .join("")}
+                ${allRows}
             </tbody>
         </table>
     `;
