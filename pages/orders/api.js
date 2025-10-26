@@ -52,6 +52,18 @@ export async function saveOrders(newOrders) {
     }
 }
 
+export async function deleteOrder(orderId) {
+    try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export function loadDrafts() {
     window.showNotification("Không có bản nháp nào", "info");
     setOrders([]);

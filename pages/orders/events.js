@@ -3,7 +3,7 @@
 import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
 import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder } from './modal-create-order.js';
-import { loadOrders, loadDrafts, loadProducts } from './api.js';
+import { loadOrders, loadDrafts, loadProducts, deleteOrder } from './api.js';
 
 function filterOrders() {
     const searchTerm = document.getElementById("searchInput").value.toLowerCase();
@@ -41,25 +41,27 @@ function filterOrders() {
     displayOrders(filteredOrders);
 }
 
-function handleTableActions(event) {
+async function handleTableActions(event) {
     const target = event.target;
     const actionElement = target.closest('[data-action]');
     if (!actionElement) return;
 
     const action = actionElement.dataset.action;
-    const orderId = parseInt(actionElement.closest('tr').dataset.orderId);
+    const orderId = parseFloat(actionElement.closest('tr').dataset.orderId);
 
     switch (action) {
         case 'edit':
             window.showNotification(`Chỉnh sửa đơn hàng #${orderId}`, "info");
             break;
         case 'delete':
-            if (confirm(`Bạn có chắc muốn xóa đơn hàng #${orderId}?`)) {
-                const newOrders = orders.filter(order => order.id !== orderId);
-                setOrders(newOrders);
-                displayOrders();
-                updateStats();
-                window.showNotification(`Đã xóa đơn hàng #${orderId}`, "success");
+            if (confirm(`Bạn có chắc muốn xóa đơn hàng này?`)) {
+                const result = await deleteOrder(orderId);
+                if (result.success) {
+                    await loadOrders(); 
+                    window.showNotification(`Đã xóa đơn hàng`, "success");
+                } else {
+                    window.showNotification(`Lỗi khi xóa đơn hàng: ${result.error}`, "error");
+                }
             }
             break;
         case 'select':

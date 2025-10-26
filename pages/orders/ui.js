@@ -42,11 +42,11 @@ export function displayOrders(ordersToDisplay = orders) {
 
         const salePriceImageHtml = order.productImageUrl
             ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image">`
-            : `<img src="../../shared/assets/placeholder.png" class="price-image" alt="Product">`;
+            : `<div class="price-text">Chưa có hình</div>`;
         
         const invoiceImageHtml = order.invoiceImageUrl
             ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
-            : `<img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">`;
+            : `<div style="font-size: 12px; color: #94a3b8;">Chưa có</div>`;
 
         return `
         <tr data-order-id="${order.id}">

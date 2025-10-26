@@ -49,4 +49,29 @@ router.post("/orders", (req, res) => {
     }
 });
 
+// Delete an order
+router.delete("/orders/:id", (req, res) => {
+    try {
+        const orderIdToDelete = parseFloat(req.params.id);
+        if (isNaN(orderIdToDelete)) {
+            return res.status(400).json({ success: false, error: "Invalid order ID." });
+        }
+
+        const existingOrders = readOrders();
+        const updatedOrders = existingOrders.filter(order => order.id !== orderIdToDelete);
+
+        if (existingOrders.length === updatedOrders.length) {
+            return res.status(404).json({ success: false, error: "Order not found." });
+        }
+
+        writeOrders(updatedOrders);
+
+        console.log(`🗑️ Order with ID ${orderIdToDelete} deleted successfully.`);
+        res.json({ success: true, message: "Order deleted successfully" });
+    } catch (error) {
+        console.error(`❌ Error deleting order with ID ${req.params.id}:`, error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 module.exports = router;
