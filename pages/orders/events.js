@@ -2,7 +2,7 @@
 
 import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
-import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow } from './modal-create-order.js';
+import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder } from './modal-create-order.js';
 import { loadOrders, loadDrafts, loadProducts } from './api.js';
 
 function filterOrders() {
@@ -103,6 +103,7 @@ export function setupEventListeners() {
     document.getElementById("closeCreateOrderModalBtnFooter")?.addEventListener("click", closeCreateOrderModal);
     document.getElementById("clearOrderFormBtn")?.addEventListener("click", clearOrderForm);
     document.getElementById("addProductRowBtn")?.addEventListener("click", addProductRow);
+    document.getElementById("submitOrderBtn")?.addEventListener("click", submitOrder);
 
     // Expose functions to window for inline event handlers
     window.updateProductCodeSuggestions = updateProductCodeSuggestions;

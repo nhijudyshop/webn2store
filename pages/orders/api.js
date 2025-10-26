@@ -16,17 +16,40 @@ export async function loadProductSuggestions() {
     }
 }
 
-export function loadOrders() {
-    // Sample data
-    const sampleOrders = [
-        { id: 1, date: "25/10/2025", time: "18:15", supplier: "A79", totalQty: 1, invoice: "100.000 ₫", productName: "2510 A79 SET ÁO TD + Q.DÀI TRƠN ĐEN", productCode: "N1213", variant: "-", quantity: 1, purchasePrice: "100.000 ₫", salePrice: "195.000 ₫", note: "", status: "waiting" },
-        { id: 2, date: "25/10/2025", time: "17:30", supplier: "B45", totalQty: 2, invoice: "250.000 ₫", productName: "2510 B45 ÁO THUN NAM TRƠN XANH", productCode: "N1214", variant: "Size M", quantity: 2, purchasePrice: "125.000 ₫", salePrice: "220.000 ₫", note: "Giao hàng nhanh", status: "delivered" },
-        { id: 3, date: "24/10/2025", time: "16:45", supplier: "C12", totalQty: 1, invoice: "80.000 ₫", productName: "2410 C12 QUẦN JEAN NAM XANH", productCode: "N1215", variant: "Size L", quantity: 1, purchasePrice: "80.000 ₫", salePrice: "150.000 ₫", note: "", status: "cancelled" }
-    ];
+export async function loadOrders() {
+    try {
+        const response = await fetch('/api/orders');
+        const result = await response.json();
+        if (result.success) {
+            // Sort by date descending before setting state
+            const sortedOrders = result.data.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+            setOrders(sortedOrders);
+            displayOrders();
+            updateStats();
+        } else {
+            console.error("Failed to load orders:", result.error);
+            window.showNotification("Lỗi tải danh sách đơn hàng", "error");
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        window.showNotification("Lỗi kết nối server khi tải đơn hàng", "error");
+    }
+}
 
-    setOrders(sampleOrders);
-    displayOrders();
-    updateStats();
+export async function saveOrders(newOrders) {
+    try {
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newOrders)
+        });
+        const result = await response.json();
+        return result.success;
+    } catch (error) {
+        console.error('Error saving orders:', error);
+        window.showNotification("Lỗi kết nối server khi lưu đơn hàng", "error");
+        return false;
+    }
 }
 
 export function loadDrafts() {

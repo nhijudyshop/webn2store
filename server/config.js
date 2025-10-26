@@ -9,6 +9,7 @@ const TEMPLATE_FILE = path.join(SETTINGS_DIR, "template.json");
 const LAST_SESSION_FILE = path.join(SETTINGS_DIR, "last-session.json");
 const PRODUCT_SUGGESTIONS_FILE = path.join(DATA_DIR, "product_suggestions.json");
 const INVENTORY_PRODUCTS_FILE = path.join(DATA_DIR, "inventory_products.json");
+const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for orders data
 
@@ -20,5 +21,6 @@ module.exports = {
     LAST_SESSION_FILE,
     PRODUCT_SUGGESTIONS_FILE,
     INVENTORY_PRODUCTS_FILE,
+    ORDERS_FILE,
     CACHE_DURATION,
 };

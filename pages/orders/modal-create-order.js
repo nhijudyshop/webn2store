@@ -3,6 +3,7 @@
 import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { productSuggestions } from './state.js';
 import { formatCurrency } from './ui.js';
+import { saveOrders, loadOrders } from './api.js';
 
 /**
  * Handles pasting an image from the clipboard into a dropzone.
@@ -57,7 +58,6 @@ export function createOrder() {
             addProductRow();
         }
 
-        // Add paste listener to the main invoice dropzone
         const mainDropzone = modal.querySelector('.order-info-grid .image-dropzone');
         if (mainDropzone && !mainDropzone.dataset.pasteListenerAdded) {
             mainDropzone.addEventListener('paste', handlePaste);
@@ -97,10 +97,9 @@ export function clearOrderForm() {
 export function addProductRow() {
     const tbody = document.getElementById("modalProductList");
     const newRow = document.createElement("tr");
-    const rowIndex = tbody.children.length + 1;
-
+    
     newRow.innerHTML = `
-        <td>${rowIndex}</td>
+        <td></td>
         <td><input type="text" placeholder="Mã SP" list="productSuggestionsModal" oninput="window.updateProductCodeSuggestions(event)"></td>
         <td><input type="text" placeholder="Nhập tên sản phẩm"></td>
         <td><input type="number" value="1" style="width: 60px;" oninput="window.updateTotals()"></td>
@@ -117,10 +116,10 @@ export function addProductRow() {
     `;
     tbody.appendChild(newRow);
 
-    // Add paste listeners to the new dropzones
     const dropzones = newRow.querySelectorAll('.image-dropzone');
     dropzones.forEach(dz => dz.addEventListener('paste', handlePaste));
 
+    updateRowNumbers();
     window.lucide.createIcons();
     updateTotals();
 }
@@ -262,6 +261,82 @@ export async function fetchProductAndPopulateRow(event) {
     } finally {
         btn.innerHTML = '<i data-lucide="sparkles"></i>';
         window.lucide.createIcons();
+    }
+}
+
+export async function submitOrder() {
+    const modal = document.getElementById("createOrderModal");
+    const supplier = modal.querySelector('input[placeholder="Nhập tên nhà cung cấp"]').value.trim();
+    const orderDateValue = modal.querySelector('#orderDateInput').value;
+    const invoiceAmount = modal.querySelector('input[placeholder="Nhập số tiền VND"]').value;
+    const note = modal.querySelector('textarea').value.trim();
+    const productRows = modal.querySelectorAll('#modalProductList tr');
+
+    if (!supplier) {
+        window.showNotification("Vui lòng nhập tên nhà cung cấp", "error");
+        return;
+    }
+    if (productRows.length === 0) {
+        window.showNotification("Vui lòng thêm ít nhất một sản phẩm", "error");
+        return;
+    }
+
+    const newOrders = [];
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const date = new Date(orderDateValue).toLocaleDateString('vi-VN');
+
+    let totalQtyForSupplier = 0;
+    productRows.forEach(row => {
+        totalQtyForSupplier += parseInt(row.querySelector('td:nth-child(4) input').value) || 0;
+    });
+
+    productRows.forEach(row => {
+        const productCode = row.querySelector('td:nth-child(2) input').value.trim();
+        const productName = row.querySelector('td:nth-child(3) input').value.trim();
+        const quantity = parseInt(row.querySelector('td:nth-child(4) input').value) || 0;
+        const purchasePrice = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+        const salePrice = parseFloat(row.querySelector('td:nth-child(6) input').value) || 0;
+        const variantSelect = row.querySelector('td:nth-child(10) select');
+        const variant = variantSelect.selectedIndex > 0 ? variantSelect.options[variantSelect.selectedIndex].text : '-';
+
+        if (!productName || quantity === 0) {
+            return; // Skip empty rows
+        }
+
+        const order = {
+            id: Date.now() + Math.random(), // Simple unique ID
+            date: date,
+            time: time,
+            rawDate: new Date(`${orderDateValue}T${time}`), // For sorting
+            supplier: supplier,
+            totalQty: totalQtyForSupplier, // This is for the whole supplier order, repeated
+            invoice: formatCurrency(invoiceAmount),
+            productName: productName,
+            productCode: productCode,
+            variant: variant,
+            quantity: quantity,
+            purchasePrice: formatCurrency(purchasePrice),
+            salePrice: formatCurrency(salePrice),
+            note: note,
+            status: 'waiting'
+        };
+        newOrders.push(order);
+    });
+
+    if (newOrders.length === 0) {
+        window.showNotification("Không có sản phẩm hợp lệ để tạo đơn hàng", "error");
+        return;
+    }
+
+    const success = await saveOrders(newOrders);
+    if (success) {
+        window.showNotification(`Đã tạo thành công ${newOrders.length} mục đơn hàng!`, "success");
+        closeCreateOrderModal();
+        clearOrderForm();
+        await loadOrders();
+    } else {
+        window.showNotification("Có lỗi xảy ra khi lưu đơn hàng.", "error");
     }
 }
 
