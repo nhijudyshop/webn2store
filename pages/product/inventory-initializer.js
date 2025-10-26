@@ -43,6 +43,7 @@ function clearData() {
  */
 async function loadProductSuggestions() {
     try {
+        console.log('Attempting to load product suggestions...'); // Added log
         const response = await fetch('/api/products/suggestions');
         const result = await response.json();
 
@@ -56,7 +57,8 @@ async function loadProductSuggestions() {
                     option.textContent = `${item.code} - ${item.name}`;
                     datalist.appendChild(option);
                 });
-                console.log(`✅ Loaded ${result.data.length} product suggestions.`);
+                console.log(`✅ Loaded ${result.data.length} product suggestions into datalist.`); // Added log
+                console.log('Datalist options:', datalist.options); // Added log to inspect datalist content
             }
         } else {
             console.error('❌ Failed to load product suggestions:', result.error);

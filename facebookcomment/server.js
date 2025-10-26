@@ -619,7 +619,7 @@ function loadProductSuggestionsFromExcel() {
         })).filter(item => item.code); // Filter out items without a code
 
         productSuggestionsCache = suggestions;
-        console.log(`✅ Loaded ${suggestions.length} product suggestions from Excel.`);
+        console.log(`✅ Loaded ${suggestions.length} product suggestions from Excel. Sample:`, suggestions.slice(0, 3)); // Added sample log
         return suggestions;
     } catch (error) {
         console.error("❌ Error loading product suggestions from Excel:", error);
