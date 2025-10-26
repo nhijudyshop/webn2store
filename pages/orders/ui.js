@@ -56,7 +56,7 @@ export function displayOrders(ordersToDisplay = orders) {
             ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
             : `<div class="image-placeholder">Chưa có hình</div>`;
         
-        const invoiceValueHtml = order.invoiceImageUrl ? `<div class="invoice-value">${order.invoice}</div>` : '';
+        const invoiceValueHtml = `<div class="invoice-value">${order.invoice}</div>`;
 
         return `
         <tr data-order-id="${order.id}">
