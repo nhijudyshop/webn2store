@@ -58,6 +58,7 @@ export function createOrder() {
             addProductRow();
         }
 
+        // Add paste listener to the main invoice dropzone
         const mainDropzone = modal.querySelector('.order-info-grid .image-dropzone');
         if (mainDropzone && !mainDropzone.dataset.pasteListenerAdded) {
             mainDropzone.addEventListener('paste', handlePaste);
@@ -271,6 +272,8 @@ export async function submitOrder() {
     const invoiceAmount = modal.querySelector('input[placeholder="Nhập số tiền VND"]').value;
     const note = modal.querySelector('textarea').value.trim();
     const productRows = modal.querySelectorAll('#modalProductList tr');
+    const invoiceImageDropzone = modal.querySelector('.order-info-grid .image-dropzone img');
+    const invoiceImageUrl = invoiceImageDropzone ? invoiceImageDropzone.src : null;
 
     if (!supplier) {
         window.showNotification("Vui lòng nhập tên nhà cung cấp", "error");
@@ -299,6 +302,12 @@ export async function submitOrder() {
         const salePrice = parseFloat(row.querySelector('td:nth-child(6) input').value) || 0;
         const variantSelect = row.querySelector('td:nth-child(10) select');
         const variant = variantSelect.selectedIndex > 0 ? variantSelect.options[variantSelect.selectedIndex].text : '-';
+        
+        const productImageDropzone = row.querySelector('td:nth-child(8) .image-dropzone img');
+        const purchasePriceImageDropzone = row.querySelector('td:nth-child(9) .image-dropzone img');
+
+        const productImageUrl = productImageDropzone ? productImageDropzone.src : null;
+        const purchasePriceImageUrl = purchasePriceImageDropzone ? purchasePriceImageDropzone.src : null;
 
         if (!productName || quantity === 0) {
             return; // Skip empty rows
@@ -312,6 +321,7 @@ export async function submitOrder() {
             supplier: supplier,
             totalQty: totalQtyForSupplier, // This is for the whole supplier order, repeated
             invoice: formatCurrency(invoiceAmount),
+            invoiceImageUrl: invoiceImageUrl,
             productName: productName,
             productCode: productCode,
             variant: variant,
@@ -319,7 +329,9 @@ export async function submitOrder() {
             purchasePrice: formatCurrency(purchasePrice),
             salePrice: formatCurrency(salePrice),
             note: note,
-            status: 'waiting'
+            status: 'waiting',
+            productImageUrl: productImageUrl,
+            purchasePriceImageUrl: purchasePriceImageUrl
         };
         newOrders.push(order);
     });

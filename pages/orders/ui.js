@@ -35,23 +35,36 @@ export function displayOrders(ordersToDisplay = orders) {
         return;
     }
 
-    const html = ordersToDisplay.map(order => `
+    const html = ordersToDisplay.map(order => {
+        const purchasePriceImageHtml = order.purchasePriceImageUrl
+            ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image">`
+            : `<div class="price-text">Chưa có hình</div>`;
+
+        const salePriceImageHtml = order.productImageUrl
+            ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image">`
+            : `<img src="../../shared/assets/placeholder.png" class="price-image" alt="Product">`;
+        
+        const invoiceImageHtml = order.invoiceImageUrl
+            ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
+            : `<img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product">`;
+
+        return `
         <tr data-order-id="${order.id}">
             <td><div class="order-date"><i data-lucide="calendar"></i><div><div>${order.date}</div><div style="font-size: 12px; color: #64748b;">(${order.time})</div></div></div></td>
             <td><div class="supplier-info">${order.supplier}</div><div class="supplier-qty">Tổng SL: ${order.totalQty}</div></td>
-            <td><div class="invoice-info"><div class="invoice-images"><img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product"><img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product"></div><div class="invoice-value">${order.invoice}</div></div></td>
+            <td><div class="invoice-info"><div class="invoice-images">${invoiceImageHtml}</div><div class="invoice-value">${order.invoice}</div></div></td>
             <td><div class="product-name">${order.productName}</div></td>
             <td><span class="product-code">${order.productCode}</span></td>
             <td><div class="variant">${order.variant}</div></td>
             <td><div class="quantity">${order.quantity}</div></td>
-            <td><div class="price-cell"><div class="price-text">Chưa có hình</div><div class="price">${order.purchasePrice}</div></div></td>
-            <td><div class="price-cell"><img src="../../shared/assets/placeholder.png" class="price-image" alt="Product"><div class="price">${order.salePrice}</div></div></td>
+            <td><div class="price-cell">${purchasePriceImageHtml}<div class="price">${order.purchasePrice}</div></div></td>
+            <td><div class="price-cell">${salePriceImageHtml}<div class="price">${order.salePrice}</div></div></td>
             <td><div style="color: #64748b; font-size: 14px;">${order.note || '-'}</div></td>
             <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
             <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
             <td><div class="action-buttons"><button class="btn-delete" data-action="delete" title="Xóa đơn hàng"><i data-lucide="trash-2"></i></button><input type="checkbox" class="checkbox" data-action="select"></div></td>
         </tr>
-    `).join('');
+    `}).join('');
 
     tbody.innerHTML = html;
     window.lucide.createIcons();

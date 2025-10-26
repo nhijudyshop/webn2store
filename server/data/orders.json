@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "id": 1761507049377.568,
+    "date": "26/10/2025",
+    "time": "02:30",
+    "rawDate": "2025-10-25T19:30:00.000Z",
+    "supplier": "NCC",
+    "totalQty": 2,
+    "invoice": "1 ₫",
+    "productName": "1710 A40 QUẦN SUÔNG LƯNG MIU XANH 09433 SIZE (2)",
+    "productCode": "N449A2",
+    "variant": "1710 A40 QUẦN SUÔNG LƯNG MIU XANH 09433 SIZE (2)",
+    "quantity": 1,
+    "purchasePrice": "275.000 ₫",
+    "salePrice": "370.000 ₫",
+    "note": "",
+    "status": "waiting"
+  },
+  {
+    "id": 1761507049378.5945,
+    "date": "26/10/2025",
+    "time": "02:30",
+    "rawDate": "2025-10-25T19:30:00.000Z",
+    "supplier": "NCC",
+    "totalQty": 2,
+    "invoice": "1 ₫",
+    "productName": "2110 A3 ĐẦM CỔ BẺ GC (Xanh)",
+    "productCode": "N558X",
+    "variant": "2110 A3 ĐẦM CỔ BẺ GC (Xanh)",
+    "quantity": 1,
+    "purchasePrice": "150.000 ₫",
+    "salePrice": "250.000 ₫",
+    "note": "",
+    "status": "waiting"
+  }
+]
