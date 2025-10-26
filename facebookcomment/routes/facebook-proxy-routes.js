@@ -1,200 +1,15 @@
 const express = require("express");
-const cors = require("cors");
 const axios = require("axios");
-const path = require("path");
-const fs = require("fs");
-const XLSX = require("xlsx"); // Import xlsx library
+const { getAuthHeader, generateGuid } = require("../utils/server-utils");
+const { CACHE_DURATION } = require("../config");
 
-const app = express();
-const PORT = 3000;
+const router = express.Router();
 
-// Enable CORS for all routes
-app.use(cors());
-app.use(express.json());
-
-// Serve static files (HTML)
-app.use(express.static(__dirname));
-
-// Also serve the shared and pages directories from the root
-app.use('/shared', express.static(path.join(__dirname, '..', 'shared')));
-app.use('/pages', express.static(path.join(__dirname, '..', 'pages')));
-
-// Settings directory
-const SETTINGS_DIR = path.join(__dirname, "settings");
-const PRINTERS_FILE = path.join(SETTINGS_DIR, "printers.json");
-const TEMPLATE_FILE = path.join(SETTINGS_DIR, "template.json");
-const LAST_SESSION_FILE = path.join(SETTINGS_DIR, "last-session.json");
-
-// Ensure settings directory exists
-if (!fs.existsSync(SETTINGS_DIR)) {
-    fs.mkdirSync(SETTINGS_DIR, { recursive: true });
-    console.log("📁 Created settings directory");
-}
-
-// Initialize default files if they don't exist
-if (!fs.existsSync(PRINTERS_FILE)) {
-    fs.writeFileSync(PRINTERS_FILE, JSON.stringify([], null, 2));
-    console.log("📄 Created printers.json");
-}
-
-if (!fs.existsSync(TEMPLATE_FILE)) {
-    const defaultTemplate = {
-        width: 1152,
-        height: "auto",
-        threshold: 95,
-        scale: 2,
-        fonts: {
-            session: 72,
-            phone: 52,
-            customer: 52,
-            product: 36,
-            comment: 32,
-            time: 28,
-        },
-        alignment: "center",
-        bold: true,
-        italic: false,
-        padding: 20,
-        lineSpacing: 12,
-    };
-    fs.writeFileSync(TEMPLATE_FILE, JSON.stringify(defaultTemplate, null, 2));
-    console.log("📄 Created template.json");
-}
-
-if (!fs.existsSync(LAST_SESSION_FILE)) {
-    const defaultSession = {
-        pageId: null,
-        videoId: null,
-        connectionMode: "stream",
-        refreshInterval: 10,
-        autoStart: false,
-    };
-    fs.writeFileSync(
-        LAST_SESSION_FILE,
-        JSON.stringify(defaultSession, null, 2),
-    );
-    console.log("📄 Created last-session.json");
-}
-
-// Helper function to get Authorization header from client request
-function getAuthHeader(req) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        throw new Error("Authorization header with Bearer token is required.");
-    }
-    return authHeader;
-}
-
-// Generate GUID
-function generateGuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
-}
-
-// ===== SETTINGS ENDPOINTS =====
-
-// Get printers
-app.get("/api/settings/printers", (req, res) => {
-    try {
-        const data = fs.readFileSync(PRINTERS_FILE, "utf8");
-        const printers = JSON.parse(data);
-        res.json({ success: true, data: printers });
-    } catch (error) {
-        console.error("❌ Error reading printers:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Save printers
-app.post("/api/settings/printers", (req, res) => {
-    try {
-        const printers = req.body;
-        fs.writeFileSync(PRINTERS_FILE, JSON.stringify(printers, null, 2));
-        console.log("✅ Printers saved successfully");
-        res.json({ success: true, message: "Printers saved successfully" });
-    } catch (error) {
-        console.error("❌ Error saving printers:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Get template settings
-app.get("/api/settings/template", (req, res) => {
-    try {
-        const data = fs.readFileSync(TEMPLATE_FILE, "utf8");
-        const template = JSON.parse(data);
-        res.json({ success: true, data: template });
-    } catch (error) {
-        console.error("❌ Error reading template:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Save template settings
-app.post("/api/settings/template", (req, res) => {
-    try {
-        const template = req.body;
-        fs.writeFileSync(TEMPLATE_FILE, JSON.stringify(template, null, 2));
-        console.log("✅ Template saved successfully");
-        res.json({ success: true, message: "Template saved successfully" });
-    } catch (error) {
-        console.error("❌ Error saving template:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Get last session
-app.get("/api/settings/last-session", (req, res) => {
-    try {
-        const data = fs.readFileSync(LAST_SESSION_FILE, "utf8");
-        const session = JSON.parse(data);
-        res.json({ success: true, data: session });
-    } catch (error) {
-        console.error("❌ Error reading last session:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Save last session
-app.post("/api/settings/last-session", (req, res) => {
-    try {
-        const session = req.body;
-        fs.writeFileSync(LAST_SESSION_FILE, JSON.stringify(session, null, 2));
-        console.log("✅ Last session saved successfully");
-        res.json({ success: true, message: "Last session saved successfully" });
-    } catch (error) {
-        console.error("❌ Error saving last session:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-    
-});
-
-// Delete last session
-app.delete("/api/settings/last-session", (req, res) => {
-    try {
-        if (fs.existsSync(LAST_SESSION_FILE)) {
-            fs.unlinkSync(LAST_SESSION_FILE);
-            console.log("🗑️ Last session deleted successfully");
-        }
-        res.json({
-            success: true,
-            message: "Last session deleted successfully",
-        });
-    } catch (error) {
-        console.error("❌ Error deleting last session:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
+// Cache for orders data (in-memory cache to avoid spamming API)
+const ordersCache = new Map();
 
 // Proxy endpoint for getting Facebook accounts/pages
-app.get("/api/accounts", async (req, res) => {
+router.get("/accounts", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
         const url = `https://tomato.tpos.vn/odata/CRMTeam/ODataService.GetAllFacebook?$expand=Childs`;
@@ -238,7 +53,7 @@ app.get("/api/accounts", async (req, res) => {
 });
 
 // Proxy endpoint for getting videos from a page
-app.get("/api/videos", async (req, res) => {
+router.get("/videos", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
         const { pageid, limit = 10 } = req.query;
@@ -299,7 +114,7 @@ app.get("/api/videos", async (req, res) => {
 });
 
 // Proxy endpoint for regular polling
-app.get("/api/comments", async (req, res) => {
+router.get("/comments", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
         const { pageid, postId, limit = 50, skip = 0 } = req.query; // Add limit and skip
@@ -362,13 +177,9 @@ app.get("/api/comments", async (req, res) => {
     }
 });
 
-// Cache for orders data (in-memory cache to avoid spamming API)
-const ordersCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
 // Endpoint to get detailed orders info (PrintCount, Telephone, PartnerStatus)
 // Optimized with caching to prevent spam requests
-app.get("/api/orders-detail", async (req, res) => {
+router.get("/orders-detail", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
         const { postId, top = 500, forceRefresh = false } = req.query;
@@ -455,7 +266,7 @@ app.get("/api/orders-detail", async (req, res) => {
 });
 
 // Proxy endpoint for Avatar - with proper error handling
-app.get("/api/avatar/:psid", async (req, res) => {
+router.get("/avatar/:psid", async (req, res) => {
     try {
         const { psid } = req.params;
         const size = req.query.size || 50;
@@ -526,7 +337,7 @@ app.get("/api/avatar/:psid", async (req, res) => {
 });
 
 // Proxy endpoint for EventStream (SSE)
-app.get("/api/stream", async (req, res) => {
+router.get("/stream", async (req, res) => {
     const { pageid, postId, token } = req.query; // Get token from query parameter
 
     if (!pageid || !postId || !token) {
@@ -587,79 +398,4 @@ app.get("/api/stream", async (req, res) => {
     }
 });
 
-// In-memory cache for product suggestions
-let productSuggestionsCache = null;
-const PRODUCT_EXCEL_FILE = path.join(__dirname, "san_pham.xlsx");
-
-/**
- * Reads product data from the Excel file and caches it.
- * @returns {Array<Object>} An array of product suggestions.
- */
-function loadProductSuggestionsFromExcel() {
-    if (productSuggestionsCache) {
-        console.log("💾 Returning cached product suggestions.");
-        return productSuggestionsCache;
-    }
-
-    console.log("📊 Loading product suggestions from Excel...");
-    try {
-        if (!fs.existsSync(PRODUCT_EXCEL_FILE)) {
-            console.warn(`⚠️ Product Excel file not found: ${PRODUCT_EXCEL_FILE}`);
-            return [];
-        }
-
-        const workbook = XLSX.readFile(PRODUCT_EXCEL_FILE);
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet);
-
-        const suggestions = json.map(row => ({
-            code: row.DefaultCode ? String(row.DefaultCode).toUpperCase() : '',
-            name: row.Name || ''
-        })).filter(item => item.code); // Filter out items without a code
-
-        productSuggestionsCache = suggestions;
-        console.log(`✅ Loaded ${suggestions.length} product suggestions from Excel.`);
-        return suggestions;
-    } catch (error) {
-        console.error("❌ Error loading product suggestions from Excel:", error);
-        return [];
-    }
-}
-
-// Endpoint for product suggestions
-app.get("/api/products/suggestions", (req, res) => {
-    try {
-        const suggestions = loadProductSuggestionsFromExcel();
-        res.json({ success: true, data: suggestions });
-    } catch (error) {
-        console.error("❌ Error serving product suggestions:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`
-╔═══════════════════════════════════════════════════════════╗
-║   🚀 SERVER ĐANG CHẠY!                                    ║
-╠═══════════════════════════════════════════════════════════╣
-║   📡 URL: http://localhost:${PORT}                           ║
-╠═══════════════════════════════════════════════════════════╣
-║   ✨ Giao diện chính:                                     ║
-║      http://localhost:${PORT}/index.html                       ║
-║                                                           ║
-║   ⚙️ Cài đặt:                                             ║
-║      http://localhost:${PORT}/settings.html                    ║
-║                                                           ║
-║   📁 Settings folder: ./settings/                         ║
-║      - printers.json                                      ║
-║      - template.json                                      ║
-║      - last-session.json                                  ║
-║   📁 Product data: ./san_pham.xlsx                        ║
-╠═══════════════════════════════════════════════════════════╣
-║   🛑 Dừng server: Ctrl + C                                ║
-╚═══════════════════════════════════════════════════════════╝
-    `);
-});
+module.exports = router;
