@@ -38,15 +38,15 @@ export function displayOrders(ordersToDisplay = orders) {
     const html = ordersToDisplay.map(order => {
         const purchasePriceImageHtml = order.purchasePriceImageUrl
             ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image">`
-            : `<div class="price-text">Chưa có hình</div>`;
+            : `<div class="image-placeholder">Chưa có hình</div>`;
 
         const salePriceImageHtml = order.productImageUrl
             ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image">`
-            : `<div class="price-text">Chưa có hình</div>`;
+            : `<div class="image-placeholder">Chưa có hình</div>`;
         
         const invoiceImageHtml = order.invoiceImageUrl
             ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
-            : `<div style="font-size: 12px; color: #94a3b8;">Chưa có hình</div>`;
+            : `<div class="image-placeholder">Chưa có hình</div>`;
 
         return `
         <tr data-order-id="${order.id}">
