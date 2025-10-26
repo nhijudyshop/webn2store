@@ -251,7 +251,7 @@ function initializeIndexPage() {
     });
 
     // Load token from localStorage using TPOS_API
-    TPOS_API.loadToken();
+    // TPOS_API.loadToken(); // This is now handled by settings.html
 
     // Load accounts on page load
     loadAccounts().then(() => {
@@ -1931,6 +1931,25 @@ function previewTemplate() {
     previewWindow.document.close();
 }
 
+// ===== TOKEN MANAGEMENT FUNCTIONS (for settings.html) =====
+function toggleTokenVisibilitySettings() {
+    const input = document.getElementById("bearerTokenSettings");
+    const icon = document.getElementById("eyeIconSettings");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.setAttribute("data-lucide", "eye-off");
+    } else {
+        input.type = "password";
+        icon.setAttribute("data-lucide", "eye");
+    }
+    lucide.createIcons();
+}
+
+function saveTokenSettings() {
+    TPOS_API.saveToken(null, 'bearerTokenSettings'); // Use the new input ID
+}
+
 // ===== INITIALIZATION LOGIC (Handles different pages) =====
 document.addEventListener("DOMContentLoaded", function () {
     // Initialize Lucide icons globally
@@ -1978,5 +1997,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 lucide.createIcons(); // Re-initialize icons for newly active tab content
             });
         });
+
+        // Load token for settings page
+        TPOS_API.loadToken('bearerTokenSettings');
     }
 });

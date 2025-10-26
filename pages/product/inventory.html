@@ -21,71 +21,6 @@
             <div class="header">
                 <h1>📦 Quản Lý Kho Sản Phẩm</h1>
 
-                <!-- Token Configuration -->
-                <div
-                    class="controls"
-                    style="
-                        margin-bottom: 20px;
-                        background: white;
-                        padding: 20px;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-                    "
-                >
-                    <div class="form-group" style="grid-column: 1 / -1">
-                        <label for="bearerToken">
-                            <i data-lucide="key"></i>
-                            Bearer Token (bắt buộc):
-                        </label>
-                        <div
-                            style="
-                                display: flex;
-                                gap: 12px;
-                                align-items: flex-end;
-                            "
-                        >
-                            <input
-                                type="password"
-                                id="bearerToken"
-                                placeholder="Nhập Bearer Token từ TPOS..."
-                                style="flex: 1"
-                            />
-                            <button
-                                type="button"
-                                class="btn-search"
-                                onclick="toggleTokenVisibility()"
-                                style="padding: 12px 20px"
-                            >
-                                <i data-lucide="eye" id="eyeIcon"></i>
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-search"
-                                onclick="TPOS_API.saveToken()"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #10b981 0%,
-                                        #059669 100%
-                                    );
-                                "
-                            >
-                                <i data-lucide="save"></i>
-                                Lưu Token
-                            </button>
-                        </div>
-                        <small
-                            style="
-                                color: #64748b;
-                                margin-top: 8px;
-                                display: block;
-                            "
-                        >
-                            Token sẽ được lưu trong trình duyệt.
-                        </small>
-                    </div>
-                </div>
-
                 <form class="search-form" onsubmit="searchProduct(event)">
                     <div class="form-input-group">
                         <label for="productCode"
@@ -152,7 +87,7 @@
                     <div id="savedDataInfo" class="saved-data-info">
                         <div class="saved-data-empty">
                             <i data-lucide="inbox"></i>
-                            <span>Chưa có dữ liệu đã lưu</span>
+                            <span>Chưa có sản phẩm nào được lưu</span>
                         </div>
                     </div>
                 </div>
@@ -235,7 +170,6 @@
                             </div>
                         </div>
                         <div class="meta-item">
-                            <div class="meta-label">Số biến thể</div>
                             <div
                                 class="meta-value"
                                 id="productInfoVariantCount"

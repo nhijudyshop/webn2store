@@ -22,20 +22,20 @@
         <div class="header">
             <h1>⚙️ Cài đặt</h1>
             <div class="tabs-nav">
-                <button class="tab-button active" data-tab="printers">
+                <button class="tab-button" data-tab="printers">
                     <i data-lucide="printer"></i> Máy in
                 </button>
                 <button class="tab-button" data-tab="template">
                     <i data-lucide="file-text"></i> Template In
                 </button>
-                <button class="tab-button" data-tab="general" onclick="showNotification('Đang phát triển', 'info')">
+                <button class="tab-button active" data-tab="general">
                     <i data-lucide="settings-2"></i> Chung
                 </button>
             </div>
         </div>
 
         <!-- Printers Tab -->
-        <div class="tab-content active" id="printers">
+        <div class="tab-content" id="printers">
             <!-- Server Status -->
             <div class="content-section">
                 <div class="flex items-center justify-between mb-4">
@@ -287,10 +287,43 @@
         </div>
 
         <!-- General Tab -->
-        <div class="tab-content" id="general">
-            <div class="empty-state">
-                <div class="empty-state-icon">🚧</div>
-                <p>Tính năng này đang được phát triển.</p>
+        <div class="tab-content active" id="general">
+            <div class="content-section">
+                <h2>🔑 Bearer Token</h2>
+                <div class="form-group">
+                    <label for="bearerTokenSettings">
+                        <i data-lucide="key"></i>
+                        Bearer Token (bắt buộc):
+                    </label>
+                    <div style="display: flex; gap: 12px; align-items: flex-end;">
+                        <input
+                            type="password"
+                            id="bearerTokenSettings"
+                            placeholder="Nhập Bearer Token từ TPOS..."
+                            style="flex: 1"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="toggleTokenVisibilitySettings()"
+                            style="padding: 12px 20px"
+                        >
+                            <i data-lucide="eye" id="eyeIconSettings"></i>
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            onclick="saveTokenSettings()"
+                            style="padding: 12px 20px"
+                        >
+                            <i data-lucide="save"></i>
+                            Lưu Token
+                        </button>
+                    </div>
+                    <small style="color: #64748b; margin-top: 8px; display: block;">
+                        Token sẽ được lưu trong trình duyệt.
+                    </small>
+                </div>
             </div>
         </div>
     </div>
@@ -298,6 +331,9 @@
     <!-- JavaScript -->
     <!-- Shared Sidebar JS -->
     <script src="../shared/sidebar/sidebar.js"></script>
+    
+    <!-- Shared API Service (for TPOS) -->
+    <script src="../../shared/api/tpos-api.js"></script>
     
     <!-- Page JS -->
     <script src="app.js"></script>

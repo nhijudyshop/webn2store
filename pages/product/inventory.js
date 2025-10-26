@@ -285,24 +285,6 @@ function autoLoadSavedData() {
     );
 }
 
-// ===== TOKEN MANAGEMENT =====
-// Removed saveToken, loadToken, getToken, loadTokenFromFile, handleTokenFile
-// Now using TPOS_API.saveToken() and TPOS_API.loadToken() directly
-
-function toggleTokenVisibility() {
-    const input = document.getElementById("bearerToken");
-    const icon = document.getElementById("eyeIcon");
-
-    if (input.type === "password") {
-        input.type = "text";
-        icon.setAttribute("data-lucide", "eye-off");
-    } else {
-        input.type = "password";
-        icon.setAttribute("data-lucide", "eye");
-    }
-    lucide.createIcons();
-}
-
 // ===== SEARCH PRODUCT =====
 async function searchProduct(event) {
     event.preventDefault();
@@ -564,9 +546,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Load saved token using TPOS_API
-    TPOS_API.loadToken();
-
     // AUTO-LOAD: Tự động load dữ liệu đã lưu (nếu có)
     setTimeout(() => {
         autoLoadSavedData();
@@ -587,12 +566,4 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(style);
 
     console.log("Inventory page initialized");
-
-    // Check if token is saved
-    const savedToken = TPOS_API.getToken();
-    if (savedToken) {
-        console.log("Token loaded from localStorage");
-    } else {
-        console.log("No token found. Please enter Bearer Token.");
-    }
 });
