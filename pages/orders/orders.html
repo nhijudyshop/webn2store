@@ -173,6 +173,7 @@
                             <div class="status-filter">
                                 <i data-lucide="filter"></i>
                                 <select id="statusFilter">
+                                    <option value="all">Tất cả trạng thái</option>
                                     <option value="waiting">Chờ Hàng</option>
                                     <option value="delivered">Đã giao</option>
                                     <option value="cancelled">Đã hủy</option>
@@ -206,6 +207,114 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Order Modal -->
+        <div id="createOrderModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Tạo đơn đặt hàng mới</h2>
+                    <div class="header-actions">
+                        <button class="btn-clear" onclick="clearOrderForm()">
+                            <i data-lucide="rotate-cw"></i> Clear
+                        </button>
+                        <button class="btn-close" onclick="closeCreateOrderModal()">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info-grid">
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label>Nhà cung cấp *</label>
+                            <input type="text" placeholder="Nhập tên nhà cung cấp">
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày đặt hàng</label>
+                            <input type="date" id="orderDateInput">
+                        </div>
+                        <div class="form-group">
+                            <label>Số tiền hóa đơn (VND)</label>
+                            <input type="number" placeholder="Nhập số tiền VND">
+                        </div>
+                        <div class="form-group" style="grid-row: span 2;">
+                            <label>Ảnh hóa đơn</label>
+                            <div class="image-dropzone">
+                                <i data-lucide="image"></i>
+                                <span>Ctrl+V</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-list-section">
+                        <div class="product-list-header">
+                            <h3>Danh sách sản phẩm</h3>
+                            <button class="btn-select-from-inventory">
+                                <i data-lucide="archive"></i> Chọn từ Kho SP
+                            </button>
+                        </div>
+                        <div class="product-table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Mã sản phẩm</th>
+                                        <th>SL</th>
+                                        <th>Giá mua (VND)</th>
+                                        <th>Giá bán (VND)</th>
+                                        <th>Thành tiền (VND)</th>
+                                        <th>Hình ảnh sản phẩm</th>
+                                        <th>Hình ảnh Giá mua</th>
+                                        <th>Biến thể</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalProductList">
+                                    <!-- Product rows will be added here by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="product-table-footer">
+                            <button class="btn-add-product" onclick="addProductRow()">
+                                <i data-lucide="plus"></i> Thêm sản phẩm
+                            </button>
+                            <div class="total-quantity">
+                                <strong>Tổng số lượng:</strong> <span id="modalTotalQuantity">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label>Ghi chú</label>
+                        <textarea placeholder="Ghi chú thêm cho đơn hàng..." rows="3"></textarea>
+                    </div>
+
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <label>Tổng tiền:</label>
+                            <span class="value" id="modalSubtotal">0 ₫</span>
+                        </div>
+                        <div class="summary-row">
+                            <label>Giảm giá:</label>
+                            <input type="number" value="0" class="form-control">
+                        </div>
+                        <div class="summary-row">
+                            <label><i data-lucide="truck"></i> Thêm tiền ship</label>
+                            <input type="number" value="0" class="form-control">
+                        </div>
+                        <div class="summary-row total">
+                            <label>Thành tiền:</label>
+                            <span class="value" id="modalTotal">0 ₫</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeCreateOrderModal()">Hủy</button>
+                    <button class="btn-tertiary">Lưu nháp</button>
+                    <button class="btn-primary">Tạo đơn hàng</button>
                 </div>
             </div>
         </div>

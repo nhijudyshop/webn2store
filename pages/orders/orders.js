@@ -25,10 +25,6 @@ function switchTab(tab) {
 }
 
 // ===== ORDER MANAGEMENT =====
-function createOrder() {
-    showNotification("Tính năng tạo đơn hàng đang được phát triển", "info");
-}
-
 function exportExcel(type) {
     if (type === 'purchase') {
         showNotification("Đang xuất Excel mua hàng...", "info");
@@ -416,6 +412,88 @@ function displayFilteredOrders(filteredOrders) {
     tbody.innerHTML = html;
     lucide.createIcons();
 }
+
+// ===== MODAL FUNCTIONS =====
+function createOrder() {
+    const modal = document.getElementById("createOrderModal");
+    if (modal) {
+        modal.style.display = "flex";
+        // Set date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('orderDateInput').value = today;
+        // Add a default product row if list is empty
+        if (document.getElementById("modalProductList").children.length === 0) {
+            addProductRow();
+        }
+        lucide.createIcons();
+    }
+}
+
+function closeCreateOrderModal() {
+    const modal = document.getElementById("createOrderModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+function clearOrderForm() {
+    if (confirm("Bạn có chắc muốn xóa toàn bộ thông tin đã nhập?")) {
+        const modal = document.getElementById("createOrderModal");
+        modal.querySelectorAll('input, textarea').forEach(input => {
+            if (input.type === 'date') {
+                input.value = new Date().toISOString().split('T')[0];
+            } else if (input.type === 'number') {
+                input.value = '0';
+            } else {
+                input.value = '';
+            }
+        });
+        document.getElementById("modalProductList").innerHTML = '';
+        addProductRow();
+        updateTotals();
+        showNotification("Đã xóa thông tin trên form", "info");
+    }
+}
+
+function addProductRow() {
+    const tbody = document.getElementById("modalProductList");
+    const newRow = document.createElement("tr");
+    const rowIndex = tbody.children.length + 1;
+
+    newRow.innerHTML = `
+        <td>${rowIndex}</td>
+        <td><input type="text" placeholder="Nhập tên sản phẩm"></td>
+        <td><input type="text" placeholder="Mã SP"></td>
+        <td><input type="number" value="1" style="width: 60px;"></td>
+        <td><input type="number" value="0"></td>
+        <td><input type="number" value="0"></td>
+        <td>0 ₫</td>
+        <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
+        <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
+        <td><select><option>Chọn biến thể...</option></select></td>
+        <td class="action-cell">
+            <button class="btn-action" title="Gợi ý thông minh"><i data-lucide="sparkles"></i></button>
+            <button class="btn-action" title="Sao chép"><i data-lucide="copy"></i></button>
+            <button class="btn-action delete" title="Xóa" onclick="this.closest('tr').remove(); updateTotals();"><i data-lucide="trash-2"></i></button>
+        </td>
+    `;
+    tbody.appendChild(newRow);
+    lucide.createIcons();
+    updateTotals();
+}
+
+function updateTotals() {
+    // This is a placeholder for now.
+    // A full implementation would calculate totals based on product rows.
+    document.getElementById("modalTotalQuantity").textContent = document.getElementById("modalProductList").children.length;
+}
+
+// Expose functions to global scope for onclick handlers
+window.createOrder = createOrder;
+window.closeCreateOrderModal = closeCreateOrderModal;
+window.clearOrderForm = clearOrderForm;
+window.addProductRow = addProductRow;
+
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
