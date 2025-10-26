@@ -150,14 +150,24 @@ export function handleDataFile(event) {
 
 export function updateSavedDataList() {
     const infoDiv = document.getElementById("savedDataInfo");
-    if (!infoDiv) return;
+    const savedDataWrapper = document.getElementById("savedDataWrapper"); // Get the wrapper element
+    if (!infoDiv || !savedDataWrapper) return;
 
     const savedProducts = loadAllSavedProducts();
 
     if (savedProducts.length === 0) {
-        infoDiv.innerHTML = ``; // Set innerHTML to empty string
+        savedDataWrapper.style.display = 'none'; // Hide the entire section
+        infoDiv.innerHTML = `
+            <div class="saved-data-empty">
+                <i data-lucide="inbox"></i>
+                <span>Chưa có sản phẩm nào được lưu</span>
+            </div>
+        `; // Keep the empty state message for when it's shown again
+        window.lucide.createIcons();
         return;
     }
+
+    savedDataWrapper.style.display = 'block'; // Show the section if there are products
 
     infoDiv.innerHTML = `
         <div class="saved-products-list">
@@ -213,7 +223,7 @@ export function loadProductFromList(productCode) {
 
 export function autoLoadSavedData() {
     const savedProducts = loadAllSavedProducts();
-    updateSavedDataList();
+    updateSavedDataList(); // Call this first to handle visibility
 
     if (savedProducts.length === 0) {
         return;
