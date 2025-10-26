@@ -421,3 +421,37 @@
     transition: none;
     pointer-events: none;
 }
+
+/* Always visible tooltip for product name */
+.tooltip-always-visible[data-tooltip]:not([data-tooltip=""])::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e293b;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 110;
+    opacity: 1;
+    transition: none;
+    pointer-events: none;
+}
+
+.tooltip-always-visible[data-tooltip]:not([data-tooltip=""])::before {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+    z-index: 110;
+    opacity: 1;
+    transition: none;
+    pointer-events: none;
+}
