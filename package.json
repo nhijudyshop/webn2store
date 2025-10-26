@@ -2,10 +2,10 @@
   "name": "facebook-comments-viewer",
   "version": "1.0.0",
   "description": "Facebook Comments Viewer App",
-  "main": "facebookcomment/app.js",
+  "main": "facebookcomment/server.js",
   "scripts": {
-    "start": "node facebookcomment/app.js",
-    "dev": "nodemon facebookcomment/app.js"
+    "start": "node facebookcomment/server.js",
+    "dev": "nodemon facebookcomment/server.js"
   },
   "keywords": ["facebook", "comments", "viewer"],
   "author": "",

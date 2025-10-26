@@ -29,7 +29,9 @@ export const appState = {
     videosData: [], // Stores videos/posts data for selected page
 };
 
-// Expose appState globally for debugging if needed
-window.appState = appState;
+// Expose appState globally for debugging if needed, but only in the browser
+if (typeof window !== 'undefined') {
+    window.appState = appState;
+}
 
 console.log("✅ App State module loaded");
