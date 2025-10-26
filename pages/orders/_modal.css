@@ -234,7 +234,6 @@
 }
 
 .product-table-wrapper {
-    overflow-x: auto;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     background: white;
@@ -293,7 +292,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10;
+    z-index: 100;
     object-fit: contain;
     border: 2px solid white;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -385,4 +384,40 @@
 .summary-row input[type="number"] {
     width: 120px;
     text-align: right;
+}
+
+/* Custom Tooltip */
+.tooltip-host {
+    position: relative;
+}
+.tooltip-host:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e293b;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 110;
+    opacity: 1;
+    transition: none; /* Instant display */
+    pointer-events: none;
+}
+.tooltip-host:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+    z-index: 110;
+    opacity: 1;
+    transition: none;
+    pointer-events: none;
 }
