@@ -520,6 +520,8 @@ async function loadAccounts() {
 // Populate page selector
 function populatePageSelector(accounts) {
     const selector = document.getElementById("selectedPageId");
+    const currentValue = selector.value; // Remember current value
+
     selector.innerHTML = '<option value="">-- Chọn Page --</option>';
 
     accounts.forEach((account) => {
@@ -532,6 +534,11 @@ function populatePageSelector(accounts) {
             selector.appendChild(option);
         });
     });
+
+    // Re-apply the remembered value if it's still valid
+    if (currentValue) {
+        selector.value = currentValue;
+    }
 }
 
 // ===== LOAD VIDEOS =====
