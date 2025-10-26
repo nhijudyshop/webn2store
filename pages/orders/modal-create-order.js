@@ -1,6 +1,5 @@
 // pages/orders/modal-create-order.js
 
-import { openSelectProductModal } from './modal-select-product.js';
 import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { productSuggestions } from './state.js';
 import { formatCurrency } from './ui.js';
@@ -239,6 +238,3 @@ export async function fetchProductAndPopulateRow(event) {
         window.lucide.createIcons();
     }
 }
-
-// Make openSelectProductModal available for the onclick attribute
-window.openSelectProductModal = openSelectProductModal;

@@ -1,6 +1,6 @@
 // pages/orders/api.js
 
-import { setOrders, setInventoryProducts, setProductSuggestions } from './state.js';
+import { setOrders, setProductSuggestions } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
 
 export async function loadProductSuggestions() {
@@ -13,34 +13,6 @@ export async function loadProductSuggestions() {
         }
     } catch (error) {
         console.error('Error loading product suggestions:', error);
-    }
-}
-
-export async function loadInventoryProducts() {
-    try {
-        // Thay đổi endpoint để lấy dữ liệu từ kho sản phẩm đã lưu
-        const response = await fetch('/api/inventory/products');
-        const result = await response.json();
-        if (result.success && Array.isArray(result.data)) {
-            // Chuyển đổi dữ liệu để phù hợp với cấu trúc hiển thị
-            const mappedProducts = result.data.map(item => ({
-                code: item.product.DefaultCode,
-                name: item.product.Name,
-                imageUrl: item.product.ImageUrl,
-                purchasePrice: item.product.PurchasePrice,
-                salePrice: item.product.ListPrice,
-            }));
-            setInventoryProducts(mappedProducts);
-            console.log(`✅ Loaded ${mappedProducts.length} inventory products from server.`);
-        } else {
-            console.error('❌ Failed to load inventory products.');
-            const tbody = document.getElementById("inventoryProductList");
-            if(tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Lỗi tải danh sách sản phẩm.</td></tr>`;
-        }
-    } catch (error) {
-        console.error('❌ Error fetching inventory products:', error);
-        const tbody = document.getElementById("inventoryProductList");
-        if(tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Lỗi kết nối. Không thể tải sản phẩm.</td></tr>`;
     }
 }
 
