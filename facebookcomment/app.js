@@ -29,10 +29,10 @@ const appState = {
 // ===== IMPORT MODULES =====
 import { loadLastSession, saveLastSession, clearLastSession, restoreLastSession } from './utils/session-manager.js';
 import { loadAccounts, loadVideos, populateVideoSelector } from './utils/facebook-ui-manager.js';
-import { renderAllComments, filterAndDisplayComments } from './utils/comment-display.js';
+import { renderAllComments } from './utils/comment-display.js'; // renderAllComments is from comment-display.js
 import { fetchOrders, refreshOrders } from './utils/order-data-manager.js';
 import { loadPrintersForPrinting, loadTemplateSettingsForPrinting, handleCreateOrder, handleViewInfo } from './utils/printer-template-manager.js';
-import { processComments, connectStream, fetchComments, renderPaginationControls, goToPage } from './utils/search-pagination-manager.js';
+import { processComments, connectStream, fetchComments, renderPaginationControls, goToPage, filterAndDisplayComments } from './utils/search-pagination-manager.js'; // filterAndDisplayComments is from search-pagination-manager.js
 import { initializeSettingsPage } from './utils/settings-page-initializer.js'; // New import for settings page
 
 // ===== GLOBAL EXPORTS (for HTML onclicks and shared access) =====
