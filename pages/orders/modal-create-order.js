@@ -32,6 +32,21 @@ function handlePaste(event) {
     }
 }
 
+/**
+ * Updates the row numbers (STT column) in the product table.
+ */
+function updateRowNumbers() {
+    const tbody = document.getElementById("modalProductList");
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+        const firstCell = row.querySelector('td:first-child');
+        if (firstCell) {
+            firstCell.textContent = index + 1;
+        }
+    });
+}
+
 export function createOrder() {
     const modal = document.getElementById("createOrderModal");
     if (modal) {
@@ -97,8 +112,8 @@ export function addProductRow() {
         <td><select><option>Chọn biến thể...</option></select></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
-            <button class="btn-action" title="Sao chép"><i data-lucide="copy"></i></button>
-            <button class="btn-action delete" title="Xóa" onclick="this.closest('tr').remove(); window.updateTotals();"><i data-lucide="trash-2"></i></button>
+            <button class="btn-action" title="Sao chép" onclick="window.cloneProductRow(event)"><i data-lucide="copy"></i></button>
+            <button class="btn-action delete" title="Xóa" onclick="window.deleteProductRow(event)"><i data-lucide="trash-2"></i></button>
         </td>
     `;
     tbody.appendChild(newRow);
@@ -111,9 +126,36 @@ export function addProductRow() {
     updateTotals();
 }
 
+export function cloneProductRow(event) {
+    const btn = event.currentTarget;
+    const originalRow = btn.closest('tr');
+    if (!originalRow) return;
+
+    const clonedRow = originalRow.cloneNode(true);
+    originalRow.insertAdjacentElement('afterend', clonedRow);
+
+    const dropzones = clonedRow.querySelectorAll('.image-dropzone');
+    dropzones.forEach(dz => dz.addEventListener('paste', handlePaste));
+
+    updateRowNumbers();
+    updateTotals();
+    window.lucide.createIcons();
+}
+
+export function deleteProductRow(event) {
+    const btn = event.currentTarget;
+    const row = btn.closest('tr');
+    if (row) {
+        row.remove();
+        updateTotals();
+        updateRowNumbers();
+    }
+}
+
 export function updateTotals() {
     const rows = document.getElementById("modalProductList").children;
     let subtotal = 0;
+    let totalQuantity = 0;
 
     for (const row of rows) {
         const qtyInput = row.querySelector('td:nth-child(4) input');
@@ -125,13 +167,14 @@ export function updateTotals() {
         const lineTotal = quantity * price;
 
         subtotal += lineTotal;
+        totalQuantity += quantity;
 
         if (lineTotalCell) {
             lineTotalCell.textContent = formatCurrency(lineTotal);
         }
     }
 
-    document.getElementById("modalTotalQuantity").textContent = rows.length;
+    document.getElementById("modalTotalQuantity").textContent = totalQuantity;
 
     const subtotalEl = document.getElementById('modalSubtotal');
     const totalEl = document.getElementById('modalTotal');
@@ -238,3 +281,7 @@ export async function fetchProductAndPopulateRow(event) {
         window.lucide.createIcons();
     }
 }
+
+// Expose functions to window for inline event handlers
+window.cloneProductRow = cloneProductRow;
+window.deleteProductRow = deleteProductRow;
