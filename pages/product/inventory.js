@@ -205,9 +205,7 @@ function updateSavedDataList() {
                         </div>
                         <div class="saved-product-time">${data.savedAt}</div>
                     </div>
-                    <button class="btn-delete-product" onclick="event.stopPropagation(); deleteSavedProduct('${data.productCode}')" title="Xóa sản phẩm này">
-                        <i data-lucide="trash-2"></i>
-                    </button>
+                    <!-- Nút xóa từng sản phẩm đã được loại bỏ theo yêu cầu -->
                 </div>
             `,
                 )
@@ -531,11 +529,11 @@ function clearData() {
     // Show empty states
     showEmptyState(
         "parentTableWrapper",
-        'Nhập mã sản phẩm và nhấn "Tìm kiếm" để xem thông tin',
+        'Nhập mã sản phẩm và nhấn "Thêm" để xem thông tin',
     );
     showEmptyState(
         "variantsTableWrapper",
-        'Nhập mã sản phẩm và nhấn "Tìm kiếm" để xem danh sách biến thể',
+        'Nhập mã sản phẩm và nhấn "Thêm" để xem danh sách biến thể',
     );
 
     showNotification("Đã xóa dữ liệu", "info");
