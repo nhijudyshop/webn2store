@@ -8,7 +8,7 @@
  */
 
 // ===== CONFIGURATION =====
-const TPOS_CONFIG = {
+export const TPOS_CONFIG = {
     baseUrl: "https://tomato.tpos.vn/odata",
     storageKey: "tpos_bearer_token",
     appVersion: "5.9.10.1",
@@ -21,7 +21,7 @@ const TPOS_CONFIG = {
  * @param {string} inputId - Optional input field ID to get token from
  * @returns {string|null} Bearer token or null if not found
  */
-function getToken(inputId = "bearerToken") {
+export function getToken(inputId = "bearerToken") {
     // Try to get from input field first
     const inputElement = document.getElementById(inputId);
     let token = inputElement ? inputElement.value.trim() : null;
@@ -44,7 +44,7 @@ function getToken(inputId = "bearerToken") {
  * @param {string} inputId - Optional input field ID to save token from
  * @returns {boolean} Success status
  */
-function saveToken(token = null, inputId = "bearerToken") {
+export function saveToken(token = null, inputId = "bearerToken") {
     if (!token) {
         const inputElement = document.getElementById(inputId);
         token = inputElement ? inputElement.value.trim() : null;
@@ -74,7 +74,7 @@ function saveToken(token = null, inputId = "bearerToken") {
  * @param {string} inputId - Input field ID to set token to
  * @returns {string|null} Token or null
  */
-function loadToken(inputId = "bearerToken") {
+export function loadToken(inputId = "bearerToken") {
     const token = localStorage.getItem(TPOS_CONFIG.storageKey);
     const inputElement = document.getElementById(inputId);
     
@@ -88,7 +88,7 @@ function loadToken(inputId = "bearerToken") {
 /**
  * Clear token from localStorage
  */
-function clearToken() {
+export function clearToken() {
     localStorage.removeItem(TPOS_CONFIG.storageKey);
     if (typeof showNotification !== "undefined") {
         showNotification("Đã xóa token", "info");
@@ -101,7 +101,7 @@ function clearToken() {
  * Generate unique request ID for TPOS API
  * @returns {string} UUID v4 string
  */
-function generateRequestId() {
+export function generateRequestId() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
         /[xy]/g,
         function (c) {
@@ -118,7 +118,7 @@ function generateRequestId() {
  * @returns {Object} Headers object
  * @throws {Error} If token not found
  */
-function getTPOSHeaders(token = null) {
+export function getTPOSHeaders(token = null) {
     if (!token) {
         token = getToken();
     }
@@ -153,7 +153,7 @@ function getTPOSHeaders(token = null) {
  * @param {Object} options - Optional search parameters
  * @returns {Promise<Object>} Search results
  */
-async function searchProductByCode(productCode, options = {}) {
+export async function searchProductByCode(productCode, options = {}) {
     const {
         top = 50,
         orderby = "DateCreated desc",
@@ -189,7 +189,7 @@ async function searchProductByCode(productCode, options = {}) {
  * @param {string} token - Optional bearer token
  * @returns {Promise<Object>} Product details with variants
  */
-async function getProductDetails(productId, token = null) {
+export async function getProductDetails(productId, token = null) {
     const headers = getTPOSHeaders(token);
     const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate(${productId})?$expand=UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)`;
 
@@ -219,7 +219,7 @@ async function getProductDetails(productId, token = null) {
  * @param {string} token - Optional bearer token
  * @returns {Promise<Object>} Full product details with variants
  */
-async function getProductByCode(productCode, token = null) {
+export async function getProductByCode(productCode, token = null) {
     try {
         // Step 1: Search for product
         const searchResults = await searchProductByCode(productCode, { token });
@@ -250,7 +250,7 @@ async function getProductByCode(productCode, token = null) {
  * @param {Object} filters - Filter options
  * @returns {Promise<Object>} Product list
  */
-async function getProductList(filters = {}) {
+export async function getProductList(filters = {}) {
     const {
         top = 50,
         skip = 0,
@@ -288,7 +288,7 @@ async function getProductList(filters = {}) {
  * @param {Object} options - Fetch options
  * @returns {Promise<Object>} Response data
  */
-async function tposRequest(endpoint, options = {}) {
+export async function tposRequest(endpoint, options = {}) {
     const { method = "GET", body = null, token = null } = options;
 
     const headers = getTPOSHeaders(token);
@@ -333,29 +333,5 @@ async function tposRequest(endpoint, options = {}) {
 
     return data;
 }
-
-// ===== EXPORT FUNCTIONS =====
-// Make functions available globally
-window.TPOS_API = {
-    // Token management
-    getToken,
-    saveToken,
-    loadToken,
-    clearToken,
-    
-    // Request helpers
-    generateRequestId,
-    getTPOSHeaders,
-    
-    // API methods
-    searchProductByCode,
-    getProductDetails,
-    getProductByCode,
-    getProductList,
-    tposRequest,
-    
-    // Config
-    config: TPOS_CONFIG,
-};
 
 console.log("✅ TPOS API Service loaded");

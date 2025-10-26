@@ -27,6 +27,7 @@ const appState = {
 };
 
 // ===== IMPORT MODULES =====
+import { loadToken } from '../shared/api/tpos-api.js'; // Import loadToken directly
 import { loadLastSession, saveLastSession, clearLastSession, restoreLastSession } from './utils/session-manager.js';
 import { loadAccounts, loadVideos, populateVideoSelector, loadVideosForPageId } from './utils/facebook-ui-manager.js'; // Added loadVideosForPageId
 import { renderAllComments } from './utils/comment-display.js';
@@ -80,7 +81,7 @@ async function initializeIndexPage() {
         searchBox.focus();
     });
 
-    window.TPOS_API.loadToken(); // Load token from localStorage
+    loadToken(); // Use imported loadToken directly
 
     await loadAccounts(appState); // Load accounts
     await restoreLastSession(appState, startFetching); // Removed loadVideos argument
@@ -227,7 +228,7 @@ function clearComments(appState) {
     const searchBox = document.getElementById("searchBox");
     if (searchBox) searchBox.value = "";
     const clearSearch = document.getElementById("clearSearch");
-    if (clearSearch) clear.classList.remove("show");
+    if (clearSearch) clearSearch.classList.remove("show"); // Fixed variable name
     const searchStats = document.getElementById("searchStats");
     if (searchStats) searchStats.classList.remove("show");
 

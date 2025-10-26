@@ -1,6 +1,7 @@
 // facebookcomment/utils/session-manager.js
 
 import { loadVideosForPageId } from './facebook-ui-manager.js'; // Import the new function
+import { getToken, saveToken } from '../../shared/api/tpos-api.js'; // Import directly
 
 /**
  * Loads the last saved session from the server.

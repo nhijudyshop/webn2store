@@ -1,5 +1,7 @@
 // facebookcomment/utils/settings/token-management.js
 
+import { saveToken } from '../../../shared/api/tpos-api.js'; // Import saveToken directly
+
 /**
  * Toggles the visibility of the Bearer Token input field.
  */
@@ -19,7 +21,8 @@ export function toggleTokenVisibilitySettings() {
 
 /**
  * Saves the Bearer Token from the settings page input.
+ * @param {string} inputId - The ID of the input field containing the token.
  */
-export function saveTokenSettings() {
-    window.TPOS_API.saveToken(null, 'bearerTokenSettings'); // Use the new input ID
+export function saveTokenSettings(inputId = 'bearerTokenSettings') {
+    saveToken(null, inputId); // Use imported saveToken directly
 }

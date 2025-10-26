@@ -2,6 +2,7 @@
 
 import { createCommentElement, createCommentElementWithHighlight, renderAllComments, normalizeVietnamese } from './comment-display.js';
 import { fetchOrders } from './order-data-manager.js';
+import { getToken, tposRequest } from '../../shared/api/tpos-api.js'; // Import getToken and tposRequest directly
 
 /**
  * Filters and displays comments based on a search term.
@@ -229,7 +230,7 @@ export function connectStream(appState) {
     const pageId = videoId.split("_")[0];
     const postId = videoId;
 
-    const token = window.TPOS_API.getToken();
+    const token = getToken(); // Use imported getToken directly
     if (!token) {
         errorContainer.innerHTML = '<div class="error">⚠️ Vui lòng nhập Bearer Token trước khi kết nối stream!</div>';
         window.stopFetching(appState);
@@ -323,7 +324,7 @@ export async function fetchComments(appState) {
     refreshStatus.innerHTML = '<span class="pulse"></span> Đang tải...';
 
     try {
-        const data = await window.TPOS_API.tposRequest(`/api/comments?pageid=${pageId}&postId=${postId}&limit=${appState.commentsPerPage}&skip=${skip}`);
+        const data = await tposRequest(`/api/comments?pageid=${pageId}&postId=${postId}&limit=${appState.commentsPerPage}&skip=${skip}`);
         processComments(data, appState);
         refreshStatus.textContent = "Đang theo dõi (Polling)...";
     } catch (error) {

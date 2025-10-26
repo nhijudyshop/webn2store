@@ -1,5 +1,7 @@
 // facebookcomment/utils/order-data-manager.js
 
+import { tposRequest } from '../../shared/api/tpos-api.js'; // Import tposRequest directly
+
 /**
  * Fetches detailed order information from the API and maps it for quick lookup.
  * @param {string} postId - The ID of the post to fetch orders for.
@@ -15,7 +17,7 @@ export async function fetchOrders(postId, appState) {
         console.log("📦 Fetching detailed orders mapping...");
         const startTime = Date.now();
 
-        const data = await window.TPOS_API.tposRequest(`/api/orders-detail?postId=${postId}`);
+        const data = await tposRequest(`/api/orders-detail?postId=${postId}`);
 
         const fetchTime = Date.now() - startTime;
 
@@ -105,7 +107,7 @@ export async function refreshOrders(appState, filterAndDisplayComments, renderAl
 
         const startTime = Date.now();
 
-        const data = await window.TPOS_API.tposRequest(
+        const data = await tposRequest(
             `/api/orders-detail?postId=${postId}&forceRefresh=true`,
         );
 

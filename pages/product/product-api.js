@@ -1,6 +1,6 @@
 // pages/product/product-api.js
 
-import { TPOS_API } from '../../shared/api/tpos-api.js';
+import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
 import { showLoading, showEmptyState } from './product-utils.js';
@@ -20,7 +20,7 @@ export async function searchProduct(event) {
         showLoading("parentTableWrapper");
         showLoading("variantsTableWrapper");
 
-        const detailData = await TPOS_API.getProductByCode(productCode);
+        const detailData = await getProductByCode(productCode);
 
         setCurrentProduct(detailData);
         setCurrentVariants(detailData.ProductVariants || []);

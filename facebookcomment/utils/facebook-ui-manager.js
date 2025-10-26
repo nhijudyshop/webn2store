@@ -1,5 +1,7 @@
 // facebookcomment/utils/facebook-ui-manager.js
 
+import { tposRequest } from '../../shared/api/tpos-api.js'; // Import tposRequest directly
+
 /**
  * Loads Facebook accounts/pages from the TPOS API and populates the selector.
  * @param {object} appState - The global application state object.
@@ -10,7 +12,7 @@ export async function loadAccounts(appState) {
         '<option value="">Đang tải danh sách pages...</option>';
 
     try {
-        const data = await window.TPOS_API.tposRequest("CRMTeam/ODataService.GetAllFacebook?$expand=Childs");
+        const data = await tposRequest("CRMTeam/ODataService.GetAllFacebook?$expand=Childs");
         appState.accountsData = data.value || [];
 
         if (appState.accountsData.length === 0) {
@@ -74,7 +76,7 @@ export async function loadVideosForPageId(pageId, limit, appState) {
     videoSelector.innerHTML = '<option value="">Đang tải videos...</option>';
 
     try {
-        const data = await window.TPOS_API.tposRequest(
+        const data = await tposRequest(
             `/api/videos?pageid=${pageId}&limit=${limit}`,
         );
         appState.videosData = data.data || [];

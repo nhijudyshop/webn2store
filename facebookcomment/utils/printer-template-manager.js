@@ -1,6 +1,7 @@
 // facebookcomment/utils/printer-template-manager.js
 
 import { generateBillHTML } from './settings/template-management.js'; // Import generateBillHTML
+import { tposRequest } from '../../shared/api/tpos-api.js'; // Import tposRequest directly
 
 /**
  * Loads printer configurations from the server for use in printing.

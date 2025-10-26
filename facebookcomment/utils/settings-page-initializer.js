@@ -4,6 +4,7 @@ import { loadPrinters, addPrinter, deletePrinter, setActivePrinter, testPrinterC
 import { loadTemplateSettings, populateTemplateForm, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate, generateBillHTML } from './settings/template-management.js';
 import { checkServerStatus } from './settings/server-status.js';
 import { toggleTokenVisibilitySettings, saveTokenSettings } from './settings/token-management.js';
+import { loadToken, saveToken } from '../../shared/api/tpos-api.js'; // Import loadToken and saveToken directly
 
 /**
  * Initiates a test print using the active printer and current template settings.
@@ -115,7 +116,7 @@ export function initializeSettingsPage(appState) {
     });
 
     // Load token for settings page
-    window.TPOS_API.loadToken('bearerTokenSettings');
+    loadToken('bearerTokenSettings'); // Use imported loadToken directly
 
     // Expose functions globally for onclick attributes in HTML
     window.setActivePrinter = (index) => setActivePrinter(index, appState);
@@ -126,6 +127,6 @@ export function initializeSettingsPage(appState) {
     window.setAlignment = (align) => setAlignment(align, appState);
     window.previewTemplate = () => previewTemplate(appState);
     window.toggleTokenVisibilitySettings = toggleTokenVisibilitySettings;
-    window.saveTokenSettings = saveTokenSettings;
+    window.saveTokenSettings = () => saveTokenSettings('bearerTokenSettings'); // Pass inputId
     window.testPrint = () => testPrint(appState);
 }

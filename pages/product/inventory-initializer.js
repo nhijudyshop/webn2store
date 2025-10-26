@@ -1,6 +1,6 @@
 // pages/product/inventory-initializer.js
 
-import { TPOS_API } from '../../shared/api/tpos-api.js';
+import { loadToken } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 import { showEmptyState } from './product-utils.js';
 import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList } from './product-storage.js';
@@ -41,7 +41,7 @@ function clearData() {
 document.addEventListener("DOMContentLoaded", () => {
     window.lucide.createIcons();
 
-    TPOS_API.loadToken();
+    loadToken();
 
     setTimeout(() => {
         autoLoadSavedData();
