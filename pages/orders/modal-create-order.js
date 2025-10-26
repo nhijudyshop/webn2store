@@ -112,7 +112,6 @@ export function addProductRow() {
         <td><select><option>Chọn biến thể...</option></select></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
-            <button class="btn-action" title="Sao chép" onclick="window.cloneProductRow(event)"><i data-lucide="copy"></i></button>
             <button class="btn-action delete" title="Xóa" onclick="window.deleteProductRow(event)"><i data-lucide="trash-2"></i></button>
         </td>
     `;
@@ -124,22 +123,6 @@ export function addProductRow() {
 
     window.lucide.createIcons();
     updateTotals();
-}
-
-export function cloneProductRow(event) {
-    const btn = event.currentTarget;
-    const originalRow = btn.closest('tr');
-    if (!originalRow) return;
-
-    const clonedRow = originalRow.cloneNode(true);
-    originalRow.insertAdjacentElement('afterend', clonedRow);
-
-    const dropzones = clonedRow.querySelectorAll('.image-dropzone');
-    dropzones.forEach(dz => dz.addEventListener('paste', handlePaste));
-
-    updateRowNumbers();
-    updateTotals();
-    window.lucide.createIcons();
 }
 
 export function deleteProductRow(event) {
@@ -283,5 +266,4 @@ export async function fetchProductAndPopulateRow(event) {
 }
 
 // Expose functions to window for inline event handlers
-window.cloneProductRow = cloneProductRow;
 window.deleteProductRow = deleteProductRow;
