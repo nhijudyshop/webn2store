@@ -546,6 +546,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Lucide icons
     lucide.createIcons();
 
+    // Load saved token using TPOS_API
+    TPOS_API.loadToken();
+
     // AUTO-LOAD: Tự động load dữ liệu đã lưu (nếu có)
     setTimeout(() => {
         autoLoadSavedData();

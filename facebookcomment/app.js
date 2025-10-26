@@ -251,7 +251,7 @@ function initializeIndexPage() {
     });
 
     // Load token from localStorage using TPOS_API
-    // TPOS_API.loadToken(); // This is now handled by settings.html
+    TPOS_API.loadToken();
 
     // Load accounts on page load
     loadAccounts().then(() => {
