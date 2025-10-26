@@ -14,6 +14,10 @@ app.use(express.json());
 // Serve static files (HTML)
 app.use(express.static(__dirname));
 
+// Also serve the shared and pages directories from the root
+app.use('/shared', express.static(path.join(__dirname, '..', 'shared')));
+app.use('/pages', express.static(path.join(__dirname, '..', 'pages')));
+
 // Settings directory
 const SETTINGS_DIR = path.join(__dirname, "settings");
 const PRINTERS_FILE = path.join(SETTINGS_DIR, "printers.json");
