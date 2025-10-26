@@ -1,0 +1,30 @@
+/* ===== _responsive.css ===== */
+@media (max-width: 768px) {
+    .saved-data-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .saved-data-actions {
+        width: 100%;
+    }
+
+    .btn-saved-data {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .form-input-group {
+        width: 100%;
+    }
+
+    .btn-search,
+    .btn-clear {
+        width: 100%;
+        justify-content: center;
+    }
+}
