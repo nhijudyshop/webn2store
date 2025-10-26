@@ -155,19 +155,12 @@ export function updateSavedDataList() {
     const savedProducts = loadAllSavedProducts();
 
     if (savedProducts.length === 0) {
-        infoDiv.innerHTML = `
-            <div class="saved-data-empty">
-                <i data-lucide="inbox"></i>
-                <span>Chưa có sản phẩm nào được lưu</span>
-            </div>
-        `;
-        window.lucide.createIcons();
+        infoDiv.innerHTML = ``; // Set innerHTML to empty string
         return;
     }
 
     infoDiv.innerHTML = `
         <div class="saved-products-list">
-            <!-- Phần hiển thị tổng số sản phẩm đã lưu đã được loại bỏ -->
             ${savedProducts
                 .map(
                     (data) => `
