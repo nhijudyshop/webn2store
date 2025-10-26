@@ -52,6 +52,12 @@ let lastSession = {
     autoStart: false
 };
 
+// Pagination variables
+let currentPage = 1;
+const commentsPerPage = 50; // Default comments per page
+let totalCommentsCount = 0;
+
+
 // ===== SIDEBAR FUNCTIONS (Now handled by shared/sidebar/sidebar.js) =====
 // Note: The functions toggleSidebar, closeSidebar, and showNotification are now globally available from sidebar.js
 
@@ -222,6 +228,7 @@ async function initializeIndexPage() {
     const clearSearch = document.getElementById("clearSearch");
     const searchStats = document.getElementById("searchStats");
     const refreshGroup = document.getElementById("refreshIntervalGroup"); // Get this element
+    const paginationControls = document.getElementById("paginationControls"); // Get pagination controls
 
     searchBox.addEventListener("input", function (e) {
         currentSearchTerm = e.target.value.toLowerCase().trim();
@@ -264,8 +271,13 @@ async function initializeIndexPage() {
         
         if (connectionMode === "stream") {
             refreshGroup.style.display = "none";
+            paginationControls.style.display = "none"; // Hide pagination for stream
         } else {
             refreshGroup.style.display = "flex";
+            // Only show pagination if comments are loaded and not searching
+            if (allCommentsData.length > 0 && !currentSearchTerm) {
+                paginationControls.style.display = "flex";
+            }
         }
         
         // Save to session
@@ -298,6 +310,10 @@ async function initializeIndexPage() {
     // Set initial display for refresh interval group based on current connectionMode
     if (refreshGroup) {
         refreshGroup.style.display = connectionMode === "stream" ? "none" : "flex";
+    }
+    // Set initial display for pagination controls
+    if (paginationControls) {
+        paginationControls.style.display = connectionMode === "polling" && allCommentsData.length > 0 && !currentSearchTerm ? "flex" : "none";
     }
 }
 
@@ -396,6 +412,9 @@ function filterAndDisplayComments(searchTerm) {
 
     // Update filtered count
     document.getElementById("filteredComments").textContent = filtered.length;
+
+    // Hide pagination when searching
+    document.getElementById("paginationControls").style.display = "none";
 }
 
 function renderAllComments() {
@@ -420,6 +439,13 @@ function renderAllComments() {
 
     document.getElementById("filteredComments").textContent =
         allCommentsData.length;
+    
+    // Show pagination if in polling mode and not searching
+    if (connectionMode === "polling" && !currentSearchTerm) {
+        document.getElementById("paginationControls").style.display = "flex";
+    } else {
+        document.getElementById("paginationControls").style.display = "none";
+    }
 }
 
 // ===== LOAD ACCOUNTS/PAGES =====
@@ -686,11 +712,13 @@ function createCommentElement(comment, isNew = false) {
             `);
         }
 
-        if (orderInfo.telephone) {
+        // Always display phone number if orderInfo exists, with N/A fallback
+        if (orderInfo.telephone !== undefined) {
+            const displayPhone = orderInfo.telephone ? orderInfo.telephone : 'N/A';
             details.push(`
                 <div class="customer-detail-item">
                     <span class="icon">📱</span>
-                    <span class="value phone-value">${orderInfo.telephone}</span>
+                    <span class="value phone-value">${displayPhone}</span>
                 </div>
             `);
         }
@@ -809,11 +837,13 @@ function createCommentElementWithHighlight(comment, searchTerm, isNew = false) {
             `);
         }
 
-        if (orderInfo.telephone) {
+        // Always display phone number if orderInfo exists, with N/A fallback
+        if (orderInfo.telephone !== undefined) {
+            const displayPhone = orderInfo.telephone ? orderInfo.telephone : 'N/A';
             details.push(`
                 <div class="customer-detail-item">
                     <span class="icon">📱</span>
-                    <span class="value phone-value">${highlightText(orderInfo.telephone, searchTerm)}</span>
+                    <span class="value phone-value">${highlightText(displayPhone, searchTerm)}</span>
                 </div>
             `);
         }
@@ -1036,6 +1066,7 @@ function processComments(data) {
 
     if (data.data && Array.isArray(data.data)) {
         allCommentsData = data.data;
+        totalCommentsCount = data.totalCount || data.data.length; // Assuming API returns totalCount
 
         if (currentSearchTerm) {
             filterAndDisplayComments(currentSearchTerm);
@@ -1140,6 +1171,9 @@ function processComments(data) {
     const now = new Date();
     document.getElementById("lastUpdate").textContent =
         `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    
+    // Update pagination controls after processing comments
+    renderPaginationControls();
 }
 
 // ===== STREAM CONNECTION =====
@@ -1246,12 +1280,13 @@ async function fetchComments() {
 
     const pageId = videoId.split("_")[0];
     const postId = videoId;
+    const skip = (currentPage - 1) * commentsPerPage;
 
     refreshIndicator.classList.add("active");
     refreshStatus.innerHTML = '<span class="pulse"></span> Đang tải...';
 
     try {
-        const data = await TPOS_API.tposRequest(`/api/comments?pageid=${pageId}&postId=${postId}`);
+        const data = await TPOS_API.tposRequest(`/api/comments?pageid=${pageId}&postId=${postId}&limit=${commentsPerPage}&skip=${skip}`);
         processComments(data);
         refreshStatus.textContent = "Đang theo dõi (Polling)...";
     } catch (error) {
@@ -1260,6 +1295,44 @@ async function fetchComments() {
         showNotification(`Lỗi tải comments: ${error.message}`, "error");
     } finally {
         refreshIndicator.classList.remove("active");
+    }
+}
+
+// ===== PAGINATION FUNCTIONS =====
+function renderPaginationControls() {
+    const paginationControls = document.getElementById("paginationControls");
+    const prevBtn = document.getElementById("prevPageBtn");
+    const nextBtn = document.getElementById("nextPageBtn");
+    const pageInfo = document.getElementById("pageInfo");
+
+    if (connectionMode === "stream" || currentSearchTerm) {
+        paginationControls.style.display = "none";
+        return;
+    }
+
+    const totalPages = Math.ceil(totalCommentsCount / commentsPerPage);
+
+    if (totalPages <= 1) {
+        paginationControls.style.display = "none";
+        return;
+    }
+
+    paginationControls.style.display = "flex";
+    pageInfo.textContent = `Trang ${currentPage}/${totalPages}`;
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+}
+
+function goToPage(pageNumber) {
+    if (pageNumber < 1) pageNumber = 1;
+    const totalPages = Math.ceil(totalCommentsCount / commentsPerPage);
+    if (pageNumber > totalPages) pageNumber = totalPages;
+
+    if (pageNumber !== currentPage) {
+        currentPage = pageNumber;
+        fetchComments(); // Fetch comments for the new page
+        document.getElementById("commentsList").scrollTop = 0; // Scroll to top
     }
 }
 
@@ -1278,6 +1351,7 @@ async function startFetching() {
     knownCommentIds.clear();
     isFirstLoad = true;
     document.getElementById("newComments").textContent = "0";
+    currentPage = 1; // Reset to first page on start
 
     document.getElementById("startBtn").disabled = true;
     document.getElementById("stopBtn").disabled = false;
@@ -1290,6 +1364,7 @@ async function startFetching() {
 
     if (connectionMode === "stream") {
         connectStream();
+        document.getElementById("paginationControls").style.display = "none";
     } else {
         const interval =
             parseInt(document.getElementById("refreshInterval").value) || 10;
@@ -1302,6 +1377,7 @@ async function startFetching() {
         fetchComments();
 
         refreshInterval = setInterval(fetchComments, interval * 1000);
+        document.getElementById("paginationControls").style.display = "flex";
     }
 }
 
@@ -1325,6 +1401,8 @@ function stopFetching() {
     // Disable auto-start
     lastSession.autoStart = false;
     saveLastSession();
+
+    document.getElementById("paginationControls").style.display = "none"; // Hide pagination on stop
 }
 
 function clearComments() {
@@ -1348,6 +1426,8 @@ function clearComments() {
     document.getElementById("totalComments").textContent = "0";
     document.getElementById("newComments").textContent = "0";
     document.getElementById("filteredComments").textContent = "0";
+    currentPage = 1; // Reset pagination
+    totalCommentsCount = 0; // Reset total count
 
     const commentsList = document.getElementById("commentsList");
     commentsList.innerHTML =
@@ -1356,6 +1436,7 @@ function clearComments() {
     document.getElementById("errorContainer").innerHTML = "";
 
     document.getElementById("startBtn").disabled = false;
+    document.getElementById("paginationControls").style.display = "none"; // Hide pagination on clear
 }
 
 // ===== REFRESH ORDERS =====
