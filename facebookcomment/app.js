@@ -666,16 +666,19 @@ function createCommentElement(comment, isNew = false) {
     const userId = comment.from?.id;
     const commentId = comment.id;
 
-    // Create avatar HTML
-    let avatarHTML = "";
-    const avatarUrl = comment.from?.picture?.data?.url;
+    let avatarBlockHTML = '';
+    if (connectionMode !== 'polling') { // Only show avatar if not in polling mode
+        let avatarHTML = "";
+        const avatarUrl = comment.from?.picture?.data?.url;
 
-    if (avatarUrl) {
-        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-    } else if (userId) {
-        avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-    } else {
-        avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
+        if (avatarUrl) {
+            avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
+        } else if (userId) {
+            avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
+        } else {
+            avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
+        }
+        avatarBlockHTML = `<div class="avatar">${avatarHTML}</div>`;
     }
 
     // Check if user has order
@@ -774,9 +777,7 @@ function createCommentElement(comment, isNew = false) {
 
     return `
         <div class="comment-item ${newClass}">
-            <div class="avatar">
-                ${avatarHTML}
-            </div>
+            ${avatarBlockHTML}
             <div class="comment-content">
                 <div class="comment-header">
                     <span class="comment-author ${nameClass}">${name}</span>
@@ -804,15 +805,19 @@ function createCommentElementWithHighlight(comment, searchTerm, isNew = false) {
     const highlightedName = highlightText(name, searchTerm);
     const highlightedMessage = highlightText(message, searchTerm);
 
-    let avatarHTML = "";
-    const avatarUrl = comment.from?.picture?.data?.url;
+    let avatarBlockHTML = '';
+    if (connectionMode !== 'polling') { // Only show avatar if not in polling mode
+        let avatarHTML = "";
+        const avatarUrl = comment.from?.picture?.data?.url;
 
-    if (avatarUrl) {
-        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-    } else if (userId) {
-        avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-    } else {
-        avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
+        if (avatarUrl) {
+            avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
+        } else if (userId) {
+            avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
+        } else {
+            avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
+        }
+        avatarBlockHTML = `<div class="avatar">${avatarHTML}</div>`;
     }
 
     let orderHTML = "";
@@ -909,9 +914,7 @@ function createCommentElementWithHighlight(comment, searchTerm, isNew = false) {
 
     return `
         <div class="comment-item ${newClass}">
-            <div class="avatar">
-                ${avatarHTML}
-            </div>
+            ${avatarBlockHTML}
             <div class="comment-content">
                 <div class="comment-header">
                     <span class="comment-author ${nameClass}">${highlightedName}</span>
