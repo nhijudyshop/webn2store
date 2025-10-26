@@ -35,7 +35,7 @@ export function displayOrders(ordersToDisplay = orders) {
     }
 
     const html = ordersToDisplay.map(order => `
-        <tr>
+        <tr data-order-id="${order.id}">
             <td><div class="order-date"><i data-lucide="calendar"></i><div><div>${order.date}</div><div style="font-size: 12px; color: #64748b;">(${order.time})</div></div></div></td>
             <td><div class="supplier-info">${order.supplier}</div><div class="supplier-qty">Tổng SL: ${order.totalQty}</div></td>
             <td><div class="invoice-info"><div class="invoice-images"><img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product"><img src="../../shared/assets/placeholder.png" class="invoice-image" alt="Product"></div><div class="invoice-value">${order.invoice}</div></div></td>
@@ -47,8 +47,8 @@ export function displayOrders(ordersToDisplay = orders) {
             <td><div class="price-cell"><img src="../../shared/assets/placeholder.png" class="price-image" alt="Product"><div class="price">${order.salePrice}</div></div></td>
             <td><div style="color: #64748b; font-size: 14px;">${order.note || '-'}</div></td>
             <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
-            <td><button class="btn-edit" onclick="editOrder(${order.id})" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
-            <td><div class="action-buttons"><button class="btn-delete" onclick="deleteOrder(${order.id})" title="Xóa đơn hàng"><i data-lucide="trash-2"></i></button><input type="checkbox" class="checkbox" onchange="toggleOrderSelection(${order.id})"></div></td>
+            <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
+            <td><div class="action-buttons"><button class="btn-delete" data-action="delete" title="Xóa đơn hàng"><i data-lucide="trash-2"></i></button><input type="checkbox" class="checkbox" data-action="select"></div></td>
         </tr>
     `).join('');
 

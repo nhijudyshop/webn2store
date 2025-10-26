@@ -24,7 +24,7 @@
                     <h1>Quản lý đặt hàng</h1>
                     <p>Theo dõi và quản lý đơn đặt hàng với các nhà cung cấp</p>
                 </div>
-                <button class="btn-create-order" onclick="createOrder()">
+                <button class="btn-create-order" id="createOrderBtn">
                     <i data-lucide="plus"></i>
                     Tạo đơn đặt hàng
                 </button>
@@ -87,16 +87,13 @@
 
                 <!-- Navigation Tabs -->
                 <div class="nav-tabs">
-                    <button
-                        class="tab-btn active"
-                        onclick="switchTab('orders')"
-                    >
+                    <button class="tab-btn active" data-tab="orders">
                         Đơn hàng
                     </button>
-                    <button class="tab-btn" onclick="switchTab('drafts')">
+                    <button class="tab-btn" data-tab="drafts">
                         Nháp <span class="badge">0</span>
                     </button>
-                    <button class="tab-btn" onclick="switchTab('products')">
+                    <button class="tab-btn" data-tab="products">
                         <i data-lucide="package"></i>
                         Sản phẩm đã đặt
                     </button>
@@ -113,17 +110,11 @@
                             </p>
                         </div>
                         <div class="export-buttons">
-                            <button
-                                class="btn-export"
-                                onclick="exportExcel('purchase')"
-                            >
+                            <button class="btn-export" id="exportPurchaseBtn">
                                 <i data-lucide="shopping-cart"></i>
                                 Xuất Excel mua hàng
                             </button>
-                            <button
-                                class="btn-export"
-                                onclick="exportExcel('products')"
-                            >
+                            <button class="btn-export" id="exportProductsBtn">
                                 <i data-lucide="download"></i>
                                 Xuất Excel Thêm SP
                             </button>
@@ -137,7 +128,7 @@
                                 <label>Từ ngày:</label>
                                 <div class="date-picker">
                                     <i data-lucide="calendar"></i>
-                                    <button onclick="selectDate('from')">
+                                    <button id="selectDateFromBtn">
                                         Chọn ngày
                                     </button>
                                 </div>
@@ -146,7 +137,7 @@
                                 <label>Đến ngày:</label>
                                 <div class="date-picker">
                                     <i data-lucide="calendar"></i>
-                                    <button onclick="selectDate('to')">
+                                    <button id="selectDateToBtn">
                                         Chọn ngày
                                     </button>
                                 </div>
@@ -217,10 +208,10 @@
                 <div class="modal-header">
                     <h2>Tạo đơn đặt hàng mới</h2>
                     <div class="header-actions">
-                        <button class="btn-clear" onclick="clearOrderForm()">
+                        <button class="btn-clear" id="clearOrderFormBtn">
                             <i data-lucide="rotate-cw"></i> Clear
                         </button>
-                        <button class="btn-close" onclick="closeCreateOrderModal()">
+                        <button class="btn-close" id="closeCreateOrderModalBtnHeader">
                             <i data-lucide="x"></i>
                         </button>
                     </div>
@@ -251,7 +242,7 @@
                     <div class="product-list-section">
                         <div class="product-list-header">
                             <h3>Danh sách sản phẩm</h3>
-                            <button class="btn-select-from-inventory" onclick="openSelectProductModal()">
+                            <button class="btn-select-from-inventory" id="openSelectProductModalBtn">
                                 <i data-lucide="archive"></i> Chọn từ Kho SP
                             </button>
                         </div>
@@ -278,7 +269,7 @@
                             </table>
                         </div>
                         <div class="product-table-footer">
-                            <button class="btn-add-product" onclick="addProductRow()">
+                            <button class="btn-add-product" id="addProductRowBtn">
                                 <i data-lucide="plus"></i> Thêm sản phẩm
                             </button>
                             <div class="total-quantity">
@@ -312,7 +303,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeCreateOrderModal()">Hủy</button>
+                    <button class="btn-secondary" id="closeCreateOrderModalBtnFooter">Hủy</button>
                     <button class="btn-tertiary">Lưu nháp</button>
                     <button class="btn-primary">Tạo đơn hàng</button>
                 </div>
@@ -324,7 +315,7 @@
             <div class="modal-content" style="max-width: 1000px; height: 85vh;">
                 <div class="modal-header">
                     <h2>Chọn sản phẩm từ kho</h2>
-                    <button class="btn-close" onclick="closeSelectProductModal()">
+                    <button class="btn-close" id="closeSelectProductModalBtnHeader">
                         <i data-lucide="x"></i>
                     </button>
                 </div>
@@ -359,7 +350,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeSelectProductModal()">Hủy</button>
+                    <button class="btn-secondary" id="closeSelectProductModalBtnFooter">Hủy</button>
                     <button class="btn-primary">Thêm sản phẩm</button>
                 </div>
             </div>
