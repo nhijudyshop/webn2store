@@ -301,7 +301,7 @@ app.get("/api/videos", async (req, res) => {
 app.get("/api/comments", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
-        const { pageid, postId } = req.query;
+        const { pageid, postId, limit = 50, skip = 0 } = req.query; // Add limit and skip
 
         if (!pageid || !postId) {
             return res.status(400).json({
@@ -309,7 +309,8 @@ app.get("/api/comments", async (req, res) => {
             });
         }
 
-        const url = `https://tomato.tpos.vn/api/facebook-graph/comment?pageid=${pageid}&facebook_type=Page&postId=${postId}&limit=50&order=reverse_chronological`;
+        // Construct URL with limit and offset (skip)
+        const url = `https://tomato.tpos.vn/api/facebook-graph/comment?pageid=${pageid}&facebook_type=Page&postId=${postId}&limit=${limit}&offset=${skip}&order=reverse_chronological`;
 
         console.log(`📡 Fetching: ${url}`);
 

@@ -740,6 +740,17 @@ function createCommentElement(comment, isNew = false) {
                 </div>
             `);
         }
+        
+        // Add PartnerStatus badge
+        if (orderInfo.partnerStatus) {
+            const statusClass = orderInfo.partnerStatus.toLowerCase(); // e.g., "vip", "normal", "blacklist"
+            details.push(`
+                <div class="customer-detail-item status-badge status-${statusClass}">
+                    <span class="icon">⭐</span>
+                    <span class="value">${orderInfo.partnerStatus}</span>
+                </div>
+            `);
+        }
 
         // New: put details directly into inlineCustomerDetails
         if (details.length > 0) {
@@ -862,6 +873,17 @@ function createCommentElementWithHighlight(comment, searchTerm, isNew = false) {
                 <div class="customer-detail-item">
                     <span class="icon">🤝</span>
                     <span class="value">${highlightText(orderInfo.partnerName, searchTerm)}</span>
+                </div>
+            `);
+        }
+
+        // Add PartnerStatus badge
+        if (orderInfo.partnerStatus) {
+            const statusClass = orderInfo.partnerStatus.toLowerCase(); // e.g., "vip", "normal", "blacklist"
+            details.push(`
+                <div class="customer-detail-item status-badge status-${statusClass}">
+                    <span class="icon">⭐</span>
+                    <span class="value">${highlightText(orderInfo.partnerStatus, searchTerm)}</span>
                 </div>
             `);
         }

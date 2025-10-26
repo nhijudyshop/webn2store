@@ -140,6 +140,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- Pagination Controls (Hidden by default, shown for Polling mode) -->
+        <div class="pagination-controls" id="paginationControls" style="display: none;">
+            <button id="prevPageBtn" onclick="goToPage(currentPage - 1)" disabled>
+                <i data-lucide="chevron-left"></i> Trang trước
+            </button>
+            <span id="pageInfo" class="pagination-info">Trang 1/1</span>
+            <button id="nextPageBtn" onclick="goToPage(currentPage + 1)" disabled>
+                Trang sau <i data-lucide="chevron-right"></i>
+            </button>
+        </div>
     </div>
 
     <!-- JavaScript -->

@@ -2,6 +2,6 @@
   "pageId": "270136663390370",
   "videoId": "270136663390370_1363806618461599",
   "connectionMode": "polling",
-  "refreshInterval": 60,
+  "refreshInterval": 5,
   "autoStart": false
 }
