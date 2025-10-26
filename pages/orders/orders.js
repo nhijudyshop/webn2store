@@ -1,6 +1,7 @@
 // ===== GLOBAL VARIABLES =====
 let orders = [];
 let currentTab = 'orders';
+let inventoryProducts = []; // To store products for the selection modal
 
 // ===== SIDEBAR FUNCTIONS =====
 // Note: The functions toggleSidebar, closeSidebar, and showNotification are now globally available from sidebar.js
@@ -38,6 +39,26 @@ function selectDate(type) {
 }
 
 // ===== LOAD DATA =====
+async function loadInventoryProducts() {
+    try {
+        const response = await fetch('/api/products/suggestions');
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data)) {
+            inventoryProducts = result.data;
+            console.log(`✅ Loaded ${inventoryProducts.length} inventory products.`);
+        } else {
+            console.error('❌ Failed to load inventory products.');
+            const tbody = document.getElementById("inventoryProductList");
+            if(tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Lỗi tải danh sách sản phẩm.</td></tr>`;
+        }
+    } catch (error) {
+        console.error('❌ Error fetching inventory products:', error);
+        const tbody = document.getElementById("inventoryProductList");
+        if(tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Lỗi kết nối. Không thể tải sản phẩm.</td></tr>`;
+    }
+}
+
+
 function loadOrders() {
     // Sample data
     const sampleOrders = [
@@ -273,6 +294,12 @@ function setupEventListeners() {
     if (statusFilter) {
         statusFilter.addEventListener("change", filterOrders);
     }
+
+    // Product search in modal
+    const productSearchInput = document.getElementById("productSearchInput");
+    if (productSearchInput) {
+        productSearchInput.addEventListener("input", handleProductSearch);
+    }
 }
 
 function filterOrders() {
@@ -493,11 +520,8 @@ function openSelectProductModal() {
     if (modal) {
         modal.style.display = "flex";
         lucide.createIcons();
-        // Placeholder for loading products
-        setTimeout(() => {
-            const tbody = document.getElementById("inventoryProductList");
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">Chức năng đang được phát triển.</td></tr>`;
-        }, 1000);
+        // Display initial list of products (e.g., first 50)
+        displayInventoryProducts(inventoryProducts.slice(0, 50));
     }
 }
 
@@ -507,6 +531,43 @@ function closeSelectProductModal() {
         modal.style.display = "none";
     }
 }
+
+function displayInventoryProducts(productsToDisplay) {
+    const tbody = document.getElementById("inventoryProductList");
+    if (!productsToDisplay || productsToDisplay.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Không tìm thấy sản phẩm.</td></tr>`;
+        return;
+    }
+
+    const html = productsToDisplay.map(product => `
+        <tr>
+            <td><img src="../../shared/assets/placeholder.png" class="price-image" alt="Product"></td>
+            <td><span class="product-code">${product.code}</span></td>
+            <td>${product.name}</td>
+            <td>-</td>
+            <td>0 ₫</td>
+            <td>0 ₫</td>
+            <td><input type="checkbox" class="checkbox" data-product-code="${product.code}"></td>
+        </tr>
+    `).join('');
+    tbody.innerHTML = html;
+}
+
+function handleProductSearch(event) {
+    const searchTerm = event.target.value.toLowerCase().trim();
+    if (searchTerm.length < 2) {
+        displayInventoryProducts(inventoryProducts.slice(0, 50)); // Show default list if search is too short
+        return;
+    }
+
+    const filtered = inventoryProducts.filter(p => 
+        p.code.toLowerCase().includes(searchTerm) || 
+        p.name.toLowerCase().includes(searchTerm)
+    );
+
+    displayInventoryProducts(filtered.slice(0, 50)); // Display filtered results, limited to 50
+}
+
 
 // Expose functions to global scope for onclick handlers
 window.createOrder = createOrder;
@@ -524,6 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load initial data
     loadOrders();
+    loadInventoryProducts();
 
     // Setup event listeners
     setupEventListeners();
