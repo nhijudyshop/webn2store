@@ -2,7 +2,7 @@
 
 import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
-import { handleProductSearch, closeSelectProductModal } from './modal-select-product.js';
+import { handleProductSearch, closeSelectProductModal, openSelectProductModal } from './modal-select-product.js';
 import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow } from './modal-create-order.js';
 import { loadOrders, loadDrafts, loadProducts } from './api.js';
 
@@ -104,7 +104,7 @@ export function setupEventListeners() {
     document.getElementById("closeCreateOrderModalBtnFooter")?.addEventListener("click", closeCreateOrderModal);
     document.getElementById("clearOrderFormBtn")?.addEventListener("click", clearOrderForm);
     document.getElementById("addProductRowBtn")?.addEventListener("click", addProductRow);
-    document.getElementById("openSelectProductModalBtn")?.addEventListener("click", createModal.openSelectProductModal);
+    document.getElementById("openSelectProductModalBtn")?.addEventListener("click", openSelectProductModal);
 
     // Select Product Modal buttons and search
     document.getElementById("closeSelectProductModalBtnHeader")?.addEventListener("click", closeSelectProductModal);
