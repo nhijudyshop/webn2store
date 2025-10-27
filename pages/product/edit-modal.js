@@ -2,7 +2,7 @@
 
 import { tposRequest, getProductByCode } from '../../shared/api/tpos-api.js';
 import { currentProduct, originalProductPayload, setOriginalProductPayload, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayVariants } from './product-display.js';
 import { saveProductData } from './product-storage.js';
 import { editModalState, getCategoryFromAttributeId, updateVariantInput, openVariantSelector, variantData } from './variant-editor.js';
 
@@ -311,7 +311,6 @@ export async function saveProductChanges(event) {
         setCurrentVariants(updatedProductData.ProductVariants || []);
         displayProductInfo(updatedProductData);
         displayVariants(updatedProductData.ProductVariants || []);
-        updateStats(updatedProductData);
         await saveProductData(updatedProductData);
 
         closeEditModal();
