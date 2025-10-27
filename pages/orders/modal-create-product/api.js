@@ -80,8 +80,10 @@ function cartesian(...args) {
     return r;
 }
 
-function buildProductVariants(row, productName, purchasePrice, listPrice) {
+function buildProductVariants(row, productName) {
     const { selectedVariants, variantSelectionOrder } = row;
+    const listPriceInput = row.querySelector('td:nth-child(5) input').value;
+    const listPrice = parseAndMultiplyPrice(listPriceInput);
 
     const variantGroups = variantSelectionOrder
         .map(category => [...selectedVariants[category]])
@@ -102,32 +104,8 @@ function buildProductVariants(row, productName, purchasePrice, listPrice) {
         }).filter(Boolean);
 
         return {
-            Id: 0,
-            DefaultCode: null, // TPOS will generate this
-            NameTemplate: productName,
-            Name: variantName,
-            ProductTmplId: 0,
-            UOMId: 0,
-            UOMPOId: 0,
-            NameGet: variantName,
-            Barcode: null, // TPOS will generate this
-            PriceVariant: listPrice,
-            SaleOK: true,
-            PurchaseOK: true,
-            Active: true,
-            ListPrice: 0, // Use PriceVariant for sale price
-            StandardPrice: 0, // Cost is defined on the template
-            PurchasePrice: null,
-            Type: "product",
-            CategId: 0,
-            InvoicePolicy: "order",
-            PurchaseMethod: "receive",
-            Tracking: "none",
-            AvailableInPOS: true,
-            NameTemplateNoSign: productName,
-            AttributeValues: attributeValues,
-            InitInventory: 0,
-            Weight: 0,
+            Id: 0, EAN13: null, DefaultCode: null, NameTemplate: productName, NameNoSign: null, ProductTmplId: 0, UOMId: 0, UOMName: null, UOMPOId: 0, QtyAvailable: 0, VirtualAvailable: 0, OutgoingQty: null, IncomingQty: null, NameGet: variantName, POSCategId: null, Price: null, Barcode: null, Image: null, ImageUrl: null, Thumbnails: [], PriceVariant: listPrice, SaleOK: true, PurchaseOK: true, DisplayAttributeValues: null, LstPrice: 0, Active: true, ListPrice: 0, PurchasePrice: null, DiscountSale: null, DiscountPurchase: null, StandardPrice: 0, Weight: 0, Volume: null, OldPrice: null, IsDiscount: false, ProductTmplEnableAll: false, Version: 0, Description: null, LastUpdated: null, Type: "product", CategId: 0, CostMethod: null, InvoicePolicy: "order", Variant_TeamId: 0, Name: variantName, PropertyCostMethod: null, PropertyValuation: null, PurchaseMethod: "receive", SaleDelay: 0, Tracking: null, Valuation: null, AvailableInPOS: true, CompanyId: null, IsCombo: null, NameTemplateNoSign: productName, TaxesIds: [], StockValue: null, SaleValue: null, PosSalesCount: null, Factor: null, CategName: null, AmountTotal: null, NameCombos: [], RewardName: null, Product_UOMId: null, Tags: null, DateCreated: null, InitInventory: 0, OrderTag: null, StringExtraProperties: null, CreatedById: null, TaxAmount: null, Error: null,
+            AttributeValues: attributeValues
         };
     });
 }
@@ -157,62 +135,16 @@ export async function saveNewProducts() {
         const imageBase64WithPrefix = await getImageAsBase64(imgElement);
         const imageBase64 = imageBase64WithPrefix ? imageBase64WithPrefix.split(',')[1] : null;
         const attributeLines = buildAttributeLines(row);
-        let productVariants = buildProductVariants(row, name, purchasePrice, listPrice);
-
-        // If no variants are generated, create a default one
-        if (productVariants.length === 0 && attributeLines.length === 0) {
-            productVariants.push({
-                Id: 0,
-                DefaultCode: code,
-                NameTemplate: name,
-                Name: name,
-                Barcode: code,
-                PriceVariant: listPrice,
-                StandardPrice: purchasePrice,
-                ListPrice: listPrice,
-                PurchasePrice: purchasePrice,
-                SaleOK: true,
-                PurchaseOK: true,
-                Active: true,
-                Type: "product",
-                UOMId: 1,
-                UOMPOId: 1,
-                CategId: 2,
-                InvoicePolicy: "order",
-                PurchaseMethod: "receive",
-                Tracking: "none",
-                AvailableInPOS: true,
-                AttributeValues: []
-            });
-        }
+        const productVariants = buildProductVariants(row, name);
 
         const payload = {
-            Id: 0,
-            Name: name,
-            Type: "product",
-            ListPrice: listPrice,
-            PurchasePrice: purchasePrice,
-            StandardPrice: purchasePrice, // For template, this should be the cost price
-            SaleOK: true,
-            PurchaseOK: true,
-            Active: true,
-            UOMId: 1,
-            UOMPOId: 1,
-            DefaultCode: code,
-            CategId: 2,
-            Barcode: code,
-            AvailableInPOS: true,
-            Tracking: "none",
-            InvoicePolicy: "order",
-            PurchaseMethod: "receive",
-            Image: imageBase64,
-            UOM: { Id: 1 },
-            Categ: { Id: 2 },
-            UOMPO: { Id: 1 },
+            Id: 0, Name: name, NameNoSign: null, Description: null, Type: "product", ShowType: "Có thể lưu trữ", ListPrice: listPrice, DiscountSale: 0, DiscountPurchase: 0, PurchasePrice: purchasePrice, StandardPrice: 0, SaleOK: true, PurchaseOK: true, Active: true, UOMId: 1, UOMName: null, UOMPOId: 1, UOMPOName: null, UOSId: null, IsProductVariant: false, EAN13: null, DefaultCode: code, QtyAvailable: 0, VirtualAvailable: 0, OutgoingQty: 0, IncomingQty: 0, PropertyCostMethod: null, CategId: 2, CategCompleteName: null, CategName: null, Weight: 0, Tracking: "none", DescriptionPurchase: null, DescriptionSale: null, CompanyId: 1, NameGet: null, PropertyStockProductionId: null, SaleDelay: 0, InvoicePolicy: "order", PurchaseMethod: "receive", PropertyValuation: null, Valuation: null, AvailableInPOS: true, POSCategId: null, CostMethod: null, Barcode: code, Image: imageBase64, ImageUrl: null, Thumbnails: [], ProductVariantCount: 0, LastUpdated: null, UOMCategId: null, BOMCount: 0, Volume: null, CategNameNoSign: null, UOMNameNoSign: null, UOMPONameNoSign: null, IsCombo: false, EnableAll: false, ComboPurchased: null, TaxAmount: null, Version: 0, VariantFirstId: null, VariantFistId: null, ZaloProductId: null, CompanyName: null, CompanyNameNoSign: null, DateCreated: null, InitInventory: 0, UOMViewId: null, ImporterId: null, ImporterName: null, ImporterAddress: null, ProducerId: null, ProducerName: null, ProducerAddress: null, DistributorId: null, DistributorName: null, DistributorAddress: null, OriginCountryId: null, OriginCountryName: null, InfoWarning: null, Element: null, YearOfManufacture: null, Specifications: null, Tags: null, CreatedByName: null, OrderTag: null, StringExtraProperties: null, CreatedById: null, Error: null,
+            UOM: { Id: 1, Name: "Cái", NameNoSign: null, Rounding: 0.001, Active: true, Factor: 1, FactorInv: 1, UOMType: "reference", CategoryId: 1, CategoryName: "Đơn vị", Description: null, ShowUOMType: "Đơn vị gốc của nhóm này", NameGet: "Cái", ShowFactor: 1, DateCreated: "2018-05-25T15:44:44.14+07:00" },
+            Categ: { Id: 2, Name: "Có thể bán", CompleteName: "Có thể bán", ParentId: null, ParentCompleteName: null, ParentLeft: 0, ParentRight: 1, Sequence: null, Type: "normal", AccountIncomeCategId: null, AccountExpenseCategId: null, StockJournalId: null, StockAccountInputCategId: null, StockAccountOutputCategId: null, StockValuationAccountId: null, PropertyValuation: null, PropertyCostMethod: "average", NameNoSign: "Co the ban", IsPos: true, Version: null, IsDelete: false },
+            UOMPO: { Id: 1, Name: "Cái", NameNoSign: null, Rounding: 0.001, Active: true, Factor: 1, FactorInv: 1, UOMType: "reference", CategoryId: 1, CategoryName: "Đơn vị", Description: null, ShowUOMType: "Đơn vị gốc của nhóm này", NameGet: "Cái", ShowFactor: 1, DateCreated: "2018-05-25T15:44:44.14+07:00" },
             AttributeLines: attributeLines,
-            ProductVariants: productVariants,
-            ProductVariantCount: productVariants.length,
             Items: [], UOMLines: [], ComboProducts: [], ProductSupplierInfos: [],
+            ProductVariants: productVariants
         };
         productsToCreate.push({ payload, original: { code, name } });
     }
