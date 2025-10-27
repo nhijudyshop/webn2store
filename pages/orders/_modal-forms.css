@@ -182,7 +182,6 @@
 .product-table-wrapper td.product-code-cell {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
     padding: 8px 12px;
 }
