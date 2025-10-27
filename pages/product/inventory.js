@@ -1,7 +1,7 @@
 // pages/product/inventory.js
 
-import { loadToken } from '../../shared/api/tpos-api.js';
-import { currentProduct, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
+import { loadToken, tposRequest, getProductByCode } from '../../shared/api/tpos-api.js';
+import { currentProduct, setCurrentProduct, setCurrentVariants, originalProductPayload, setOriginalProductPayload } from './inventory-state.js';
 import { showEmptyState } from './product-utils.js';
 import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList, saveProductData } from './product-storage.js';
 import { searchProduct } from './product-api.js';
@@ -146,6 +146,32 @@ const editModalState = {
     selectedVariants: { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() },
     variantSelectionOrder: []
 };
+
+async function getImageAsBase64(imgElement) {
+    if (!imgElement || !imgElement.src) {
+        return null;
+    }
+    // If it's already a data URL, just extract the base64 part
+    if (imgElement.src.startsWith('data:image')) {
+        return imgElement.src.split(',')[1];
+    }
+    // If it's a URL, fetch and convert
+    try {
+        const response = await fetch(imgElement.src);
+        if (!response.ok) throw new Error('Network response was not ok.');
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error("Error converting image to base64:", error);
+        window.showNotification("Không thể chuyển đổi hình ảnh. Vui lòng thử lại.", "error");
+        return null;
+    }
+}
 
 function recalculateTotalQuantities() {
     const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
@@ -324,8 +350,7 @@ function openEditModal() {
     document.getElementById('editProductName').value = currentProduct.Name || '';
     document.getElementById('editPurchasePrice').value = currentProduct.PurchasePrice || 0;
     document.getElementById('editListPrice').value = currentProduct.ListPrice || 0;
-    updateVariantInput(document.getElementById('editVariants'), editModalState);
-
+    
     const dropzone = document.getElementById('editImageDropzone');
     const deleteBtn = document.getElementById('deleteEditImageBtn');
     if (currentProduct.ImageUrl) {
@@ -356,6 +381,28 @@ function openEditModal() {
     }
     recalculateTotalQuantities();
 
+    // Logic for disabling variant editing
+    const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
+    const editVariantsInput = document.getElementById('editVariants');
+    
+    // Clone to remove old listeners before adding new ones
+    const newEditVariantsInput = editVariantsInput.cloneNode(true);
+    editVariantsInput.parentNode.replaceChild(newEditVariantsInput, editVariantsInput);
+
+    if (hasStock) {
+        newEditVariantsInput.disabled = true;
+        newEditVariantsInput.style.cursor = 'not-allowed';
+        newEditVariantsInput.addEventListener('click', () => {
+            window.showNotification("Biến thể đã có số lượng, vui lòng vào TPOS chỉnh sửa.", "warning");
+        });
+    } else {
+        newEditVariantsInput.disabled = false;
+        newEditVariantsInput.style.cursor = '';
+        newEditVariantsInput.addEventListener('focusin', () => openVariantSelector(newEditVariantsInput));
+    }
+    updateVariantInput(newEditVariantsInput, editModalState);
+
+
     document.getElementById('editProductModal').style.display = 'flex';
     window.lucide.createIcons();
 }
@@ -367,21 +414,37 @@ function closeEditModal() {
 
 async function saveProductChanges(event) {
     event.preventDefault();
-    if (!currentProduct) return;
+    if (!currentProduct || !originalProductPayload) return;
+
+    const btn = document.querySelector('#editProductForm button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Đang lưu...';
+    window.lucide.createIcons();
+
+    // Create a deep copy of the original payload to modify
+    const payload = JSON.parse(JSON.stringify(originalProductPayload));
 
     // Update basic info
-    currentProduct.Name = document.getElementById('editProductName').value;
-    currentProduct.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
-    currentProduct.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+    payload.Name = document.getElementById('editProductName').value;
+    payload.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
+    payload.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+    payload.StandardPrice = payload.PurchasePrice; // Sync StandardPrice with PurchasePrice
 
+    // Handle image update
     const imgElement = document.querySelector('#editImageDropzone img');
-    currentProduct.ImageUrl = imgElement ? imgElement.src : null;
+    if (imgElement && imgElement.src.startsWith('data:image')) { // Check if it's a new (pasted) image
+        payload.Image = await getImageAsBase64(imgElement);
+        payload.ImageUrl = null;
+        if (payload.Images) {
+            payload.Images = [];
+        }
+    }
 
     // Update variant quantities
     const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
     variantRows.forEach(row => {
         const variantId = parseInt(row.dataset.variantId, 10);
-        const variant = currentProduct.ProductVariants.find(v => v.Id === variantId);
+        const variant = payload.ProductVariants.find(v => v.Id === variantId);
         if (variant) {
             const qtyInput = row.querySelector('input[data-field="QtyAvailable"]');
             const virtualInput = row.querySelector('input[data-field="VirtualAvailable"]');
@@ -389,21 +452,38 @@ async function saveProductChanges(event) {
             variant.VirtualAvailable = parseInt(virtualInput.value, 10) || 0;
         }
     });
-
-    // Update parent product's quantities to be the sum
-    currentProduct.QtyAvailable = parseInt(document.getElementById('editQtyAvailable').textContent, 10) || 0;
-    currentProduct.VirtualAvailable = parseInt(document.getElementById('editVirtualAvailable').textContent, 10) || 0;
     
     try {
-        await saveProductData(currentProduct);
-        displayProductInfo(currentProduct);
-        displayParentProduct(currentProduct);
-        displayVariants(currentProduct.ProductVariants || []);
-        updateStats(currentProduct);
+        // Send the updated payload to the new endpoint
+        await tposRequest('/api/products/update', {
+            method: 'POST',
+            body: payload
+        });
+
+        // After successful save, re-fetch the product data to ensure UI is in sync
+        const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
+        
+        // Update state and UI with fresh data
+        setOriginalProductPayload(updatedProductData); // Update the payload template
+        setCurrentProduct(updatedProductData);
+        setCurrentVariants(updatedProductData.ProductVariants || []);
+        displayProductInfo(updatedProductData);
+        displayParentProduct(updatedProductData);
+        displayVariants(updatedProductData.ProductVariants || []);
+        updateStats(updatedProductData);
+        
+        // Also update the locally saved data
+        await saveProductData(updatedProductData);
+
         closeEditModal();
-        window.showNotification("Đã cập nhật sản phẩm!", "success");
+        window.showNotification("Đã cập nhật sản phẩm thành công trên TPOS!", "success");
+
     } catch (error) {
-        window.showNotification("Lỗi khi lưu thay đổi: " + error.message, "error");
+        window.showNotification("Lỗi khi cập nhật sản phẩm: " + error.message, "error");
+        console.error("Update error:", error);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Lưu thay đổi';
     }
 }
 
@@ -420,7 +500,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Edit Modal Listeners
     const editImageDropzone = document.getElementById('editImageDropzone');
     const deleteEditImageBtn = document.getElementById('deleteEditImageBtn');
-    const editVariantsInput = document.getElementById('editVariants');
     const variantSelector = document.getElementById('variantSelector');
 
     if (editImageDropzone) editImageDropzone.addEventListener('paste', handleImagePaste);
@@ -432,13 +511,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.lucide.createIcons();
         });
     }
-    if (editVariantsInput) editVariantsInput.addEventListener('focusin', () => openVariantSelector(editVariantsInput));
+    
+    // The listener for editVariants input is now dynamically added in openEditModal
+    
     if (variantSelector) {
         variantSelector.addEventListener('change', handleVariantSelection);
         variantSelector.querySelector('.btn-close-selector')?.addEventListener('click', closeVariantSelector);
     }
     document.addEventListener('click', (event) => {
-        if (variantSelector && !variantSelector.contains(event.target) && event.target !== activeVariantInput) {
+        const editVariantsInput = document.getElementById('editVariants');
+        if (variantSelector && !variantSelector.contains(event.target) && event.target !== editVariantsInput) {
             closeVariantSelector();
         }
     });

@@ -246,5 +246,27 @@ router.post("/products/insert", async (req, res) => {
     }
 });
 
+// Proxy endpoint for updating a product
+router.post("/products/update", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const productData = req.body;
+        const url = "https://tomato.tpos.vn/odata/ProductTemplate/ODataService.UpdateV2";
+
+        console.log(`🚀 Updating product on TPOS: ${productData.Name}`);
+
+        const response = await axios.post(url, productData, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log(`✅ Product updated successfully on TPOS: ${productData.Name}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error("❌ Error updating product on TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ error: "Failed to update product on TPOS", details: error.response?.data });
+    }
+});
+
 
 module.exports = router;

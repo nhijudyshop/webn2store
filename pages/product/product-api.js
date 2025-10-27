@@ -1,7 +1,7 @@
 // pages/product/product-api.js
 
 import { getProductByCode } from '../../shared/api/tpos-api.js';
-import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
+import { setCurrentProduct, setCurrentVariants, setOriginalProductPayload } from './inventory-state.js';
 import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
 import { showLoading, showEmptyState } from './product-utils.js';
 import { saveProductData, loadAllSavedProducts } from './product-storage.js';
@@ -22,6 +22,7 @@ export async function searchProduct(event) {
 
         const detailData = await getProductByCode(productCode);
 
+        setOriginalProductPayload(detailData); // Store the raw payload
         setCurrentProduct(detailData);
         setCurrentVariants(detailData.ProductVariants || []);
 
