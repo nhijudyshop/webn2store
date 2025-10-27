@@ -179,23 +179,6 @@
     border-radius: 6px;
 }
 
-.product-table-wrapper td.product-code-cell {
-    /* No flex, rely on vertical-align: middle from td */
-}
-
-.product-table-wrapper td.product-code-cell input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    vertical-align: middle;
-    margin-right: 8px;
-}
-
-.product-table-wrapper td.product-code-cell input[type="text"] {
-    vertical-align: middle;
-    width: calc(100% - 30px); /* Adjust width to account for checkbox and margin */
-}
-
 .product-table-wrapper td.image-cell {
     position: relative;
 }
