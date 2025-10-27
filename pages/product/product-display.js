@@ -22,6 +22,7 @@ export function displayProductInfo(product) {
 
     image.src = product.ImageUrl || "../../shared/assets/placeholder.png";
     image.onerror = () => {
+        image.onerror = null; // Prevent infinite loop
         image.src = "../../shared/assets/placeholder.png";
     };
     name.textContent = product.Name || "-";
@@ -65,7 +66,7 @@ export function displayParentProduct(product) {
                     <td>
                         <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
                              class="product-image" 
-                             onerror="this.src='../../shared/assets/placeholder.png'"
+                             onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
                              alt="${product.Name}">
                     </td>
                     <td><strong>${product.Name || "-"}</strong></td>
@@ -117,7 +118,7 @@ export function displayVariants(variants) {
                         <td>
                             <img src="${currentProduct?.ImageUrl || "../../shared/assets/placeholder.png"}" 
                                  class="product-image" 
-                                 onerror="this.src='../../shared/assets/placeholder.png'"
+                                 onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
                                  alt="${variant.NameTemplate}">
                         </td>
                         <td><strong>${variant.NameTemplate || "-"}</strong></td>
@@ -199,7 +200,7 @@ export function renderAllSavedProductsTable(savedProducts) {
                 <td>
                     <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
                          class="product-image" 
-                         onerror="this.src='../../shared/assets/placeholder.png'"
+                         onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
                          alt="${product.Name}">
                 </td>
                 <td><strong>${product.Name || "-"}</strong></td>
@@ -219,7 +220,7 @@ export function renderAllSavedProductsTable(savedProducts) {
                 <td>
                     <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
                          class="product-image" 
-                         onerror="this.src='../../shared/assets/placeholder.png'"
+                         onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
                          alt="${variant.NameTemplate}">
                 </td>
                 <td style="padding-left: 30px;">${variant.NameTemplate || "-"}</td>
