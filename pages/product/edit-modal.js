@@ -4,7 +4,89 @@ import { tposRequest, getProductByCode } from '../../shared/api/tpos-api.js';
 import { currentProduct, originalProductPayload, setOriginalProductPayload, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
 import { saveProductData } from './product-storage.js';
-import { editModalState, getCategoryFromAttributeId, updateVariantInput, openVariantSelector } from './variant-editor.js';
+import { editModalState, getCategoryFromAttributeId, updateVariantInput, openVariantSelector, variantData } from './variant-editor.js';
+
+// ===== Helper functions for variant generation (adapted from create-product modal) =====
+
+function getAttributeId(category) {
+    switch (category) {
+        case 'colors': return 3;
+        case 'letterSizes': return 1;
+        case 'numberSizes': return 4;
+        default: return 0;
+    }
+}
+
+function buildAttributeLines(state) {
+    const attributeLines = [];
+    const { selectedVariants, variantSelectionOrder } = state;
+
+    for (const category of variantSelectionOrder) {
+        const selectedSet = selectedVariants[category];
+        if (selectedSet.size > 0) {
+            const attributeId = getAttributeId(category);
+            const values = [...selectedSet].map(name => {
+                return variantData[category].find(v => v.Name === name);
+            }).filter(Boolean);
+
+            if (values.length > 0) {
+                attributeLines.push({
+                    Attribute: { Id: attributeId },
+                    Values: values,
+                    AttributeId: attributeId
+                });
+            }
+        }
+    }
+    return attributeLines;
+}
+
+function cartesian(...args) {
+    const r = [], max = args.length - 1;
+    function helper(arr, i) {
+        for (let j = 0, l = args[i].length; j < l; j++) {
+            const a = arr.slice(0);
+            a.push(args[i][j]);
+            if (i === max)
+                r.push(a);
+            else
+                helper(a, i + 1);
+        }
+    }
+    helper([], 0);
+    return r;
+}
+
+function buildProductVariants(productName, listPrice, state) {
+    const { selectedVariants, variantSelectionOrder } = state;
+
+    const variantGroups = variantSelectionOrder
+        .map(category => [...selectedVariants[category]])
+        .filter(group => group.length > 0);
+
+    if (variantGroups.length === 0) return [];
+
+    const combinations = cartesian(...variantGroups);
+
+    return combinations.map(combo => {
+        const variantName = `${productName} (${combo.join(', ')})`;
+        const attributeValues = combo.map(valueName => {
+            for (const category of variantSelectionOrder) {
+                const variant = variantData[category].find(v => v.Name === valueName);
+                if (variant) return variant;
+            }
+            return null;
+        }).filter(Boolean);
+
+        return {
+            Id: 0, EAN13: null, DefaultCode: null, NameTemplate: productName, NameNoSign: null, ProductTmplId: 0, UOMId: 0, UOMName: null, UOMPOId: 0, QtyAvailable: 0, VirtualAvailable: 0, OutgoingQty: null, IncomingQty: null, NameGet: variantName, POSCategId: null, Price: null, Barcode: null, Image: null, ImageUrl: null, Thumbnails: [], PriceVariant: listPrice, SaleOK: true, PurchaseOK: true, DisplayAttributeValues: null, LstPrice: 0, Active: true, ListPrice: 0, PurchasePrice: null, DiscountSale: null, DiscountPurchase: null, StandardPrice: 0, Weight: 0, Volume: null, OldPrice: null, IsDiscount: false, ProductTmplEnableAll: false, Version: 0, Description: null, LastUpdated: null, Type: "product", CategId: 0, CostMethod: null, InvoicePolicy: "order", Variant_TeamId: 0, Name: variantName, PropertyCostMethod: null, PropertyValuation: null, PurchaseMethod: "receive", SaleDelay: 0, Tracking: null, Valuation: null, AvailableInPOS: true, CompanyId: null, IsCombo: null, NameTemplateNoSign: productName, TaxesIds: [], StockValue: null, SaleValue: null, PosSalesCount: null, Factor: null, CategName: null, AmountTotal: null, NameCombos: [], RewardName: null, Product_UOMId: null, Tags: null, DateCreated: null, InitInventory: 0, OrderTag: null, StringExtraProperties: null, CreatedById: null, TaxAmount: null, Error: null,
+            AttributeValues: attributeValues
+        };
+    });
+}
+
+
+// ===== Main Modal Logic =====
 
 async function getImageAsBase64(imgElement) {
     if (!imgElement || !imgElement.src) {
@@ -181,23 +263,35 @@ export async function saveProductChanges(event) {
     window.lucide.createIcons();
 
     try {
-        // Create payload from original data to ensure we have all necessary fields
         const payload = JSON.parse(JSON.stringify(originalProductPayload));
 
-        // Update fields from the form
-        payload.Name = document.getElementById('editProductName').value;
+        // Update basic fields
+        const newName = document.getElementById('editProductName').value;
+        const newListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+        payload.Name = newName;
         payload.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
-        payload.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+        payload.ListPrice = newListPrice;
         payload.StandardPrice = payload.PurchasePrice;
 
         const imgElement = document.querySelector('#editImageDropzone img');
         if (imgElement && imgElement.src.startsWith('data:image')) {
             payload.Image = await getImageAsBase64(imgElement);
-            payload.ImageUrl = null; // Clear ImageUrl if new image is provided
+            payload.ImageUrl = null;
             if (payload.Images) payload.Images = [];
         }
 
-        // IMPORTANT: Remove quantity fields from variants to prevent accidental updates
+        // Check if we can update variants
+        const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
+
+        if (!hasStock) {
+            console.log("🔄 No stock found, regenerating variants based on new attributes...");
+            payload.AttributeLines = buildAttributeLines(editModalState);
+            payload.ProductVariants = buildProductVariants(newName, newListPrice, editModalState);
+        } else {
+            console.log("📦 Stock found, skipping variant structure update.");
+        }
+
+        // ALWAYS remove quantity fields from variants to prevent accidental updates
         if (payload.ProductVariants) {
             payload.ProductVariants.forEach(v => {
                 delete v.QtyAvailable;
@@ -205,14 +299,13 @@ export async function saveProductChanges(event) {
             });
         }
 
-        // Send the update request for product info only
+        // Send the update request
         await tposRequest('/api/products/update', { method: 'POST', body: payload });
-        console.log("✅ Product info updated (without stock quantities).");
+        console.log("✅ Product update request sent.");
 
         // Fetch fresh data from TPOS to confirm changes and update UI
         const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
         
-        // Update local state and UI
         setOriginalProductPayload(updatedProductData);
         setCurrentProduct(updatedProductData);
         setCurrentVariants(updatedProductData.ProductVariants || []);
@@ -223,7 +316,7 @@ export async function saveProductChanges(event) {
         await saveProductData(updatedProductData);
 
         closeEditModal();
-        window.showNotification("Đã cập nhật thông tin sản phẩm thành công!", "success");
+        window.showNotification("Đã cập nhật sản phẩm thành công!", "success");
 
     } catch (error) {
         window.showNotification("Lỗi khi cập nhật sản phẩm: " + error.message, "error");
