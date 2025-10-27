@@ -100,6 +100,7 @@ function handlePasteProductModal(event) {
                 
                 dropzone.innerHTML = '';
                 dropzone.appendChild(img);
+                dropzone.classList.add('has-image');
             };
             reader.readAsDataURL(file);
             
@@ -150,8 +151,8 @@ export function addProductRowProductModal() {
         <td></td>
         <td><input type="text" placeholder="Mã SP"></td>
         <td><input type="text" placeholder="Tên sản phẩm"></td>
-        <td><div class="tooltip-host"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
-        <td><div class="tooltip-host"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
+        <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
+        <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
         <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div></td>
         <td><input type="text" placeholder="VD: Size S, Màu đỏ" class="variant-input" readonly></td>
         <td class="action-cell">
@@ -170,6 +171,8 @@ export function addProductRowProductModal() {
 
     const dropzone = newRow.querySelector('.image-dropzone');
     dropzone.addEventListener('paste', handlePasteProductModal);
+    dropzone.addEventListener('mouseenter', (e) => e.currentTarget.focus());
+    dropzone.addEventListener('mouseleave', (e) => e.currentTarget.blur());
 
     updateRowNumbersProductModal();
     window.lucide.createIcons();
