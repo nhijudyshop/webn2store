@@ -1,7 +1,7 @@
 // pages/product/product-display.js
 
 import { formatCurrency, showEmptyState } from './product-utils.js';
-import { currentProduct } from './inventory-state.js';
+import { currentProduct, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 
 export function displayProductInfo(product) {
     const card = document.getElementById("productInfoCard");
@@ -182,4 +182,23 @@ export function switchTab(tab) {
     document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
     document.getElementById(`${tab}Tab`).classList.add("active");
     window.lucide.createIcons();
+}
+
+export function clearData() {
+    document.getElementById("productCode").value = "";
+
+    setCurrentProduct(null);
+    setCurrentVariants([]);
+
+    document.getElementById("productInfoCard").classList.remove("show");
+
+    document.getElementById("totalProducts").textContent = "0";
+    document.getElementById("totalVariants").textContent = "0";
+    document.getElementById("totalQty").textContent = "0";
+    document.getElementById("totalValue").textContent = "0đ";
+
+    showEmptyState("parentTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem thông tin');
+    showEmptyState("variantsTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem danh sách biến thể');
+
+    window.showNotification("Đã xóa dữ liệu", "info");
 }
