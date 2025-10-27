@@ -43,13 +43,12 @@ router.post("/tpos-login", async (req, res) => {
             return res.status(400).json({ success: false, error: "Username or password missing." });
         }
 
-        // Use a plain object for the payload; axios will handle the URL encoding.
-        const payload = {
-            grant_type: 'password',
-            username: username,
-            password: password,
-            client_id: 'tmtWebApp'
-        };
+        // Correctly format the payload as URLSearchParams for application/x-www-form-urlencoded
+        const payload = new URLSearchParams();
+        payload.append('grant_type', 'password');
+        payload.append('username', username);
+        payload.append('password', password);
+        payload.append('client_id', 'tmtWebApp');
 
         const response = await axios.post("https://tomato.tpos.vn/token", payload, {
             headers: {
