@@ -1,4 +1,3 @@
-1000.">
 // pages/orders/modal-create-product.js
 
 import { loadProductSuggestions } from './api.js';
