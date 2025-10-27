@@ -9,7 +9,6 @@ import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuan
 import { closeVariantSelector, handleVariantSelection, activeVariantInput } from './variant-editor.js';
 
 // ===== GLOBAL EXPORTS (for HTML onclicks) =====
-window.searchProduct = searchProduct;
 window.clearData = clearData;
 window.exportToJSON = exportToJSON;
 window.importFromJSON = importFromJSON;
@@ -19,7 +18,6 @@ window.loadProductFromList = loadProductFromList;
 window.switchTab = switchTab;
 window.openEditModal = openEditModal;
 window.closeEditModal = closeEditModal;
-window.saveProductChanges = saveProductChanges;
 window.recalculateTotalQuantities = recalculateTotalQuantities;
 
 // ===== INIT =====
@@ -30,9 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     await autoLoadSavedData();
 
     // Main Event Listeners
+    document.querySelector('.search-form')?.addEventListener('submit', searchProduct);
     document.getElementById('productCode')?.addEventListener('input', updateSuggestions);
     
     // Edit Modal & Variant Selector Listeners
+    document.getElementById('editProductForm')?.addEventListener('submit', saveProductChanges);
     const editImageDropzone = document.getElementById('editImageDropzone');
     const deleteEditImageBtn = document.getElementById('deleteEditImageBtn');
     const variantSelector = document.getElementById('variantSelector');

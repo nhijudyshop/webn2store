@@ -27,7 +27,7 @@
             </div>
 
             <div class="main-content-area">
-                <form class="search-form" onsubmit="searchProduct(event)">
+                <form class="search-form">
                     <div class="form-group search-input-group">
                         <label for="productCode"
                             >Mã sản phẩm (DefaultCode):</label
@@ -196,7 +196,7 @@
                     <button class="btn-close" onclick="closeEditModal()"><i data-lucide="x"></i></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editProductForm" onsubmit="saveProductChanges(event)">
+                    <form id="editProductForm">
                         <div class="form-group">
                             <label for="editProductName">Tên sản phẩm</label>
                             <input type="text" id="editProductName" required>
