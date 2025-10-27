@@ -1,7 +1,7 @@
 [
   {
     "id": 109408,
-    "timestamp": "2025-10-27T16:25:13.114Z",
+    "timestamp": "2025-10-27T16:31:39.970Z",
     "productCode": "NTEST999",
     "productName": "NTEST999",
     "product": {
@@ -72,7 +72,7 @@
       "EnableAll": false,
       "ComboPurchased": null,
       "TaxAmount": null,
-      "Version": 5615,
+      "Version": 5618,
       "VariantFirstId": null,
       "VariantFistId": null,
       "ZaloProductId": null,
@@ -512,7 +512,7 @@
         }
       ]
     },
-    "savedAt": "23:25:13 27/10/2025"
+    "savedAt": "23:31:39 27/10/2025"
   },
   {
     "id": 108967,
