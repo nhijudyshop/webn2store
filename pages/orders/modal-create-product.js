@@ -2,6 +2,7 @@
 
 import { loadProductSuggestions } from './api.js';
 import { tposRequest } from '../../shared/api/tpos-api.js';
+import { addProductRow, fetchProductAndPopulateRow } from './modal-create-order.js';
 
 let variantData = { colors: [], letterSizes: [], numberSizes: [] };
 let variantDataLoaded = false;
@@ -351,6 +352,29 @@ export async function saveNewProducts() {
             }
         } catch (error) {
             window.showNotification("Tạo sản phẩm TPOS thành công, nhưng lỗi cập nhật danh sách gợi ý.", "warning");
+        }
+    }
+
+    // Add successfully created products to the order modal
+    if (successfullyCreated.length > 0) {
+        const orderTbody = document.getElementById("modalProductList");
+        for (const product of successfullyCreated) {
+            let targetRow = orderTbody.lastElementChild;
+            const isLastRowEmpty = targetRow && targetRow.querySelector('input[placeholder="Mã SP"]').value.trim() === '';
+
+            if (!isLastRowEmpty) {
+                addProductRow();
+                targetRow = orderTbody.lastElementChild;
+            }
+            
+            const codeInput = targetRow.querySelector('input[placeholder="Mã SP"]');
+            const sparkleButton = targetRow.querySelector('button[title="Gợi ý thông minh"]');
+
+            if (codeInput && sparkleButton) {
+                codeInput.value = product.code;
+                // Use a mock event object to call the function
+                await fetchProductAndPopulateRow({ currentTarget: sparkleButton });
+            }
         }
     }
 
