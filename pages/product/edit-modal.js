@@ -36,10 +36,10 @@ export function recalculateTotalQuantities() {
     let totalVirtual = 0;
 
     variantRows.forEach(row => {
-        const qtyInput = row.querySelector('input[data-field="QtyAvailable"]');
-        const virtualInput = row.querySelector('input[data-field="VirtualAvailable"]');
-        totalQty += parseInt(qtyInput.value, 10) || 0;
-        totalVirtual += parseInt(virtualInput.value, 10) || 0;
+        const qtyDisplay = row.querySelectorAll('td .value-display')[0];
+        const virtualDisplay = row.querySelectorAll('td .value-display')[1];
+        if (qtyDisplay) totalQty += parseInt(qtyDisplay.textContent, 10) || 0;
+        if (virtualDisplay) totalVirtual += parseInt(virtualDisplay.textContent, 10) || 0;
     });
 
     document.getElementById('editQtyAvailable').textContent = totalQty;
@@ -133,8 +133,8 @@ export function openEditModal() {
             row.innerHTML = `
                 <td style="text-align: left;">${variant.Name}</td>
                 <td><span class="product-code">${variant.DefaultCode || '-'}</span></td>
-                <td><input type="number" value="${variant.QtyAvailable || 0}" data-field="QtyAvailable" oninput="recalculateTotalQuantities()"></td>
-                <td><input type="number" value="${variant.VirtualAvailable || 0}" data-field="VirtualAvailable" oninput="recalculateTotalQuantities()"></td>
+                <td><div class="value-display" style="justify-content: center;">${variant.QtyAvailable || 0}</div></td>
+                <td><div class="value-display" style="justify-content: center;">${variant.VirtualAvailable || 0}</div></td>
             `;
             variantsTbody.appendChild(row);
         });
@@ -181,61 +181,38 @@ export async function saveProductChanges(event) {
     window.lucide.createIcons();
 
     try {
-        // Step 1: Update general product info (name, price, image)
-        const infoPayload = JSON.parse(JSON.stringify(originalProductPayload));
-        infoPayload.Name = document.getElementById('editProductName').value;
-        infoPayload.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
-        infoPayload.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
-        infoPayload.StandardPrice = infoPayload.PurchasePrice;
+        // Create payload from original data to ensure we have all necessary fields
+        const payload = JSON.parse(JSON.stringify(originalProductPayload));
+
+        // Update fields from the form
+        payload.Name = document.getElementById('editProductName').value;
+        payload.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
+        payload.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+        payload.StandardPrice = payload.PurchasePrice;
 
         const imgElement = document.querySelector('#editImageDropzone img');
         if (imgElement && imgElement.src.startsWith('data:image')) {
-            infoPayload.Image = await getImageAsBase64(imgElement);
-            infoPayload.ImageUrl = null;
-            if (infoPayload.Images) infoPayload.Images = [];
+            payload.Image = await getImageAsBase64(imgElement);
+            payload.ImageUrl = null; // Clear ImageUrl if new image is provided
+            if (payload.Images) payload.Images = [];
         }
-        // We no longer send quantity fields in this payload
-        if (infoPayload.ProductVariants) {
-            infoPayload.ProductVariants.forEach(v => {
+
+        // IMPORTANT: Remove quantity fields from variants to prevent accidental updates
+        if (payload.ProductVariants) {
+            payload.ProductVariants.forEach(v => {
                 delete v.QtyAvailable;
                 delete v.VirtualAvailable;
             });
         }
 
-        await tposRequest('/api/products/update', { method: 'POST', body: infoPayload });
-        console.log("✅ Product info updated.");
+        // Send the update request for product info only
+        await tposRequest('/api/products/update', { method: 'POST', body: payload });
+        console.log("✅ Product info updated (without stock quantities).");
 
-        // Step 2: Update stock quantities for changed variants
-        const stockUpdatePromises = [];
-        const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
-        
-        variantRows.forEach(row => {
-            const variantId = parseInt(row.dataset.variantId, 10);
-            const originalVariant = currentProduct.ProductVariants.find(v => v.Id === variantId);
-            if (!originalVariant) return;
-
-            const newQty = parseInt(row.querySelector('input[data-field="QtyAvailable"]').value, 10) || 0;
-            const originalQty = originalVariant.QtyAvailable || 0;
-
-            if (newQty !== originalQty) {
-                console.log(`🔄 Scheduling stock update for variant ${variantId}: ${originalQty} -> ${newQty}`);
-                stockUpdatePromises.push(
-                    tposRequest('/api/stock/update', {
-                        method: 'POST',
-                        body: { productId: variantId, newQuantity: newQty }
-                    })
-                );
-            }
-        });
-
-        if (stockUpdatePromises.length > 0) {
-            await Promise.all(stockUpdatePromises);
-            console.log(`✅ ${stockUpdatePromises.length} stock quantities updated.`);
-        }
-
-        // Step 3: Fetch fresh data and update UI
+        // Fetch fresh data from TPOS to confirm changes and update UI
         const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
         
+        // Update local state and UI
         setOriginalProductPayload(updatedProductData);
         setCurrentProduct(updatedProductData);
         setCurrentVariants(updatedProductData.ProductVariants || []);
@@ -246,7 +223,7 @@ export async function saveProductChanges(event) {
         await saveProductData(updatedProductData);
 
         closeEditModal();
-        window.showNotification("Đã cập nhật sản phẩm thành công!", "success");
+        window.showNotification("Đã cập nhật thông tin sản phẩm thành công!", "success");
 
     } catch (error) {
         window.showNotification("Lỗi khi cập nhật sản phẩm: " + error.message, "error");
