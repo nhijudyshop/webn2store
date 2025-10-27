@@ -154,6 +154,41 @@ export function cloneProductRow(event) {
     // Create a deep clone of the row
     const clonedRow = originalRow.cloneNode(true);
 
+    // Copy the product data if it exists and re-attach the onchange handler
+    if (originalRow.productData) {
+        clonedRow.productData = originalRow.productData;
+
+        const codeInput = clonedRow.querySelector('input[placeholder="Mã SP"]');
+        const nameInput = clonedRow.querySelector('td:nth-child(3) input');
+        const nameTooltipHost = nameInput.parentElement;
+        const purchasePriceInput = clonedRow.querySelector('td:nth-child(5) input');
+        const salePriceInput = clonedRow.querySelector('td:nth-child(6) input');
+        const variantSelect = clonedRow.querySelector('td:nth-child(10) select');
+        const variantTooltipHost = variantSelect.parentElement;
+        
+        if (variantSelect) {
+            variantSelect.onchange = (e) => {
+                const product = clonedRow.productData;
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                variantTooltipHost.dataset.tooltip = selectedOption.textContent;
+                if (selectedOption.value) {
+                    purchasePriceInput.value = selectedOption.dataset.purchasePrice;
+                    salePriceInput.value = selectedOption.dataset.salePrice;
+                    nameInput.value = selectedOption.textContent;
+                    nameTooltipHost.dataset.tooltip = selectedOption.textContent;
+                    codeInput.value = selectedOption.value;
+                } else {
+                    nameInput.value = product.Name;
+                    nameTooltipHost.dataset.tooltip = product.Name;
+                    purchasePriceInput.value = product.PurchasePrice || 0;
+                    salePriceInput.value = product.ListPrice || 0;
+                    codeInput.value = product.DefaultCode;
+                }
+                updateTotals();
+            };
+        }
+    }
+
     // Insert the cloned row after the original
     originalRow.parentNode.insertBefore(clonedRow, originalRow.nextSibling);
 
@@ -300,6 +335,9 @@ export async function fetchProductAndPopulateRow(event) {
     try {
         const product = await getProductByCode(productCode);
         
+        // Store product data on the row for cloning
+        row.productData = product;
+
         nameInput.value = product.Name;
         nameTooltipHost.dataset.tooltip = product.Name;
         purchasePriceInput.value = product.PurchasePrice || 0;
