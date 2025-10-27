@@ -127,13 +127,13 @@ export function displayVariants(variants) {
                             <img src="${currentProduct?.ImageUrl || ""}" 
                                  class="product-image" 
                                  onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
-                                 alt="${variant.NameTemplate}">
+                                 alt="${variant.Name}">
                         </td>
-                        <td><strong>${variant.NameTemplate || "-"}</strong></td>
+                        <td><strong>${variant.Name || "-"}</strong></td>
                         <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>
                         <td>${variant.ProductTmplId}</td>
                         <td class="price-cell">${formatCurrency(variant.PriceVariant || variant.ListPrice)}</td>
-                        <td>${formatCurrency(variant.ListPrice)}</td>
+                        <td>${formatCurrency(variant.StandardPrice)}</td>
                         <td class="qty-cell qty-available">${variant.QtyAvailable || 0}</td>
                         <td class="qty-cell qty-forecast">${variant.VirtualAvailable || 0}</td>
                     </tr>
