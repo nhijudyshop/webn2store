@@ -18,6 +18,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for orders data
 module.exports = {
     BASE_DIR,
     SETTINGS_DIR,
+    DATA_DIR,
     PRINTERS_FILE,
     TEMPLATE_FILE,
     LAST_SESSION_FILE,
