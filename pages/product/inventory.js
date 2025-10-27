@@ -24,11 +24,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.lucide.createIcons();
     loadToken();
     await loadProductSuggestions();
-    await autoLoadSavedData();
 
     // Main Event Listeners
-    document.querySelector('.search-form')?.addEventListener('submit', searchProduct);
+    const searchForm = document.querySelector('.search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', searchProduct);
+    }
     document.getElementById('productCode')?.addEventListener('input', updateSuggestions);
+    
+    // This will now just populate the input and return true if it did.
+    const loaded = await autoLoadSavedData(); 
+
+    // If a product code was loaded, automatically trigger the search form submission.
+    if (loaded && searchForm) {
+        window.showNotification(
+            `🔄 Tự động tải dữ liệu mới nhất cho sản phẩm...`,
+            "info",
+        );
+        searchForm.requestSubmit();
+    }
     
     // Edit Modal & Variant Selector Listeners
     document.getElementById('editProductForm')?.addEventListener('submit', saveProductChanges);

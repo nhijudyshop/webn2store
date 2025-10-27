@@ -191,22 +191,13 @@ export async function autoLoadSavedData() {
     const savedProducts = await loadAllSavedProducts();
 
     if (savedProducts.length === 0) {
-        return;
+        return false; // Indicate no product was loaded
     }
 
     const latestProduct = savedProducts[0];
 
-    setCurrentProduct(latestProduct.product);
-    setCurrentVariants(latestProduct.product.ProductVariants || []);
-
-    displayProductInfo(latestProduct.product);
-    displayVariants(latestProduct.product.ProductVariants || []);
-    updateStats(latestProduct.product);
-
+    // Only populate the input field, don't display stale data
     document.getElementById("productCode").value = latestProduct.productCode;
 
-    window.showNotification(
-        `✅ Đã tự động tải sản phẩm gần nhất: ${latestProduct.productCode}`,
-        "success",
-    );
+    return true; // Indicate a product code was populated
 }
