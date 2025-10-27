@@ -3,7 +3,7 @@
 import { loadToken } from '../../shared/api/tpos-api.js';
 import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList } from './product-storage.js';
 import { searchProduct } from './product-api.js';
-import { switchTab, clearData } from './product-display.js';
+import { clearData } from './product-display.js';
 import { loadProductSuggestions, updateSuggestions } from './suggestions.js';
 import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuantities, handleImagePaste } from './edit-modal.js';
 import { closeVariantSelector, handleVariantSelection, activeVariantInput } from './variant-editor.js';
@@ -15,7 +15,6 @@ window.importFromJSON = importFromJSON;
 window.handleDataFile = handleDataFile;
 window.clearSavedData = clearSavedData;
 window.loadProductFromList = loadProductFromList;
-window.switchTab = switchTab;
 window.openEditModal = openEditModal;
 window.closeEditModal = closeEditModal;
 window.recalculateTotalQuantities = recalculateTotalQuantities;

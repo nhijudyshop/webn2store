@@ -44,55 +44,6 @@ export function displayProductInfo(product) {
     card.classList.add("show");
 }
 
-export function displayParentProduct(product) {
-    const wrapper = document.getElementById("parentTableWrapper");
-    if (!wrapper) return;
-
-    if (!product) {
-        showEmptyState(wrapper.id, 'Nhập mã sản phẩm và nhấn "Thêm" để xem thông tin');
-        return;
-    }
-
-    const html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Hình ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Mã SP</th>
-                    <th>Giá bán</th>
-                    <th>Giá mua</th>
-                    <th>SL Thực tế</th>
-                    <th>SL Dự báo</th>
-                    <th>Số biến thể</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>${product.Id}</td>
-                    <td>
-                        <img src="${product.ImageUrl || ""}" 
-                             class="product-image" 
-                             onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
-                             alt="${product.Name}">
-                    </td>
-                    <td><strong>${product.Name || "-"}</strong></td>
-                    <td><span class="product-code">${product.DefaultCode || "-"}</span></td>
-                    <td class="price-cell">${formatCurrency(product.ListPrice)}</td>
-                    <td>${formatCurrency(product.PurchasePrice)}</td>
-                    <td class="qty-cell qty-available">${product.QtyAvailable || 0}</td>
-                    <td class="qty-cell qty-forecast">${product.VirtualAvailable || 0}</td>
-                    <td><span class="variant-count">${product.ProductVariantCount || 0}</span></td>
-                </tr>
-            </tbody>
-        </table>
-    `;
-
-    wrapper.innerHTML = html;
-    window.lucide.createIcons(); // Re-initialize icons
-}
-
 export function displayVariants(variants) {
     const wrapper = document.getElementById("variantsTableWrapper");
     if (!wrapper) return;
@@ -175,15 +126,6 @@ export function updateStats(product) {
         formatCurrency(totalValue);
 }
 
-export function switchTab(tab) {
-    document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
-    document.querySelectorAll(".tab-content").forEach((content) => content.classList.remove("active"));
-
-    document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
-    document.getElementById(`${tab}Tab`).classList.add("active");
-    window.lucide.createIcons();
-}
-
 export function clearData() {
     document.getElementById("productCode").value = "";
 
@@ -197,7 +139,6 @@ export function clearData() {
     document.getElementById("totalQty").textContent = "0";
     document.getElementById("totalValue").textContent = "0đ";
 
-    showEmptyState("parentTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem thông tin');
     showEmptyState("variantsTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem danh sách biến thể');
 
     window.showNotification("Đã xóa dữ liệu", "info");

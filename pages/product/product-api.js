@@ -2,7 +2,7 @@
 
 import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants, setOriginalProductPayload } from './inventory-state.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayVariants, updateStats } from './product-display.js';
 import { showLoading, showEmptyState } from './product-utils.js';
 import { saveProductData, loadAllSavedProducts } from './product-storage.js';
 
@@ -17,7 +17,6 @@ export async function searchProduct(event) {
     }
 
     try {
-        showLoading("parentTableWrapper");
         showLoading("variantsTableWrapper");
 
         const detailData = await getProductByCode(productCode);
@@ -27,7 +26,6 @@ export async function searchProduct(event) {
         setCurrentVariants(detailData.ProductVariants || []);
 
         displayProductInfo(detailData);
-        displayParentProduct(detailData);
         displayVariants(detailData.ProductVariants || []);
         updateStats(detailData);
 
@@ -37,7 +35,6 @@ export async function searchProduct(event) {
     } catch (error) {
         console.error("Error:", error);
         window.showNotification(error.message, "error");
-        showEmptyState("parentTableWrapper", "Không thể tải dữ liệu sản phẩm");
         showEmptyState("variantsTableWrapper", "Không thể tải dữ liệu biến thể");
     }
 }
