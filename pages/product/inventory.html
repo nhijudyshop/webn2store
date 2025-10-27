@@ -77,6 +77,9 @@
                         alt="Product"
                     />
                     <div class="product-info-details">
+                        <button class="btn-edit-product" onclick="openEditModal()">
+                            <i data-lucide="edit"></i> Chỉnh sửa
+                        </button>
                         <div class="product-info-name" id="productInfoName"></div>
                         <div class="product-code" id="productInfoCode"></div>
                         <div class="product-info-meta">
@@ -181,6 +184,52 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Product Modal -->
+        <div id="editProductModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h2>Chỉnh sửa sản phẩm</h2>
+                    <button class="btn-close" onclick="closeEditModal()"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm" onsubmit="saveProductChanges(event)">
+                        <div class="form-group">
+                            <label for="editProductName">Tên sản phẩm</label>
+                            <input type="text" id="editProductName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductImageURL">URL Hình ảnh</label>
+                            <input type="text" id="editProductImageURL">
+                        </div>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="editPurchasePrice">Giá mua</label>
+                                <input type="number" id="editPurchasePrice" step="any">
+                            </div>
+                            <div class="form-group">
+                                <label for="editListPrice">Giá bán</label>
+                                <input type="number" id="editListPrice" step="any">
+                            </div>
+                        </div>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="editQtyAvailable">Số lượng thực tế</label>
+                                <input type="number" id="editQtyAvailable">
+                            </div>
+                            <div class="form-group">
+                                <label for="editVirtualAvailable">Số lượng dự báo</label>
+                                <input type="number" id="editVirtualAvailable">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">Hủy</button>
+                    <button type="submit" form="editProductForm" class="btn-primary">Lưu thay đổi</button>
                 </div>
             </div>
         </div>

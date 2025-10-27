@@ -1,9 +1,10 @@
 /* ===== INVENTORY PAGE STYLES ===== */
 
 /* Import modular styles */
+@import url('../orders/_modal-base.css'); /* Reusing modal styles */
+@import url('../orders/_modal-forms.css'); /* Reusing form styles */
 @import url('./_header.css');
 @import url('./_search-form.css');
-@import url('./_saved-data.css');
 @import url('./_stats-bar.css');
 @import url('./_product-info-card.css');
 @import url('./_tabs.css');
@@ -18,41 +19,3 @@
     padding: 25px;
     margin-top: 20px; /* Space from the header */
 }
-
-/* General States (removed duplicates from common.css) */
-/*
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #94a3b8;
-}
-
-.empty-state-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-}
-
-.loading-spinner {
-    border: 4px solid #f3f4f6;
-    border-top: 4px solid #667eea;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 16px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-*/

@@ -1,9 +1,9 @@
 // pages/product/inventory.js
 
 import { loadToken } from '../../shared/api/tpos-api.js';
-import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
+import { currentProduct, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 import { showEmptyState } from './product-utils.js';
-import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList } from './product-storage.js';
+import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList, saveProductData } from './product-storage.js';
 import { searchProduct } from './product-api.js';
 import { displayProductInfo, displayParentProduct, displayVariants, updateStats, switchTab } from './product-display.js';
 import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
@@ -17,6 +17,9 @@ window.handleDataFile = handleDataFile;
 window.clearSavedData = clearSavedData;
 window.loadProductFromList = loadProductFromList;
 window.switchTab = switchTab;
+window.openEditModal = openEditModal;
+window.closeEditModal = closeEditModal;
+window.saveProductChanges = saveProductChanges;
 
 // ===== CORE APPLICATION LOGIC =====
 
@@ -131,6 +134,70 @@ function updateSuggestions(event) {
         option.textContent = `${item.code} - ${item.name}`;
         datalist.appendChild(option);
     });
+}
+
+// ===== EDIT MODAL FUNCTIONS =====
+
+function openEditModal() {
+    if (!currentProduct) {
+        window.showNotification("Chưa có sản phẩm nào được chọn để chỉnh sửa.", "error");
+        return;
+    }
+
+    // Populate the modal with current product data
+    document.getElementById('editProductName').value = currentProduct.Name || '';
+    document.getElementById('editProductImageURL').value = currentProduct.ImageUrl || '';
+    document.getElementById('editPurchasePrice').value = currentProduct.PurchasePrice || 0;
+    document.getElementById('editListPrice').value = currentProduct.ListPrice || 0;
+    document.getElementById('editQtyAvailable').value = currentProduct.QtyAvailable || 0;
+    document.getElementById('editVirtualAvailable').value = currentProduct.VirtualAvailable || 0;
+
+    // Show the modal
+    document.getElementById('editProductModal').style.display = 'flex';
+    window.lucide.createIcons();
+}
+
+function closeEditModal() {
+    document.getElementById('editProductModal').style.display = 'none';
+}
+
+async function saveProductChanges(event) {
+    event.preventDefault();
+    if (!currentProduct) return;
+
+    // Update the currentProduct object from form values
+    currentProduct.Name = document.getElementById('editProductName').value;
+    currentProduct.ImageUrl = document.getElementById('editProductImageURL').value;
+    currentProduct.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
+    currentProduct.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
+    currentProduct.QtyAvailable = parseInt(document.getElementById('editQtyAvailable').value) || 0;
+    currentProduct.VirtualAvailable = parseInt(document.getElementById('editVirtualAvailable').value) || 0;
+
+    // The image in ProductVariants might also need updating if it's separate
+    if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
+        currentProduct.ProductVariants.forEach(variant => {
+            // Assuming variants share the parent image URL
+            variant.ImageUrl = currentProduct.ImageUrl;
+        });
+    }
+
+    try {
+        // Save the updated product data
+        await saveProductData(currentProduct);
+
+        // Re-render the UI with the new data
+        displayProductInfo(currentProduct);
+        displayParentProduct(currentProduct);
+        displayVariants(currentProduct.ProductVariants || []);
+        updateStats(currentProduct);
+
+        closeEditModal();
+        window.showNotification("Đã cập nhật sản phẩm thành công!", "success");
+
+    } catch (error) {
+        console.error("Error saving product changes:", error);
+        window.showNotification("Lỗi khi lưu thay đổi: " + error.message, "error");
+    }
 }
 
 

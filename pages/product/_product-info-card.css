@@ -37,6 +37,29 @@
 
 .product-info-details {
     flex: 1;
+    position: relative; /* For positioning the edit button */
+}
+
+.btn-edit-product {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-product:hover {
+    background: #e2e8f0;
+    color: #1e293b;
 }
 
 .product-info-name {
