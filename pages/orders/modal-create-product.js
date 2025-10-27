@@ -7,6 +7,20 @@ let variantData = { colors: [], letterSizes: [], numberSizes: [] };
 let variantDataLoaded = false;
 let activeVariantInput = null;
 
+/**
+ * Parses a price string (e.g., "1.5", "1,5", "2") and multiplies by 1000.
+ * @param {string} priceString - The input price string from the user.
+ * @returns {number} The calculated price value.
+ */
+function parseAndMultiplyPrice(priceString) {
+    if (!priceString) return 0;
+    // Replace comma with dot for decimal conversion
+    const normalizedPrice = String(priceString).replace(',', '.');
+    const price = parseFloat(normalizedPrice);
+    if (isNaN(price)) return 0;
+    return price * 1000;
+}
+
 async function loadAllVariantData() {
     if (variantDataLoaded) return;
     try {
@@ -95,8 +109,8 @@ export function addProductRowProductModal() {
         <td></td>
         <td><input type="text" placeholder="Mã SP"></td>
         <td><input type="text" placeholder="Tên sản phẩm"></td>
-        <td><input type="number" value="0"></td>
-        <td><input type="number" value="0"></td>
+        <td><input type="text" value="0"></td>
+        <td><input type="text" value="0"></td>
         <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div></td>
         <td><input type="text" placeholder="VD: Size S, Màu đỏ" class="variant-input" readonly></td>
         <td class="action-cell">
@@ -195,7 +209,8 @@ function cartesian(...args) {
 
 function buildProductVariants(row, productName) {
     const { selectedVariants, variantSelectionOrder } = row;
-    const listPrice = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+    const listPriceInput = row.querySelector('td:nth-child(5) input').value;
+    const listPrice = parseAndMultiplyPrice(listPriceInput);
 
     const variantGroups = variantSelectionOrder
         .map(category => [...selectedVariants[category]])
@@ -235,11 +250,14 @@ export async function saveNewProducts() {
     for (const row of rows) {
         const code = row.querySelector('td:nth-child(2) input').value.trim();
         const name = row.querySelector('td:nth-child(3) input').value.trim();
-        const purchasePrice = parseFloat(row.querySelector('td:nth-child(4) input').value) || 0;
-        const listPrice = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+        const purchasePriceInput = row.querySelector('td:nth-child(4) input').value;
+        const listPriceInput = row.querySelector('td:nth-child(5) input').value;
         const imgElement = row.querySelector('td:nth-child(6) .image-dropzone img');
 
         if (!code || !name) continue;
+
+        const purchasePrice = parseAndMultiplyPrice(purchasePriceInput);
+        const listPrice = parseAndMultiplyPrice(listPriceInput);
 
         const imageBase64WithPrefix = await getImageAsBase64(imgElement);
         const imageBase64 = imageBase64WithPrefix ? imageBase64WithPrefix.split(',')[1] : null;

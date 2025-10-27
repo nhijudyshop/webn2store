@@ -105,8 +105,8 @@ export function addProductRow() {
         <td><input type="text" placeholder="Mã SP" list="productSuggestionsModal" oninput="window.updateProductCodeSuggestions(event)"></td>
         <td><div class="tooltip-host tooltip-always-visible" data-tooltip=""><input type="text" placeholder="Nhập tên sản phẩm" oninput="this.parentElement.dataset.tooltip = this.value"></div></td>
         <td><input type="number" value="1" style="width: 60px;" oninput="window.updateTotals()"></td>
-        <td><input type="number" value="0" oninput="window.updateTotals()"></td>
-        <td><input type="number" value="0"></td>
+        <td><input type="text" value="0" oninput="window.updateTotals()"></td>
+        <td><input type="text" value="0"></td>
         <td>0 ₫</td>
         <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
         <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
@@ -147,7 +147,8 @@ export function updateTotals() {
         const lineTotalCell = row.querySelector('td:nth-child(7)');
 
         const quantity = parseInt(qtyInput.value) || 0;
-        const price = parseFloat(priceInput.value) || 0;
+        const priceString = priceInput.value.replace(',', '.');
+        const price = parseFloat(priceString) || 0;
         const lineTotal = quantity * price;
 
         subtotal += lineTotal;
@@ -349,8 +350,10 @@ export async function submitOrder() {
         const productCode = row.querySelector('td:nth-child(2) input').value.trim();
         const productName = row.querySelector('td:nth-child(3) input').value.trim();
         const quantity = parseInt(row.querySelector('td:nth-child(4) input').value) || 0;
-        const purchasePrice = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
-        const salePrice = parseFloat(row.querySelector('td:nth-child(6) input').value) || 0;
+        const purchasePriceString = row.querySelector('td:nth-child(5) input').value.replace(',', '.');
+        const purchasePrice = parseFloat(purchasePriceString) || 0;
+        const salePriceString = row.querySelector('td:nth-child(6) input').value.replace(',', '.');
+        const salePrice = parseFloat(salePriceString) || 0;
         const variantSelect = row.querySelector('td:nth-child(10) select');
         const variant = variantSelect.selectedIndex > 0 ? variantSelect.options[variantSelect.selectedIndex].text : '-';
         
