@@ -97,7 +97,7 @@ export function addProductRowProductModal() {
         <td><input type="text" placeholder="Tên sản phẩm"></td>
         <td><input type="number" value="0"></td>
         <td><input type="number" value="0"></td>
-        <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
+        <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div></td>
         <td><input type="text" placeholder="VD: Size S, Màu đỏ" class="variant-input" readonly></td>
         <td class="action-cell">
             <button class="btn-action delete" title="Xóa" onclick="this.closest('tr').remove(); window.updateRowNumbersProductModal();"><i data-lucide="trash-2"></i></button>
