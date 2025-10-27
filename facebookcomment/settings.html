@@ -11,6 +11,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- XLSX Library for Excel file reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <!-- CSS -->
     <!-- Shared Common CSS -->
     <link rel="stylesheet" href="/shared/styles/common.css" />
@@ -372,6 +375,23 @@
                     </button>
                     <small style="color: #64748b; margin-top: 8px; display: block;">
                         Header này sẽ được tự động áp dụng cho tất cả các request API của dự án.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Product Suggestions Import Section -->
+            <div class="content-section">
+                <h2><i data-lucide="database"></i> Dữ liệu Gợi ý Sản phẩm</h2>
+                <p class="text-sm text-gray-600 mb-4">
+                    Cập nhật danh sách gợi ý sản phẩm được sử dụng trong các trang Quản lý Kho và Đặt hàng.
+                </p>
+                <div class="form-group">
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;">
+                    <button type="button" class="btn btn-success" onclick="document.getElementById('excelFileInput').click();">
+                        <i data-lucide="file-up"></i> Import từ Excel
+                    </button>
+                    <small style="color: #64748b; margin-top: 8px; display: block;">
+                        Chọn file Excel có cột "Mã sản phẩm" và "Tên sản phẩm". Dữ liệu mới sẽ được thêm vào, các mã sản phẩm trùng lặp sẽ được bỏ qua.
                     </small>
                 </div>
             </div>
