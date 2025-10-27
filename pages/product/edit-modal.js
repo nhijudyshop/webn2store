@@ -173,7 +173,9 @@ export async function saveProductChanges(event) {
     event.preventDefault();
     if (!currentProduct || !originalProductPayload) return;
 
-    const btn = document.querySelector('#editProductForm button[type="submit"]');
+    const btn = document.getElementById('saveChangesBtn');
+    if (!btn) return;
+
     btn.disabled = true;
     btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Đang lưu...';
     window.lucide.createIcons();
