@@ -1,3 +1,4 @@
+1000.">
 // pages/orders/modal-create-product.js
 
 import { loadProductSuggestions } from './api.js';
@@ -44,11 +45,19 @@ function handlePriceInput(event) {
     const rawValue = input.value.replace(',', '.');
     const numericValue = parseFloat(rawValue);
 
-    if (!isNaN(numericValue) && numericValue > 1000) {
+    if (!isNaN(numericValue)) {
+        // Always calculate and set tooltip for any valid number
         const calculatedPrice = numericValue * 1000;
-        input.classList.add('price-warning');
         tooltipHost.dataset.tooltip = formatCurrencyForTooltip(calculatedPrice);
+
+        // Conditionally add/remove warning class
+        if (numericValue > 1000) {
+            input.classList.add('price-warning');
+        } else {
+            input.classList.remove('price-warning');
+        }
     } else {
+        // If not a number, clear everything
         input.classList.remove('price-warning');
         tooltipHost.dataset.tooltip = '';
     }
