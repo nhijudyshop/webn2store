@@ -7,6 +7,7 @@ const DATA_DIR = path.join(SERVER_DIR, "data");
 const PRINTERS_FILE = path.join(SETTINGS_DIR, "printers.json");
 const TEMPLATE_FILE = path.join(SETTINGS_DIR, "template.json");
 const LAST_SESSION_FILE = path.join(SETTINGS_DIR, "last-session.json");
+const ACCOUNT_TPOS_FILE = path.join(SETTINGS_DIR, "account_tpos.json"); // New
 const PRODUCT_SUGGESTIONS_FILE = path.join(DATA_DIR, "product_suggestions.json");
 const INVENTORY_PRODUCTS_FILE = path.join(DATA_DIR, "inventory_products.json");
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
@@ -19,6 +20,7 @@ module.exports = {
     PRINTERS_FILE,
     TEMPLATE_FILE,
     LAST_SESSION_FILE,
+    ACCOUNT_TPOS_FILE, // New
     PRODUCT_SUGGESTIONS_FILE,
     INVENTORY_PRODUCTS_FILE,
     ORDERS_FILE,

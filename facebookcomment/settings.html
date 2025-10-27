@@ -325,6 +325,25 @@
                     </small>
                 </div>
             </div>
+            
+            <!-- New TPOS Account Section -->
+            <div class="content-section">
+                <h2>👤 Tài khoản TPOS</h2>
+                <div class="form-group">
+                    <label for="tposUsername"><i data-lucide="user"></i> Tên đăng nhập:</label>
+                    <input type="text" id="tposUsername" placeholder="Nhập username TPOS">
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="tposPassword"><i data-lucide="lock"></i> Mật khẩu:</label>
+                    <input type="password" id="tposPassword" placeholder="Nhập mật khẩu TPOS">
+                </div>
+                <button onclick="loginAndSaveToken()" id="loginTposBtn" class="btn btn-primary" style="margin-top: 16px; width: 100%;">
+                    <i data-lucide="log-in"></i> Đăng nhập & Lấy Token
+                </button>
+                <small style="color: #64748b; margin-top: 8px; display: block;">
+                    Tài khoản sẽ được lưu trên server để tự động lấy token.
+                </small>
+            </div>
         </div>
     </div>
 
