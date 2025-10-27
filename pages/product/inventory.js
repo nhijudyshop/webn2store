@@ -20,6 +20,7 @@ window.switchTab = switchTab;
 window.openEditModal = openEditModal;
 window.closeEditModal = closeEditModal;
 window.saveProductChanges = saveProductChanges;
+window.recalculateTotalQuantities = recalculateTotalQuantities;
 
 // ===== CORE APPLICATION LOGIC =====
 
@@ -145,6 +146,22 @@ const editModalState = {
     selectedVariants: { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() },
     variantSelectionOrder: []
 };
+
+function recalculateTotalQuantities() {
+    const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
+    let totalQty = 0;
+    let totalVirtual = 0;
+
+    variantRows.forEach(row => {
+        const qtyInput = row.querySelector('input[data-field="QtyAvailable"]');
+        const virtualInput = row.querySelector('input[data-field="VirtualAvailable"]');
+        totalQty += parseInt(qtyInput.value, 10) || 0;
+        totalVirtual += parseInt(virtualInput.value, 10) || 0;
+    });
+
+    document.getElementById('editQtyAvailable').textContent = totalQty;
+    document.getElementById('editVirtualAvailable').textContent = totalVirtual;
+}
 
 async function loadAllVariantData() {
     if (variantDataLoaded) return;
@@ -272,9 +289,7 @@ function openEditModal() {
     editModalState.selectedVariants = { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() };
     editModalState.variantSelectionOrder = [];
 
-    // Primary method: Use AttributeLines if available and populated
     if (currentProduct.AttributeLines && currentProduct.AttributeLines.length > 0) {
-        console.log("Populating variants from AttributeLines.");
         currentProduct.AttributeLines.forEach(line => {
             const category = getCategoryFromAttributeId(line.AttributeId);
             if (category) {
@@ -286,23 +301,13 @@ function openEditModal() {
                 }
             }
         });
-    } 
-    // Fallback method: Parse from ProductVariants if AttributeLines is empty/missing
-    else if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
-        console.log("Populating variants from ProductVariants (fallback).");
+    } else if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
         const attributeOrderMap = { 'Màu': 1, 'Size Chữ': 2, 'Size Số': 3 };
         const foundCategories = new Map();
-
         currentProduct.ProductVariants.forEach(variant => {
             if (variant.AttributeValues && Array.isArray(variant.AttributeValues)) {
                 variant.AttributeValues.forEach(attrValue => {
-                    let category = null;
-                    switch (attrValue.AttributeName) {
-                        case 'Màu': category = 'colors'; break;
-                        case 'Size Chữ': category = 'letterSizes'; break;
-                        case 'Size Số': category = 'numberSizes'; break;
-                    }
-                    
+                    let category = getCategoryFromAttributeId(attrValue.AttributeId);
                     if (category) {
                         if (!foundCategories.has(category)) {
                             foundCategories.set(category, attributeOrderMap[attrValue.AttributeName] || 99);
@@ -312,26 +317,15 @@ function openEditModal() {
                 });
             }
         });
-        
-        // Sort categories based on a predefined order for consistency
-        editModalState.variantSelectionOrder = [...foundCategories.keys()].sort((a, b) => {
-            const categoryA = Object.keys(editModalState.selectedVariants).find(key => key === a);
-            const categoryB = Object.keys(editModalState.selectedVariants).find(key => key === b);
-            const nameA = categoryA === 'colors' ? 'Màu' : (categoryA === 'letterSizes' ? 'Size Chữ' : 'Size Số');
-            const nameB = categoryB === 'colors' ? 'Màu' : (categoryB === 'letterSizes' ? 'Size Chữ' : 'Size Số');
-            return (attributeOrderMap[nameA] || 99) - (attributeOrderMap[nameB] || 99);
-        });
+        editModalState.variantSelectionOrder = [...foundCategories.keys()].sort((a, b) => foundCategories.get(a) - foundCategories.get(b));
     }
 
     // Populate form fields
     document.getElementById('editProductName').value = currentProduct.Name || '';
     document.getElementById('editPurchasePrice').value = currentProduct.PurchasePrice || 0;
     document.getElementById('editListPrice').value = currentProduct.ListPrice || 0;
-    document.getElementById('editQtyAvailable').textContent = currentProduct.QtyAvailable || 0;
-    document.getElementById('editVirtualAvailable').textContent = currentProduct.VirtualAvailable || 0;
     updateVariantInput(document.getElementById('editVariants'), editModalState);
 
-    // Populate image dropzone
     const dropzone = document.getElementById('editImageDropzone');
     const deleteBtn = document.getElementById('deleteEditImageBtn');
     if (currentProduct.ImageUrl) {
@@ -343,6 +337,24 @@ function openEditModal() {
         dropzone.classList.remove('has-image');
         deleteBtn.style.display = 'none';
     }
+
+    // Populate variants table
+    const variantsTbody = document.getElementById('editVariantsTableBody');
+    variantsTbody.innerHTML = '';
+    if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
+        currentProduct.ProductVariants.forEach(variant => {
+            const row = document.createElement('tr');
+            row.dataset.variantId = variant.Id;
+            row.innerHTML = `
+                <td style="text-align: left;">${variant.Name}</td>
+                <td><span class="product-code">${variant.DefaultCode || '-'}</span></td>
+                <td><input type="number" value="${variant.QtyAvailable || 0}" data-field="QtyAvailable" oninput="recalculateTotalQuantities()"></td>
+                <td><input type="number" value="${variant.VirtualAvailable || 0}" data-field="VirtualAvailable" oninput="recalculateTotalQuantities()"></td>
+            `;
+            variantsTbody.appendChild(row);
+        });
+    }
+    recalculateTotalQuantities();
 
     document.getElementById('editProductModal').style.display = 'flex';
     window.lucide.createIcons();
@@ -362,13 +374,25 @@ async function saveProductChanges(event) {
     currentProduct.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
     currentProduct.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
 
-    // Update image
     const imgElement = document.querySelector('#editImageDropzone img');
     currentProduct.ImageUrl = imgElement ? imgElement.src : null;
 
-    // TODO: Update variants logic if needed. For now, we just save the main product info.
-    // This part is complex as it requires regenerating all variant combinations.
-    // For now, we will focus on updating the parent product.
+    // Update variant quantities
+    const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
+    variantRows.forEach(row => {
+        const variantId = parseInt(row.dataset.variantId, 10);
+        const variant = currentProduct.ProductVariants.find(v => v.Id === variantId);
+        if (variant) {
+            const qtyInput = row.querySelector('input[data-field="QtyAvailable"]');
+            const virtualInput = row.querySelector('input[data-field="VirtualAvailable"]');
+            variant.QtyAvailable = parseInt(qtyInput.value, 10) || 0;
+            variant.VirtualAvailable = parseInt(virtualInput.value, 10) || 0;
+        }
+    });
+
+    // Update parent product's quantities to be the sum
+    currentProduct.QtyAvailable = parseInt(document.getElementById('editQtyAvailable').textContent, 10) || 0;
+    currentProduct.VirtualAvailable = parseInt(document.getElementById('editVirtualAvailable').textContent, 10) || 0;
     
     try {
         await saveProductData(currentProduct);

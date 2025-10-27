@@ -377,3 +377,24 @@
     border-color: #ef4444 !important;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
+
+/* Variants edit section in modal */
+.variants-edit-section {
+    margin-top: 24px;
+}
+
+.variants-edit-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+#editVariantsTable table {
+    min-width: auto;
+}
+
+#editVariantsTable input[type="number"] {
+    width: 80px;
+    text-align: center;
+}
