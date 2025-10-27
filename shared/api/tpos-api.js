@@ -113,12 +113,12 @@ export function generateRequestId() {
 }
 
 /**
- * Get standard headers for TPOS API requests
+ * Get standard headers for TPOS API requests, including custom template
  * @param {string} token - Optional bearer token (if not provided, will try to get from storage)
- * @returns {Object} Headers object
+ * @returns {Promise<Object>} Headers object
  * @throws {Error} If token not found
  */
-export function getTPOSHeaders(token = null) {
+export async function getTPOSHeaders(token = null) {
     if (!token) {
         token = getToken();
     }
@@ -127,22 +127,24 @@ export function getTPOSHeaders(token = null) {
         throw new Error("Vui lòng nhập Bearer Token trước khi gọi API");
     }
 
-    return {
+    let customHeaders = {};
+    try {
+        const response = await fetch('/api/settings/header-template');
+        if (response.ok) {
+            customHeaders = await response.json();
+        }
+    } catch (error) {
+        console.warn("Could not load custom header template:", error);
+    }
+
+    const standardHeaders = {
         accept: "application/json, text/plain, */*",
-        "accept-language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
         authorization: `Bearer ${token}`,
         "content-type": "application/json;charset=UTF-8",
-        priority: "u=1, i",
-        "sec-ch-ua": '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Windows"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "cross-site",
-        "sec-fetch-storage-access": "active",
-        tposappversion: TPOS_CONFIG.appVersion,
         "x-request-id": generateRequestId(),
     };
+
+    return { ...customHeaders, ...standardHeaders };
 }
 
 // ===== API METHODS =====
@@ -160,7 +162,7 @@ export async function searchProductByCode(productCode, options = {}) {
         token = null,
     } = options;
 
-    const headers = getTPOSHeaders(token);
+    const headers = await getTPOSHeaders(token);
     const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate/OdataService.GetViewV2?Active=true&DefaultCode=${productCode}&$top=${top}&$orderby=${orderby}&$filter=Active+eq+true&$count=true`;
 
     console.log("🔍 Searching product by code:", productCode);
@@ -190,7 +192,7 @@ export async function searchProductByCode(productCode, options = {}) {
  * @returns {Promise<Object>} Product details with variants
  */
 export async function getProductDetails(productId, token = null) {
-    const headers = getTPOSHeaders(token);
+    const headers = await getTPOSHeaders(token);
     const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate(${productId})?$expand=UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)`;
 
     console.log("📦 Fetching product details:", productId);
@@ -259,7 +261,7 @@ export async function getProductList(filters = {}) {
         token = null,
     } = filters;
 
-    const headers = getTPOSHeaders(token);
+    const headers = await getTPOSHeaders(token);
     const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate/OdataService.GetViewV2?$top=${top}&$skip=${skip}&$orderby=${orderby}&$filter=${filter}&$count=true`;
 
     console.log("📋 Fetching product list");
@@ -291,7 +293,7 @@ export async function getProductList(filters = {}) {
 export async function tposRequest(endpoint, options = {}) {
     const { method = "GET", body = null, token = null } = options;
 
-    const headers = getTPOSHeaders(token);
+    const headers = await getTPOSHeaders(token);
     let url;
 
     if (endpoint.startsWith("http")) {

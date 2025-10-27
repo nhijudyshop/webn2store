@@ -354,6 +354,24 @@
                     Tài khoản sẽ được lưu trên server để tự động lấy token.
                 </small>
             </div>
+
+            <!-- Header Template Section -->
+            <div class="content-section">
+                <h2>📋 Header Mẫu cho API</h2>
+                <div class="form-group">
+                    <label for="headerTemplateInput">
+                        <i data-lucide="file-code-2"></i>
+                        Nội dung Header (định dạng JSON):
+                    </label>
+                    <textarea id="headerTemplateInput" rows="8" placeholder='{&#10;  "accept-language": "vi-VN,vi;q=0.9",&#10;  "tposappversion": "5.9.10.1"&#10;}'></textarea>
+                    <button onclick="saveHeaderTemplate()" class="btn btn-success" style="margin-top: 12px;">
+                        <i data-lucide="save"></i> Lưu Header Mẫu
+                    </button>
+                    <small style="color: #64748b; margin-top: 8px; display: block;">
+                        Header này sẽ được tự động áp dụng cho tất cả các request API của dự án.
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
 

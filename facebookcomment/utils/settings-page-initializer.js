@@ -4,6 +4,7 @@ import { loadPrinters, addPrinter, deletePrinter, setActivePrinter, testPrinterC
 import { loadTemplateSettings, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate } from './settings/template-management.js';
 import { checkServerStatus } from './settings/server-status.js';
 import { toggleTokenVisibilitySettings, saveTokenSettings, loadTposAccount, loginAndSaveToken, addTposAccount, deleteTposAccount, setActiveTposAccount } from './settings/token-management.js';
+import { loadHeaderTemplate, saveHeaderTemplate } from './settings/header-management.js'; // New
 import { loadToken } from '../../shared/api/tpos-api.js';
 import { generateBillHTML } from '../../shared/utils/printer-template-generator.js';
 
@@ -119,6 +120,7 @@ export function initializeSettingsPage(appState) {
     // Load token for settings page
     loadToken('bearerTokenSettings');
     loadTposAccount();
+    loadHeaderTemplate(); // New
 
     // Expose functions globally for onclick attributes in HTML
     window.setActivePrinter = (index) => setActivePrinter(index, appState);
@@ -136,4 +138,6 @@ export function initializeSettingsPage(appState) {
     window.addTposAccount = addTposAccount;
     window.deleteTposAccount = deleteTposAccount;
     window.setActiveTposAccount = setActiveTposAccount;
+    // Expose new header management functions
+    window.saveHeaderTemplate = saveHeaderTemplate;
 }

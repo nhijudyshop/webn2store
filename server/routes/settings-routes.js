@@ -1,6 +1,6 @@
 const express = require("express");
 const fs = require("fs");
-const { PRINTERS_FILE, TEMPLATE_FILE, LAST_SESSION_FILE } = require("../config");
+const { PRINTERS_FILE, TEMPLATE_FILE, LAST_SESSION_FILE, HEADER_TEMPLATE_FILE } = require("../config");
 
 const router = express.Router();
 
@@ -92,6 +92,34 @@ router.delete("/settings/last-session", (req, res) => {
         });
     } catch (error) {
         console.error("❌ Error deleting last session:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get header template
+router.get("/settings/header-template", (req, res) => {
+    try {
+        if (fs.existsSync(HEADER_TEMPLATE_FILE)) {
+            const data = fs.readFileSync(HEADER_TEMPLATE_FILE, "utf8");
+            res.json(JSON.parse(data));
+        } else {
+            res.json({}); // Return empty object if file doesn't exist
+        }
+    } catch (error) {
+        console.error("❌ Error reading header template:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Save header template
+router.post("/settings/header-template", (req, res) => {
+    try {
+        const template = req.body;
+        fs.writeFileSync(HEADER_TEMPLATE_FILE, JSON.stringify(template, null, 2));
+        console.log("✅ Header template saved successfully");
+        res.json({ success: true, message: "Header template saved successfully" });
+    } catch (error) {
+        console.error("❌ Error saving header template:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
