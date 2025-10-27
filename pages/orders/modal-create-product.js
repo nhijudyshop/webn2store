@@ -21,6 +21,39 @@ function parseAndMultiplyPrice(priceString) {
     return price * 1000;
 }
 
+/**
+ * Formats a number as Vietnamese currency for tooltips.
+ * @param {number} value - The number to format.
+ * @returns {string} The formatted currency string.
+ */
+function formatCurrencyForTooltip(value) {
+    if (!value && value !== 0) return "0 ₫";
+    return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    }).format(value);
+}
+
+/**
+ * Handles input in price fields to show a warning tooltip for large numbers.
+ * @param {InputEvent} event - The input event.
+ */
+function handlePriceInput(event) {
+    const input = event.target;
+    const tooltipHost = input.parentElement;
+    const rawValue = input.value.replace(',', '.');
+    const numericValue = parseFloat(rawValue);
+
+    if (!isNaN(numericValue) && numericValue > 1000) {
+        const calculatedPrice = numericValue * 1000;
+        input.classList.add('price-warning');
+        tooltipHost.dataset.tooltip = formatCurrencyForTooltip(calculatedPrice);
+    } else {
+        input.classList.remove('price-warning');
+        tooltipHost.dataset.tooltip = '';
+    }
+}
+
 async function loadAllVariantData() {
     if (variantDataLoaded) return;
     try {
@@ -109,8 +142,8 @@ export function addProductRowProductModal() {
         <td></td>
         <td><input type="text" placeholder="Mã SP"></td>
         <td><input type="text" placeholder="Tên sản phẩm"></td>
-        <td><input type="text" value="0"></td>
-        <td><input type="text" value="0"></td>
+        <td><div class="tooltip-host"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
+        <td><div class="tooltip-host"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
         <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div></td>
         <td><input type="text" placeholder="VD: Size S, Màu đỏ" class="variant-input" readonly></td>
         <td class="action-cell">
@@ -404,6 +437,7 @@ function updateVariantInput() {
 
 // Expose functions to window for inline event handlers
 window.updateRowNumbersProductModal = updateRowNumbersProductModal;
+window.handlePriceInput = handlePriceInput;
 
 // Setup event listeners for the new modal
 document.addEventListener('DOMContentLoaded', () => {
