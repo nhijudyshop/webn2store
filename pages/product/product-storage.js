@@ -1,7 +1,7 @@
 // pages/product/product-storage.js
 
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayVariants } from './product-display.js';
 import { showEmptyState } from './product-utils.js';
 
 /**
@@ -180,7 +180,6 @@ export async function loadProductFromList(productCode) {
 
     displayProductInfo(savedData.product);
     displayVariants(savedData.product.ProductVariants || []);
-    updateStats(savedData.product);
 
     document.getElementById("productCode").value = savedData.productCode;
 

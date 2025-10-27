@@ -2,7 +2,7 @@
 
 import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants, setOriginalProductPayload } from './inventory-state.js';
-import { displayProductInfo, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayVariants } from './product-display.js';
 import { showLoading, showEmptyState } from './product-utils.js';
 import { saveProductData, loadAllSavedProducts } from './product-storage.js';
 
@@ -27,7 +27,6 @@ export async function searchProduct(event) {
 
         displayProductInfo(detailData);
         displayVariants(detailData.ProductVariants || []);
-        updateStats(detailData);
 
         await saveProductData(detailData); // Auto-save after successful search
 

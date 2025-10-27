@@ -99,33 +99,6 @@ export function displayVariants(variants) {
     window.lucide.createIcons(); // Re-initialize icons
 }
 
-export function updateStats(product) {
-    const variants = product.ProductVariants || [];
-
-    // Total products (always 1 parent)
-    document.getElementById("totalProducts").textContent = "1";
-
-    // Total variants
-    document.getElementById("totalVariants").textContent = variants.length;
-
-    // Total quantity (parent + all variants)
-    const totalQty =
-        (product.QtyAvailable || 0) +
-        variants.reduce((sum, v) => sum + (v.QtyAvailable || 0), 0);
-    document.getElementById("totalQty").textContent = totalQty;
-
-    // Total value (quantity * price for parent and variants)
-    const parentValue = (product.QtyAvailable || 0) * (product.ListPrice || 0);
-    const variantsValue = variants.reduce(
-        (sum, v) =>
-            sum + (v.QtyAvailable || 0) * (v.PriceVariant || v.ListPrice || 0),
-        0,
-    );
-    const totalValue = parentValue + variantsValue;
-    document.getElementById("totalValue").textContent =
-        formatCurrency(totalValue);
-}
-
 export function clearData() {
     document.getElementById("productCode").value = "";
 
@@ -133,11 +106,6 @@ export function clearData() {
     setCurrentVariants([]);
 
     document.getElementById("productInfoCard").classList.remove("show");
-
-    document.getElementById("totalProducts").textContent = "0";
-    document.getElementById("totalVariants").textContent = "0";
-    document.getElementById("totalQty").textContent = "0";
-    document.getElementById("totalValue").textContent = "0đ";
 
     showEmptyState("variantsTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem danh sách biến thể');
 
