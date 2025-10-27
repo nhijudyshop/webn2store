@@ -1,5 +1,7 @@
 /* ===== ORDERS PAGE STYLES (MODULAR) ===== */
-@import url('./_modal.css');
+@import url('./_modal-base.css');
+@import url('./_modal-forms.css');
+@import url('./_variant-selector.css');
 @import url('./_header.css');
 @import url('./_main-content.css');
 @import url('./_stats-grid.css');
