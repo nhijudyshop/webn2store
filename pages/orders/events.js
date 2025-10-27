@@ -2,7 +2,7 @@
 
 import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
-import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder } from './modal-create-order.js';
+import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder, cloneProductRow } from './modal-create-order.js';
 import { openCreateProductModal } from './modal-create-product/index.js';
 import { loadOrders, loadDrafts, loadProducts, deleteOrder } from './api.js';
 
@@ -114,4 +114,5 @@ export function setupEventListeners() {
     window.fetchProductAndPopulateRow = fetchProductAndPopulateRow;
     window.updateTotals = updateTotals;
     window.deleteProductRow = deleteProductRow;
+    window.cloneProductRow = cloneProductRow;
 }

@@ -114,6 +114,7 @@ export function addProductRow() {
         <td><div class="tooltip-host" data-tooltip=""><select onchange="this.parentElement.dataset.tooltip = this.options[this.selectedIndex].text"><option>Chọn biến thể...</option></select></div></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
+            <button class="btn-action" title="Nhân bản" onclick="window.cloneProductRow(event)"><i data-lucide="copy"></i></button>
             <button class="btn-action delete" title="Xóa" onclick="window.deleteProductRow(event)"><i data-lucide="trash-2"></i></button>
         </td>
     `;
@@ -139,6 +140,44 @@ export function deleteProductRow(event) {
         updateTotals();
         updateRowNumbers();
     }
+}
+
+export function cloneProductRow(event) {
+    const btn = event.currentTarget;
+    const originalRow = btn.closest('tr');
+    if (!originalRow) return;
+
+    // Deep clone the row. This copies the structure and elements.
+    const newRow = originalRow.cloneNode(true);
+
+    // `cloneNode` does NOT copy the values of input/select fields. We need to do it manually.
+    const originalInputs = originalRow.querySelectorAll('input, select');
+    const newInputs = newRow.querySelectorAll('input, select');
+
+    originalInputs.forEach((originalInput, index) => {
+        if (newInputs[index]) {
+            newInputs[index].value = originalInput.value;
+            // For selects, also set the selectedIndex to be sure
+            if (originalInput.tagName === 'SELECT') {
+                newInputs[index].selectedIndex = originalInput.selectedIndex;
+            }
+        }
+    });
+
+    // Insert the new row after the original one
+    originalRow.parentNode.insertBefore(newRow, originalRow.nextSibling);
+
+    // Re-attach event listeners added with `addEventListener` as they are not copied by `cloneNode`
+    const dropzones = newRow.querySelectorAll('.image-dropzone');
+    dropzones.forEach(dz => {
+        dz.addEventListener('paste', handlePaste);
+        dz.addEventListener('mouseenter', (e) => e.currentTarget.focus());
+        dz.addEventListener('mouseleave', (e) => e.currentTarget.blur());
+    });
+
+    // Update UI
+    updateRowNumbers();
+    updateTotals();
 }
 
 export function updateTotals() {
