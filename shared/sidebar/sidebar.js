@@ -108,7 +108,18 @@ function showNotification(message, type = "info") {
     }, 3000);
 }
 
-// ===== INITIALIZE SIDEBAR =====
+/**
+ * Handles logout functionality.
+ */
+function logout() {
+    if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+        localStorage.removeItem('isLoggedIn');
+        // It's good practice to also clear the session token on logout
+        localStorage.removeItem('tpos_bearer_token');
+        window.location.href = '/public/login.html';
+    }
+}
+
 /**
  * Load sidebar HTML and initialize
  */
@@ -129,6 +140,12 @@ async function initSidebar() {
 
         // Setup navigation links with correct paths
         setupNavigationLinks();
+
+        // Setup logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', logout);
+        }
 
         // Initialize Lucide icons for sidebar
         if (typeof lucide !== "undefined") {
