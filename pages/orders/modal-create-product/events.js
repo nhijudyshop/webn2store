@@ -29,7 +29,19 @@ async function handleProductNameBlur(event) {
     codeInput.value = 'Đang tạo mã...';
 
     try {
-        const newCode = await generateAndVerifyProductCode(productName);
+        // Get codes from other rows in the modal to avoid duplicates in the same session
+        const allRows = document.querySelectorAll('#newProductList tr');
+        const otherCodes = [];
+        allRows.forEach(r => {
+            if (r !== row) { // Exclude the current row
+                const input = r.querySelector('input[placeholder="Mã SP"]');
+                if (input && input.value) {
+                    otherCodes.push(input.value);
+                }
+            }
+        });
+
+        const newCode = await generateAndVerifyProductCode(productName, otherCodes);
         if (newCode) {
             codeInput.value = newCode;
             window.showNotification(`Đã tạo mã sản phẩm mới: ${newCode}`, "success");

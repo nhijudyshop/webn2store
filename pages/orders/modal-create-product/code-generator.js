@@ -23,9 +23,10 @@ async function isCodeAvailableOnTPOS(code) {
 /**
  * Generates a new, unique product code based on the product name and verifies it against TPOS.
  * @param {string} productName - The name of the product.
+ * @param {Array<string>} otherCodes - Codes from other rows in the current modal.
  * @returns {Promise<string|null>} A unique product code or null if an error occurs.
  */
-export async function generateAndVerifyProductCode(productName) {
+export async function generateAndVerifyProductCode(productName, otherCodes = []) {
     if (!productName) return null;
 
     // 1. Determine prefix ('N' or 'P')
@@ -33,9 +34,17 @@ export async function generateAndVerifyProductCode(productName) {
     const keywords = ['ao', 'quan', 'giay', 'non'];
     const prefix = keywords.some(k => normalizedName.includes(k)) ? 'N' : 'P';
 
-    // 2. Find the max number from local suggestions
-    const relevantCodes = productSuggestions.filter(p => p.code && p.code.toUpperCase().startsWith(prefix));
-    const numbers = relevantCodes.map(p => parseInt(p.code.substring(1), 10)).filter(n => !isNaN(n));
+    // 2. Find the max number from local suggestions AND other codes in the modal
+    const suggestionCodes = productSuggestions
+        .filter(p => p.code && p.code.toUpperCase().startsWith(prefix))
+        .map(p => p.code);
+        
+    const modalCodes = otherCodes.filter(c => c && c.toUpperCase().startsWith(prefix));
+
+    const allCodes = [...suggestionCodes, ...modalCodes];
+    
+    const numbers = allCodes.map(c => parseInt(c.substring(1), 10)).filter(n => !isNaN(n));
+    
     const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
     let nextNumber = maxNumber + 1;
 
@@ -47,6 +56,14 @@ export async function generateAndVerifyProductCode(productName) {
 
     while (!uniqueCodeFound && attempts < maxAttempts) {
         const potentialCode = `${prefix}${nextNumber}`;
+        
+        // Also check against the modal codes again to be absolutely sure
+        if (modalCodes.includes(potentialCode)) {
+            nextNumber++;
+            attempts++;
+            continue;
+        }
+
         const isAvailable = await isCodeAvailableOnTPOS(potentialCode);
         if (isAvailable) {
             uniqueCodeFound = true;
