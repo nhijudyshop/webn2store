@@ -114,6 +114,7 @@ export function addProductRow() {
         <td><div class="tooltip-host" data-tooltip=""><select onchange="this.parentElement.dataset.tooltip = this.options[this.selectedIndex].text"><option>Chọn biến thể...</option></select></div></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
+            <button class="btn-action" title="Nhân bản" onclick="window.cloneProductRow(event)"><i data-lucide="copy"></i></button>
             <button class="btn-action delete" title="Xóa" onclick="window.deleteProductRow(event)"><i data-lucide="trash-2"></i></button>
         </td>
     `;
@@ -139,6 +140,36 @@ export function deleteProductRow(event) {
         updateTotals();
         updateRowNumbers();
     }
+}
+
+/**
+ * Clones a product row in the create order modal.
+ * @param {MouseEvent} event - The click event.
+ */
+export function cloneProductRow(event) {
+    const btn = event.currentTarget;
+    const originalRow = btn.closest('tr');
+    if (!originalRow) return;
+
+    // Create a deep clone of the row
+    const clonedRow = originalRow.cloneNode(true);
+
+    // Insert the cloned row after the original
+    originalRow.parentNode.insertBefore(clonedRow, originalRow.nextSibling);
+
+    // Re-add paste event listeners to the new dropzones
+    const dropzones = clonedRow.querySelectorAll('.image-dropzone');
+    dropzones.forEach(dz => {
+        dz.addEventListener('paste', handlePaste);
+        dz.addEventListener('mouseenter', (e) => e.currentTarget.focus());
+        dz.addEventListener('mouseleave', (e) => e.currentTarget.blur());
+    });
+
+    // Update UI
+    updateRowNumbers();
+    updateTotals();
+    window.lucide.createIcons();
+    window.showNotification("Đã nhân bản dòng sản phẩm", "success");
 }
 
 export function updateTotals() {
