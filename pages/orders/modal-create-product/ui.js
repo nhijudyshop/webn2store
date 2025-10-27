@@ -47,7 +47,10 @@ export function addProductRowProductModal() {
         <td><input type="text" placeholder="Tên sản phẩm"></td>
         <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
         <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
-        <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div></td>
+        <td class="image-cell">
+            <div class="image-dropzone" tabindex="0"><i data-lucide="image"></i><span>Ctrl+V</span></div>
+            <button class="btn-delete-image"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
+        </td>
         <td><input type="text" placeholder="VD: Size S, Màu đỏ" class="variant-input" readonly></td>
         <td class="action-cell">
             <button class="btn-action delete" title="Xóa" onclick="this.closest('tr').remove(); window.updateRowNumbersProductModal();"><i data-lucide="trash-2"></i></button>
@@ -63,9 +66,17 @@ export function addProductRowProductModal() {
     newRow.variantSelectionOrder = [];
 
     const dropzone = newRow.querySelector('.image-dropzone');
+    const deleteBtn = newRow.querySelector('.btn-delete-image');
+
     dropzone.addEventListener('paste', handlePasteProductModal);
     dropzone.addEventListener('mouseenter', (e) => e.currentTarget.focus());
     dropzone.addEventListener('mouseleave', (e) => e.currentTarget.blur());
+
+    deleteBtn.addEventListener('click', () => {
+        dropzone.innerHTML = '<i data-lucide="image"></i><span>Ctrl+V</span>';
+        dropzone.classList.remove('has-image');
+        window.lucide.createIcons();
+    });
 
     updateRowNumbersProductModal();
     window.lucide.createIcons();

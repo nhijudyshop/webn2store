@@ -166,6 +166,32 @@
     border-radius: 6px;
 }
 
+.product-table-wrapper td.image-cell {
+    position: relative;
+}
+
+.product-table-wrapper .btn-delete-image {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 0;
+}
+
+.product-table-wrapper .image-dropzone.has-image + .btn-delete-image {
+    display: flex;
+}
+
 .product-table-wrapper .image-dropzone {
     height: 80px;
     width: 80px;
