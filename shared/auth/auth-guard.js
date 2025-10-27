@@ -4,6 +4,15 @@
     const currentPath = window.location.pathname;
     const isLoginPage = currentPath.endsWith('/login.html') || currentPath === '/';
 
+    // FIX: If logged in but no role, the login state is invalid.
+    // Clear it and force a new login to fix the infinite loop.
+    if (isLoggedIn && !userRole && !isLoginPage) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userRole');
+        window.location.href = '/public/login.html';
+        return; // Stop execution
+    }
+
     const pagePermissions = {
         '/facebookcomment/index.html': ['admin', 'manager', 'mod', 'staff', 'member'],
         '/pages/product/inventory.html': ['admin', 'manager', 'mod', 'staff'],
