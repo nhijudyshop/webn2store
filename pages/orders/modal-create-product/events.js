@@ -29,7 +29,7 @@ async function handleProductNameBlur(event) {
     codeInput.value = 'Đang tạo mã...';
 
     try {
-        const newCode = await generateAndVerifyProductCode(productName, row);
+        const newCode = await generateAndVerifyProductCode(productName);
         if (newCode) {
             codeInput.value = newCode;
             window.showNotification(`Đã tạo mã sản phẩm mới: ${newCode}`, "success");

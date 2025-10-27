@@ -2,7 +2,7 @@
 
 import { normalizeVietnamese } from '../../../shared/utils/text-utils.js';
 import { tposRequest } from '../../../shared/api/tpos-api.js';
-import { productSuggestions, orders } from '../state.js';
+import { productSuggestions } from '../state.js';
 
 /**
  * Checks if a product code is available on the TPOS server.
@@ -21,92 +21,45 @@ async function isCodeAvailableOnTPOS(code) {
 }
 
 /**
- * Generates a new, unique product code based on the product name and verifies it against local data and TPOS.
+ * Generates a new, unique product code based on the product name and verifies it against TPOS.
  * @param {string} productName - The name of the product.
- * @param {HTMLElement} currentRow - The current table row being edited.
  * @returns {Promise<string|null>} A unique product code or null if an error occurs.
  */
-export async function generateAndVerifyProductCode(productName, currentRow) {
+export async function generateAndVerifyProductCode(productName) {
     if (!productName) return null;
 
-    // 1. Gather all existing codes from all sources
-    const allKnownCodes = new Set();
-
-    // a. Get codes from other rows in the "Create New Product" modal
-    const modalRows = document.querySelectorAll('#newProductList tr');
-    modalRows.forEach(row => {
-        const codeInput = row.querySelector('input[placeholder="Mã SP"]');
-        if (codeInput && codeInput.value && !codeInput.value.includes('Đang tạo')) {
-            allKnownCodes.add(codeInput.value.toUpperCase());
-        }
-    });
-
-    // b. Get codes from the main orders list (orders.json)
-    orders.forEach(order => {
-        if (order.productCode) {
-            allKnownCodes.add(order.productCode.toUpperCase());
-        }
-    });
-
-    // c. Get codes from product suggestions
-    productSuggestions.forEach(p => {
-        if (p.code) {
-            allKnownCodes.add(p.code.toUpperCase());
-        }
-    });
-
-    // 2. Determine prefix ('N' or 'P')
+    // 1. Determine prefix ('N' or 'P')
     const normalizedName = normalizeVietnamese(productName);
-    const keywords = ['ao', 'quan', 'giay', 'non', 'dam', 'set', 'vay'];
+    const keywords = ['ao', 'quan', 'giay', 'non'];
     const prefix = keywords.some(k => normalizedName.includes(k)) ? 'N' : 'P';
 
-    // 3. Find the max number from ALL known codes with the same prefix
-    const relevantCodes = [...allKnownCodes].filter(code => code.startsWith(prefix));
-    const numbers = relevantCodes.map(code => {
-        const match = code.substring(1).match(/^(\d+)/);
-        return match ? parseInt(match[1], 10) : NaN;
-    }).filter(n => !isNaN(n));
-    
+    // 2. Find the max number from local suggestions
+    const relevantCodes = productSuggestions.filter(p => p.code && p.code.toUpperCase().startsWith(prefix));
+    const numbers = relevantCodes.map(p => parseInt(p.code.substring(1), 10)).filter(n => !isNaN(n));
     const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-    let baseNumber = maxNumber + 1;
+    let nextNumber = maxNumber + 1;
 
-    // 4. Generate and verify uniqueness, trying letters if base number is taken
+    // 3. Verify uniqueness on TPOS, incrementing if necessary
+    let uniqueCodeFound = false;
     let finalCode = '';
     let attempts = 0;
-    const maxAttempts = 500; // Safety break
+    const maxAttempts = 100; // To prevent infinite loops
 
-    while (!finalCode && attempts < maxAttempts) {
-        const baseCode = `${prefix}${baseNumber}`;
-        
-        // Check 1: Is base code available? (local + TPOS)
-        let isAvailable = !(allKnownCodes.has(baseCode.toUpperCase())) && await isCodeAvailableOnTPOS(baseCode);
-
+    while (!uniqueCodeFound && attempts < maxAttempts) {
+        const potentialCode = `${prefix}${nextNumber}`;
+        const isAvailable = await isCodeAvailableOnTPOS(potentialCode);
         if (isAvailable) {
-            finalCode = baseCode;
-            break; // Found a unique code
+            uniqueCodeFound = true;
+            finalCode = potentialCode;
+        } else {
+            console.log(`Code ${potentialCode} already exists, trying next...`);
+            nextNumber++;
         }
-
-        // Check 2: If base code is taken, try appending letters (A-Z)
-        let suffixCharCode = 'A'.charCodeAt(0);
-        for (let i = 0; i < 26; i++) {
-            const potentialCodeWithLetter = `${baseCode}${String.fromCharCode(suffixCharCode + i)}`;
-            isAvailable = !(allKnownCodes.has(potentialCodeWithLetter.toUpperCase())) && await isCodeAvailableOnTPOS(potentialCodeWithLetter);
-            if (isAvailable) {
-                finalCode = potentialCodeWithLetter;
-                break; // Found a unique code
-            }
-        }
-
-        if (!finalCode) {
-            // If we exhausted all letters for this base number, increment the number and try again in the next loop iteration
-            baseNumber++;
-        }
-        
         attempts++;
     }
 
-    if (!finalCode) {
-        throw new Error("Không thể tìm thấy mã sản phẩm duy nhất sau nhiều lần thử.");
+    if (!uniqueCodeFound) {
+        throw new Error("Không thể tìm thấy mã sản phẩm duy nhất sau 100 lần thử.");
     }
 
     return finalCode;
