@@ -110,6 +110,7 @@ export function addProductRowProductModal() {
         letterSizes: new Set(),
         numberSizes: new Set()
     };
+    newRow.variantSelectionOrder = [];
 
     const dropzone = newRow.querySelector('.image-dropzone');
     dropzone.addEventListener('paste', handlePasteProductModal);
@@ -210,8 +211,18 @@ function handleVariantSelection(event) {
 
     if (checkbox.checked) {
         row.selectedVariants[category].add(value);
+        // Add category to order if it's not there
+        if (!row.variantSelectionOrder.includes(category)) {
+            row.variantSelectionOrder.push(category);
+        }
     } else {
         row.selectedVariants[category].delete(value);
+        // If no items left in this category, remove it from the order
+        if (row.selectedVariants[category].size === 0) {
+            row.variantSelectionOrder = row.variantSelectionOrder.filter(
+                (cat) => cat !== category
+            );
+        }
     }
 
     updateVariantInput();
@@ -220,12 +231,16 @@ function handleVariantSelection(event) {
 function updateVariantInput() {
     if (!activeVariantInput) return;
     const row = activeVariantInput.closest('tr');
-    const { colors, letterSizes, numberSizes } = row.selectedVariants;
     
-    const parts = [];
-    if (colors.size > 0) parts.push(`(${[...colors].join(' | ')})`);
-    if (letterSizes.size > 0) parts.push(`(${[...letterSizes].join(' | ')})`);
-    if (numberSizes.size > 0) parts.push(`(${[...numberSizes].join(' | ')})`);
+    const order = row.variantSelectionOrder;
+    
+    const parts = order.map(category => {
+        const selectedSet = row.selectedVariants[category];
+        if (selectedSet.size > 0) {
+            return `(${[...selectedSet].join(' | ')})`;
+        }
+        return null;
+    }).filter(part => part !== null);
 
     activeVariantInput.value = parts.join(' ');
 }
