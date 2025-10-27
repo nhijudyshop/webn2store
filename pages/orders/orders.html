@@ -314,6 +314,47 @@
             </div>
         </div>
 
+        <!-- Create Product Modal -->
+        <div id="createProductModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 1200px;">
+                <div class="modal-header">
+                    <h2>Tạo Sản Phẩm Mới</h2>
+                    <button class="btn-close" id="closeCreateProductModalBtn">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="product-table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá mua (VND)</th>
+                                    <th>Giá bán (VND)</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Biến thể</th>
+                                    <th>Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="newProductList">
+                                <!-- New product rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="addProductRowProductModalBtn">
+                        <i data-lucide="plus"></i> Thêm Dòng
+                    </button>
+                    <button class="btn-primary" id="saveNewProductsBtn">
+                        <i data-lucide="save"></i> Lưu Sản Phẩm
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- JavaScript -->
         <!-- Shared Sidebar JS -->
         <script src="/shared/sidebar/sidebar.js"></script>

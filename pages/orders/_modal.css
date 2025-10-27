@@ -480,3 +480,21 @@
     transition: none;
     pointer-events: none;
 }
+
+/* Styles for Create Product Modal */
+#createProductModal .product-table-wrapper table {
+    min-width: auto; /* Override min-width for this specific table */
+}
+
+#createProductModal .product-table-wrapper th,
+#createProductModal .product-table-wrapper td {
+    white-space: normal;
+}
+
+#createProductModal .product-table-wrapper input[type="text"] {
+    min-width: 150px;
+}
+
+#createProductModal .product-table-wrapper input[type="number"] {
+    width: 100px;
+}

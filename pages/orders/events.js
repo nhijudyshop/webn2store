@@ -3,6 +3,7 @@
 import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
 import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder } from './modal-create-order.js';
+import { openCreateProductModal } from './modal-create-product.js';
 import { loadOrders, loadDrafts, loadProducts, deleteOrder } from './api.js';
 
 function filterOrders() {
@@ -106,9 +107,7 @@ export function setupEventListeners() {
     document.getElementById("clearOrderFormBtn")?.addEventListener("click", clearOrderForm);
     document.getElementById("addProductRowBtn")?.addEventListener("click", addProductRow);
     document.getElementById("submitOrderBtn")?.addEventListener("click", submitOrder);
-    document.getElementById("createNewProductBtn")?.addEventListener("click", () => {
-        window.showNotification("Tính năng tạo sản phẩm mới đang được phát triển.", "info");
-    });
+    document.getElementById("createNewProductBtn")?.addEventListener("click", openCreateProductModal);
 
     // Expose functions to window for inline event handlers
     window.updateProductCodeSuggestions = updateProductCodeSuggestions;
