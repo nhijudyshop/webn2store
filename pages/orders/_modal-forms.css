@@ -180,21 +180,20 @@
 }
 
 .product-table-wrapper td.product-code-cell {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
+    /* No flex, rely on vertical-align: middle from td */
 }
 
 .product-table-wrapper td.product-code-cell input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    flex-shrink: 0;
     cursor: pointer;
+    vertical-align: middle;
+    margin-right: 8px;
 }
 
 .product-table-wrapper td.product-code-cell input[type="text"] {
-    flex-grow: 1;
+    vertical-align: middle;
+    width: calc(100% - 30px); /* Adjust width to account for checkbox and margin */
 }
 
 .product-table-wrapper td.image-cell {
