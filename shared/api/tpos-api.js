@@ -1,7 +1,7 @@
 /**
  * ===== TPOS API SERVICE =====
  * Shared API functions for TPOS integration
- * Version: 2.2.0
+ * Version: 2.3.0
  * 
  * This module provides common functions to interact with TPOS API
  * All pages should use these functions instead of direct fetch calls
@@ -39,14 +39,14 @@ export function getToken(inputId = "bearerToken") {
 }
 
 /**
- * Save Bearer Token to localStorage
+ * Save Bearer Token to localStorage and updates relevant input fields.
  * @param {string} token - Bearer token to save
- * @param {string} inputId - Optional input field ID to save token from
+ * @param {string} primaryInputId - The main input field ID to update.
  * @returns {boolean} Success status
  */
-export function saveToken(token = null, inputId = "bearerToken") {
+export function saveToken(token = null, primaryInputId = "bearerToken") {
     if (!token) {
-        const inputElement = document.getElementById(inputId);
+        const inputElement = document.getElementById(primaryInputId);
         token = inputElement ? inputElement.value.trim() : null;
     }
 
@@ -62,12 +62,22 @@ export function saveToken(token = null, inputId = "bearerToken") {
 
     localStorage.setItem(TPOS_CONFIG.storageKey, token);
     
+    // Update all known token input fields
+    const tokenInputIds = ['bearerToken', 'bearerTokenSettings'];
+    tokenInputIds.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = token;
+        }
+    });
+    
     if (typeof showNotification !== "undefined") {
         showNotification("Đã lưu token thành công!", "success");
     }
     
     return true;
 }
+
 
 /**
  * Load token from localStorage and set to input field
@@ -147,6 +157,37 @@ export async function getTPOSHeaders(token = null) {
     return { ...customHeaders, ...standardHeaders };
 }
 
+/**
+ * Attempts to log in to TPOS using the active account on the server,
+ * saves the new token, and returns success status.
+ * @returns {Promise<boolean>} True if re-login and token save were successful, false otherwise.
+ */
+async function reLoginAndGetNewToken() {
+    try {
+        console.log("🔄 Attempting to auto re-login to TPOS...");
+        const response = await fetch('/api/tpos-login', { method: 'POST' });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Đăng nhập tự động thất bại');
+        }
+
+        const accessToken = result.data.access_token;
+        if (accessToken) {
+            // Save token to localStorage and update any visible input fields
+            saveToken(accessToken, 'bearerTokenSettings'); 
+            console.log("✅ Auto re-login successful. New token saved.");
+            return true;
+        } else {
+            throw new Error('Không nhận được access token mới từ TPOS.');
+        }
+    } catch (error) {
+        console.error('❌ Auto re-login failed:', error);
+        window.showNotification(`❌ Đăng nhập lại tự động thất bại: ${error.message}`, "error");
+        return false;
+    }
+}
+
 // ===== API METHODS =====
 
 /**
@@ -162,27 +203,10 @@ export async function searchProductByCode(productCode, options = {}) {
         token = null,
     } = options;
 
-    const headers = await getTPOSHeaders(token);
-    const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate/OdataService.GetViewV2?Active=true&DefaultCode=${productCode}&$top=${top}&$orderby=${orderby}&$filter=Active+eq+true&$count=true`;
-
+    const endpoint = `/ProductTemplate/OdataService.GetViewV2?Active=true&DefaultCode=${productCode}&$top=${top}&$orderby=${orderby}&$filter=Active+eq+true&$count=true`;
+    
     console.log("🔍 Searching product by code:", productCode);
-
-    const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error("Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.");
-        }
-        throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("✅ Search results:", data);
-
-    return data;
+    return tposRequest(endpoint, { token });
 }
 
 /**
@@ -192,27 +216,10 @@ export async function searchProductByCode(productCode, options = {}) {
  * @returns {Promise<Object>} Product details with variants
  */
 export async function getProductDetails(productId, token = null) {
-    const headers = await getTPOSHeaders(token);
-    const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate(${productId})?$expand=UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)`;
-
+    const endpoint = `/ProductTemplate(${productId})?$expand=UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)`;
+    
     console.log("📦 Fetching product details:", productId);
-
-    const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error("Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.");
-        }
-        throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("✅ Product details:", data);
-
-    return data;
+    return tposRequest(endpoint, { token });
 }
 
 /**
@@ -261,71 +268,61 @@ export async function getProductList(filters = {}) {
         token = null,
     } = filters;
 
-    const headers = await getTPOSHeaders(token);
-    const url = `${TPOS_CONFIG.baseUrl}/ProductTemplate/OdataService.GetViewV2?$top=${top}&$skip=${skip}&$orderby=${orderby}&$filter=${filter}&$count=true`;
+    const endpoint = `/ProductTemplate/OdataService.GetViewV2?$top=${top}&$skip=${skip}&$orderby=${orderby}&$filter=${filter}&$count=true`;
 
     console.log("📋 Fetching product list");
-
-    const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error("Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.");
-        }
-        throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("✅ Product list:", data);
-
-    return data;
+    return tposRequest(endpoint, { token });
 }
 
 /**
- * Generic TPOS API request
- * @param {string} endpoint - API endpoint (without base URL)
- * @param {Object} options - Fetch options
+ * Generic TPOS API request with automatic re-login on authentication failure.
+ * @param {string} endpoint - API endpoint (without base URL for TPOS, or full URL for others)
+ * @param {Object} options - Fetch options (method, body, token)
+ * @param {boolean} isRetry - Internal flag to prevent infinite retry loops.
  * @returns {Promise<Object>} Response data
  */
-export async function tposRequest(endpoint, options = {}) {
+export async function tposRequest(endpoint, options = {}, isRetry = false) {
     const { method = "GET", body = null, token = null } = options;
 
-    const headers = await getTPOSHeaders(token);
     let url;
-
     if (endpoint.startsWith("http")) {
-        // Absolute URL provided, use as is
         url = endpoint;
     } else if (endpoint.startsWith("/api/")) {
-        // Local proxy endpoint, use relative path to current origin
-        // The server.js is configured to handle /api routes directly.
         url = endpoint; 
     } else {
-        // TPOS OData API endpoint, prepend TPOS_CONFIG.baseUrl
-        // Remove leading slash from endpoint if it exists, to avoid double slashes
         const cleanedEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
         url = `${TPOS_CONFIG.baseUrl}/${cleanedEndpoint}`;
     }
 
     console.log(`🌐 TPOS API Request: ${method} ${url}`);
 
-    const fetchOptions = {
-        method,
-        headers,
-    };
-
+    const headers = await getTPOSHeaders(token);
+    const fetchOptions = { method, headers };
     if (body && method !== "GET") {
         fetchOptions.body = JSON.stringify(body);
     }
 
     const response = await fetch(url, fetchOptions);
 
+    if (response.status === 401 && !isRetry) {
+        console.warn('⚠️ Token expired or invalid. Attempting to re-login...');
+        window.showNotification('Token đã hết hạn, đang tự động đăng nhập lại...', 'info');
+
+        const loginSuccess = await reLoginAndGetNewToken();
+
+        if (loginSuccess) {
+            console.log('🔄 Retrying original request with new token...');
+            return tposRequest(endpoint, options, true); // Retry the request
+        } else {
+            throw new Error("Đăng nhập lại tự động thất bại. Vui lòng kiểm tra tài khoản TPOS trong Cài đặt.");
+        }
+    }
+
     if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error("Token không hợp lệ hoặc đã hết hạn. Vui lòng nhập token mới.");
+        const errorText = await response.text();
+        console.error(`❌ HTTP Error ${response.status}:`, errorText);
+        if (response.status === 401 && isRetry) {
+             throw new Error("Token mới vẫn không hợp lệ. Vui lòng kiểm tra lại tài khoản TPOS.");
         }
         throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
     }
