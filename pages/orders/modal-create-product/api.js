@@ -1,6 +1,6 @@
 // pages/orders/modal-create-product/api.js
 
-import { tposRequest } from '../../shared/api/tpos-api.js';
+import { tposRequest } from '../../../shared/api/tpos-api.js';
 import { loadProductSuggestions } from '../api.js';
 import { addProductRow, fetchProductAndPopulateRow } from '../modal-create-order.js';
 import { closeCreateProductModal } from './ui.js';
