@@ -6,6 +6,7 @@ import { showEmptyState } from './product-utils.js';
 import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList, loadAllSavedProducts } from './product-storage.js';
 import { searchProduct } from './product-api.js';
 import { displayProductInfo, displayParentProduct, displayVariants, updateStats, switchTab, renderAllSavedProductsTable } from './product-display.js';
+import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 
 // ===== GLOBAL EXPORTS (for HTML onclicks and shared access) =====
 window.searchProduct = searchProduct;
@@ -67,7 +68,7 @@ async function loadProductSuggestions() {
  * @param {Event} event - The input event from the text field.
  */
 function updateSuggestions(event) {
-    const query = event.target.value.toUpperCase().trim();
+    const query = event.target.value.trim();
     const datalist = document.getElementById('productSuggestions');
     if (!datalist) return;
 
@@ -75,32 +76,59 @@ function updateSuggestions(event) {
 
     if (!query) return;
 
-    const filtered = allProductSuggestions.filter(item => 
-        item.code.toUpperCase().startsWith(query)
-    );
+    const normalizedQuery = normalizeVietnamese(query);
+    const queryWords = normalizedQuery.split(' ').filter(w => w);
 
-    // Sort to put exact match first, then by length, then alphabetically
-    filtered.sort((a, b) => {
-        const aCode = a.code.toUpperCase();
-        const bCode = b.code.toUpperCase();
+    const filtered = allProductSuggestions.filter(item => {
+        const normalizedCode = normalizeVietnamese(item.code || '');
+        const normalizedName = normalizeVietnamese(item.name || '');
 
-        if (aCode === query) return -1;
-        if (bCode === query) return 1;
-
-        if (aCode.length !== bCode.length) {
-            return aCode.length - bCode.length;
+        // Check code: must contain the full query string
+        if (normalizedCode.includes(normalizedQuery)) {
+            return true;
         }
 
-        return aCode.localeCompare(bCode);
+        // Check name: must contain all words from the query
+        if (queryWords.every(word => normalizedName.includes(word))) {
+            return true;
+        }
+
+        return false;
     });
 
-    // Limit to a reasonable number of suggestions to display
+    // Sort results for relevance
+    filtered.sort((a, b) => {
+        const normACode = normalizeVietnamese(a.code || '');
+        const normBCode = normalizeVietnamese(b.code || '');
+        const normAName = normalizeVietnamese(a.name || '');
+        const normBName = normalizeVietnamese(b.name || '');
+
+        // Scoring function for relevance
+        const score = (itemCode, itemName) => {
+            if (itemCode === normalizedQuery) return 10; // Exact code match
+            if (itemCode.startsWith(normalizedQuery)) return 9; // Code starts with query
+            if (itemName.startsWith(normalizedQuery)) return 8; // Name starts with query
+            if (queryWords.every(word => itemName.includes(word))) return 7; // Name contains all words
+            if (itemCode.includes(normalizedQuery)) return 6; // Code contains query
+            return 0;
+        };
+
+        const scoreA = score(normACode, normAName);
+        const scoreB = score(normBCode, normBName);
+
+        if (scoreA !== scoreB) {
+            return scoreB - scoreA; // Higher score comes first
+        }
+
+        // Fallback sort by name length
+        return a.name.length - b.name.length;
+    });
+
     const suggestionsToShow = filtered.slice(0, 50);
 
     suggestionsToShow.forEach(item => {
         const option = document.createElement('option');
         option.value = item.code;
-        // Add text content which some browsers might display as extra info
         option.textContent = `${item.code} - ${item.name}`;
         datalist.appendChild(option);
     });

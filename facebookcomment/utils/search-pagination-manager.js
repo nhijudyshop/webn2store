@@ -1,6 +1,7 @@
 // facebookcomment/utils/search-pagination-manager.js
 
-import { createCommentElement, createCommentElementWithHighlight, renderAllComments, normalizeVietnamese } from './comment-display.js';
+import { createCommentElement, createCommentElementWithHighlight, renderAllComments } from './comment-display.js';
+import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 import { fetchOrders } from './order-data-manager.js';
 import { getToken, tposRequest } from '../../shared/api/tpos-api.js'; // Import getToken and tposRequest directly
 

@@ -1,4 +1,5 @@
 // facebookcomment/utils/comment-display.js
+import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 
 /**
  * Gets the initials from a given name.
@@ -32,19 +33,6 @@ export function formatTimeToGMT7(isoString) {
     const year = gmt7Time.getUTCFullYear();
 
     return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
-}
-
-/**
- * Normalizes a Vietnamese string by removing diacritics and converting to lowercase.
- * @param {string} str - The input string.
- * @returns {string} The normalized string.
- */
-export function normalizeVietnamese(str) {
-    if (!str) return "";
-    return str
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
 }
 
 /**
