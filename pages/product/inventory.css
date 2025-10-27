@@ -3,6 +3,7 @@
 /* Import modular styles */
 @import url('../orders/_modal-base.css'); /* Reusing modal styles */
 @import url('../orders/_modal-forms.css'); /* Reusing form styles */
+@import url('./_variant-selector.css');
 @import url('./_header.css');
 @import url('./_search-form.css');
 @import url('./_stats-bar.css');

@@ -202,8 +202,17 @@
                             <input type="text" id="editProductName" required>
                         </div>
                         <div class="form-group">
-                            <label for="editProductImageURL">URL Hình ảnh</label>
-                            <input type="text" id="editProductImageURL">
+                            <label>Hình ảnh</label>
+                            <div class="image-cell" style="position: relative; width: 80px;">
+                                <div id="editImageDropzone" class="image-dropzone" tabindex="0">
+                                    <i data-lucide="image"></i><span>Ctrl+V</span>
+                                </div>
+                                <button type="button" id="deleteEditImageBtn" class="btn-delete-image" style="display: none;"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editVariants">Biến thể</label>
+                            <input type="text" id="editVariants" class="variant-input" placeholder="Chọn hoặc chỉnh sửa biến thể" readonly>
                         </div>
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div class="form-group">
@@ -230,6 +239,28 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeEditModal()">Hủy</button>
                     <button type="submit" form="editProductForm" class="btn-primary">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Variant Selector Panel (hidden by default) -->
+        <div id="variantSelector" class="variant-selector-panel">
+            <div class="variant-selector-header">
+                <h4>Chọn biến thể</h4>
+                <button class="btn-close-selector"><i data-lucide="x"></i></button>
+            </div>
+            <div class="variant-selector-body">
+                <div class="variant-category">
+                    <h5>Màu</h5>
+                    <div class="variant-options-list" id="variantColors"></div>
+                </div>
+                <div class="variant-category">
+                    <h5>Size Chữ</h5>
+                    <div class="variant-options-list" id="variantLetterSizes"></div>
+                </div>
+                <div class="variant-category">
+                    <h5>Size Số</h5>
+                    <div class="variant-options-list" id="variantNumberSizes"></div>
                 </div>
             </div>
         </div>

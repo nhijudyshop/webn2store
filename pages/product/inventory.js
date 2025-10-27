@@ -136,98 +136,250 @@ function updateSuggestions(event) {
     });
 }
 
-// ===== EDIT MODAL FUNCTIONS =====
+// ===== EDIT MODAL & VARIANT LOGIC =====
+
+let variantData = { colors: [], letterSizes: [], numberSizes: [] };
+let variantDataLoaded = false;
+let activeVariantInput = null;
+const editModalState = {
+    selectedVariants: { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() },
+    variantSelectionOrder: []
+};
+
+async function loadAllVariantData() {
+    if (variantDataLoaded) return;
+    try {
+        const [colorsRes, letterSizesRes, numberSizesRes] = await Promise.all([
+            fetch('/api/variants/colors'),
+            fetch('/api/variants/sizes-letter'),
+            fetch('/api/variants/sizes-number')
+        ]);
+        const colorsData = await colorsRes.json();
+        const letterSizesData = await letterSizesRes.json();
+        const numberSizesData = await numberSizesRes.json();
+
+        if (colorsData.success) variantData.colors = colorsData.data;
+        if (letterSizesData.success) variantData.letterSizes = letterSizesData.data;
+        if (numberSizesData.success) variantData.numberSizes = numberSizesData.data;
+        
+        variantDataLoaded = true;
+        console.log("✅ Variant data loaded for editing.");
+    } catch (error) {
+        console.error("❌ Error loading variant data:", error);
+    }
+}
+
+function getCategoryFromAttributeId(id) {
+    if (id === 3) return 'colors';
+    if (id === 1) return 'letterSizes';
+    if (id === 4) return 'numberSizes';
+    return null;
+}
+
+function updateVariantInput(inputElement, state) {
+    if (!inputElement) return;
+    const parts = state.variantSelectionOrder.map(category => {
+        const selectedSet = state.selectedVariants[category];
+        if (selectedSet.size > 0) {
+            return `(${[...selectedSet].join(' | ')})`;
+        }
+        return null;
+    }).filter(part => part !== null);
+    inputElement.value = parts.join(' ');
+}
+
+function populateVariantSelector() {
+    const createCheckboxes = (data, category, containerId) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = data.map(item => `
+            <label>
+                <input type="checkbox" data-category="${category}" value="${item.Name}" ${editModalState.selectedVariants[category].has(item.Name) ? 'checked' : ''}>
+                ${item.Name}
+            </label>
+        `).join('');
+    };
+    createCheckboxes(variantData.colors, 'colors', 'variantColors');
+    createCheckboxes(variantData.letterSizes, 'letterSizes', 'variantLetterSizes');
+    createCheckboxes(variantData.numberSizes, 'numberSizes', 'variantNumberSizes');
+}
+
+async function openVariantSelector(inputElement) {
+    await loadAllVariantData();
+    activeVariantInput = inputElement;
+    const panel = document.getElementById('variantSelector');
+    const rect = inputElement.getBoundingClientRect();
+    
+    panel.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    panel.style.left = `${rect.left + window.scrollX}px`;
+
+    populateVariantSelector();
+    panel.classList.add('show');
+}
+
+function closeVariantSelector() {
+    const panel = document.getElementById('variantSelector');
+    if (panel) panel.classList.remove('show');
+    activeVariantInput = null;
+}
+
+function handleVariantSelection(event) {
+    const checkbox = event.target;
+    if (checkbox.type !== 'checkbox' || !activeVariantInput) return;
+
+    const category = checkbox.dataset.category;
+    const value = checkbox.value;
+
+    if (checkbox.checked) {
+        editModalState.selectedVariants[category].add(value);
+        if (!editModalState.variantSelectionOrder.includes(category)) {
+            editModalState.variantSelectionOrder.push(category);
+        }
+    } else {
+        editModalState.selectedVariants[category].delete(value);
+        if (editModalState.selectedVariants[category].size === 0) {
+            editModalState.variantSelectionOrder = editModalState.variantSelectionOrder.filter(cat => cat !== category);
+        }
+    }
+    updateVariantInput(activeVariantInput, editModalState);
+}
+
+function handleImagePaste(event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    const dropzone = event.currentTarget;
+    for (let item of items) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                dropzone.innerHTML = `<img src="${e.target.result}" alt="Pasted image">`;
+                dropzone.classList.add('has-image');
+                document.getElementById('deleteEditImageBtn').style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+            event.preventDefault();
+            break;
+        }
+    }
+}
 
 function openEditModal() {
     if (!currentProduct) {
-        window.showNotification("Chưa có sản phẩm nào được chọn để chỉnh sửa.", "error");
+        window.showNotification("Chưa có sản phẩm nào được chọn.", "error");
         return;
     }
 
-    // Populate the modal with current product data
+    // Reset and populate variant state
+    editModalState.selectedVariants = { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() };
+    editModalState.variantSelectionOrder = [];
+    if (currentProduct.AttributeLines && Array.isArray(currentProduct.AttributeLines)) {
+        currentProduct.AttributeLines.forEach(line => {
+            const category = getCategoryFromAttributeId(line.AttributeId);
+            if (category) {
+                if (!editModalState.variantSelectionOrder.includes(category)) {
+                    editModalState.variantSelectionOrder.push(category);
+                }
+                line.Values.forEach(value => editModalState.selectedVariants[category].add(value.Name));
+            }
+        });
+    }
+
+    // Populate form fields
     document.getElementById('editProductName').value = currentProduct.Name || '';
-    document.getElementById('editProductImageURL').value = currentProduct.ImageUrl || '';
     document.getElementById('editPurchasePrice').value = currentProduct.PurchasePrice || 0;
     document.getElementById('editListPrice').value = currentProduct.ListPrice || 0;
     document.getElementById('editQtyAvailable').value = currentProduct.QtyAvailable || 0;
     document.getElementById('editVirtualAvailable').value = currentProduct.VirtualAvailable || 0;
+    updateVariantInput(document.getElementById('editVariants'), editModalState);
 
-    // Show the modal
+    // Populate image dropzone
+    const dropzone = document.getElementById('editImageDropzone');
+    const deleteBtn = document.getElementById('deleteEditImageBtn');
+    if (currentProduct.ImageUrl) {
+        dropzone.innerHTML = `<img src="${currentProduct.ImageUrl}" alt="${currentProduct.Name}">`;
+        dropzone.classList.add('has-image');
+        deleteBtn.style.display = 'flex';
+    } else {
+        dropzone.innerHTML = '<i data-lucide="image"></i><span>Ctrl+V</span>';
+        dropzone.classList.remove('has-image');
+        deleteBtn.style.display = 'none';
+    }
+
     document.getElementById('editProductModal').style.display = 'flex';
     window.lucide.createIcons();
 }
 
 function closeEditModal() {
     document.getElementById('editProductModal').style.display = 'none';
+    closeVariantSelector();
 }
 
 async function saveProductChanges(event) {
     event.preventDefault();
     if (!currentProduct) return;
 
-    // Update the currentProduct object from form values
+    // Update basic info
     currentProduct.Name = document.getElementById('editProductName').value;
-    currentProduct.ImageUrl = document.getElementById('editProductImageURL').value;
     currentProduct.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
     currentProduct.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
     currentProduct.QtyAvailable = parseInt(document.getElementById('editQtyAvailable').value) || 0;
     currentProduct.VirtualAvailable = parseInt(document.getElementById('editVirtualAvailable').value) || 0;
 
-    // The image in ProductVariants might also need updating if it's separate
-    if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
-        currentProduct.ProductVariants.forEach(variant => {
-            // Assuming variants share the parent image URL
-            variant.ImageUrl = currentProduct.ImageUrl;
-        });
-    }
+    // Update image
+    const imgElement = document.querySelector('#editImageDropzone img');
+    currentProduct.ImageUrl = imgElement ? imgElement.src : null;
 
+    // TODO: Update variants logic if needed. For now, we just save the main product info.
+    // This part is complex as it requires regenerating all variant combinations.
+    // For now, we will focus on updating the parent product.
+    
     try {
-        // Save the updated product data
         await saveProductData(currentProduct);
-
-        // Re-render the UI with the new data
         displayProductInfo(currentProduct);
         displayParentProduct(currentProduct);
         displayVariants(currentProduct.ProductVariants || []);
         updateStats(currentProduct);
-
         closeEditModal();
-        window.showNotification("Đã cập nhật sản phẩm thành công!", "success");
-
+        window.showNotification("Đã cập nhật sản phẩm!", "success");
     } catch (error) {
-        console.error("Error saving product changes:", error);
         window.showNotification("Lỗi khi lưu thay đổi: " + error.message, "error");
     }
 }
 
-
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", async () => {
     window.lucide.createIcons();
-
     loadToken();
-    await loadProductSuggestions(); // Load suggestions into memory on page load
-
-    const productCodeInput = document.getElementById('productCode');
-    if (productCodeInput) {
-        productCodeInput.addEventListener('input', updateSuggestions);
-    }
-
+    await loadProductSuggestions();
     await autoLoadSavedData();
 
-    // Add CSS animations (if not already in common.css)
-    const style = document.createElement("style");
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+    // Event Listeners
+    document.getElementById('productCode')?.addEventListener('input', updateSuggestions);
+    
+    // Edit Modal Listeners
+    const editImageDropzone = document.getElementById('editImageDropzone');
+    const deleteEditImageBtn = document.getElementById('deleteEditImageBtn');
+    const editVariantsInput = document.getElementById('editVariants');
+    const variantSelector = document.getElementById('variantSelector');
+
+    if (editImageDropzone) editImageDropzone.addEventListener('paste', handleImagePaste);
+    if (deleteEditImageBtn) {
+        deleteEditImageBtn.addEventListener('click', () => {
+            editImageDropzone.innerHTML = '<i data-lucide="image"></i><span>Ctrl+V</span>';
+            editImageDropzone.classList.remove('has-image');
+            deleteEditImageBtn.style.display = 'none';
+            window.lucide.createIcons();
+        });
+    }
+    if (editVariantsInput) editVariantsInput.addEventListener('focusin', () => openVariantSelector(editVariantsInput));
+    if (variantSelector) {
+        variantSelector.addEventListener('change', handleVariantSelection);
+        variantSelector.querySelector('.btn-close-selector')?.addEventListener('click', closeVariantSelector);
+    }
+    document.addEventListener('click', (event) => {
+        if (variantSelector && !variantSelector.contains(event.target) && event.target !== activeVariantInput) {
+            closeVariantSelector();
         }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
+    });
 
     console.log("Inventory page initialized");
 });
