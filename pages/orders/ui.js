@@ -101,5 +101,4 @@ export function updateStats() {
     document.getElementById("totalValue").textContent = formatCurrency(totalValue);
     document.getElementById("todayOrders").textContent = todayOrders;
     document.getElementById("todayValue").textContent = formatCurrency(todayValue);
-    document.getElementById("syncStatus").textContent = "0/328";
 }

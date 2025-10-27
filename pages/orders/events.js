@@ -4,7 +4,7 @@ import { orders, setOrders } from './state.js';
 import { displayOrders, updateStats } from './ui.js';
 import { createOrder, closeCreateOrderModal, clearOrderForm, addProductRow, updateProductCodeSuggestions, fetchProductAndPopulateRow, updateTotals, deleteProductRow, submitOrder, cloneProductRow } from './modal-create-order.js';
 import { openCreateProductModal } from './modal-create-product/index.js';
-import { loadOrders, loadDrafts, loadProducts, deleteOrder } from './api.js';
+import { loadOrders, loadProducts, deleteOrder } from './api.js';
 
 function filterOrders() {
     const searchTerm = document.getElementById("searchInput").value.toLowerCase();
@@ -94,7 +94,6 @@ export function setupEventListeners() {
         
         const tab = tabButton.dataset.tab;
         if (tab === 'orders') loadOrders();
-        else if (tab === 'drafts') loadDrafts();
         else if (tab === 'products') loadProducts();
     });
 

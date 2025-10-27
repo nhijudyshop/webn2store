@@ -64,13 +64,6 @@ export async function deleteOrder(orderId) {
     }
 }
 
-export function loadDrafts() {
-    window.showNotification("Không có bản nháp nào", "info");
-    setOrders([]);
-    displayOrders();
-    updateStats();
-}
-
 export function loadProducts() {
     window.showNotification("Tính năng sản phẩm đã đặt đang được phát triển", "info");
     setOrders([]);
