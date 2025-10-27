@@ -343,9 +343,14 @@ export async function fetchProductAndPopulateRow(event) {
         purchasePriceInput.value = product.PurchasePrice || 0;
         salePriceInput.value = product.ListPrice || 0;
 
-        if (imageDropzone && product.ImageUrl) {
-            imageDropzone.innerHTML = `<img src="${product.ImageUrl}" alt="${product.Name}" onerror="this.parentElement.innerHTML = '<i data-lucide=\\'image-off\\'></i>'; window.lucide.createIcons();">`;
-            imageDropzone.classList.add('has-image');
+        if (imageDropzone) {
+            if (product.ImageUrl) {
+                imageDropzone.innerHTML = `<img src="${product.ImageUrl}" alt="${product.Name}" onerror="this.parentElement.innerHTML = 'Chưa có hình';">`;
+                imageDropzone.classList.add('has-image');
+            } else {
+                imageDropzone.innerHTML = 'Chưa có hình';
+                imageDropzone.classList.remove('has-image');
+            }
         }
 
         if (variantSelect && product.ProductVariants && product.ProductVariants.length > 0) {

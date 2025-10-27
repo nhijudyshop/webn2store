@@ -38,24 +38,24 @@ export function displayOrders(ordersToDisplay = orders) {
     const html = ordersToDisplay.map(order => {
         const purchasePriceHtml = `
             ${order.purchasePriceImageUrl
-                ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image">`
-                : `<div class="image-placeholder">Chưa có hình</div>`
+                ? `<img src="${order.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder price-image">Chưa có hình</div>`
             }
             <div class="price">${order.purchasePrice}</div>
         `;
 
         const salePriceHtml = `
             ${order.productImageUrl
-                ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image">`
-                : `<div class="image-placeholder">Chưa có hình</div>`
+                ? `<img src="${order.productImageUrl}" class="price-image" alt="Product Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder price-image">Chưa có hình</div>`
             }
             <div class="price">${order.salePrice}</div>
         `;
         
         const invoiceHtml = `
             ${order.invoiceImageUrl
-                ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice">`
-                : `<div class="image-placeholder">Chưa có hình</div>`
+                ? `<img src="${order.invoiceImageUrl}" class="invoice-image" alt="Invoice" onerror="this.outerHTML='<div class=\\'image-placeholder invoice-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder invoice-image">Chưa có hình</div>`
             }
             <div class="invoice-value">${order.invoice}</div>
         `;

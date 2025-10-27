@@ -6,7 +6,6 @@ import { loadAllSavedProducts } from './product-storage.js'; // Import loadAllSa
 
 export function displayProductInfo(product) {
     const card = document.getElementById("productInfoCard");
-    const image = document.getElementById("productInfoImage");
     const name = document.getElementById("productInfoName");
     const code = document.getElementById("productInfoCode");
     const listPrice = document.getElementById("productInfoListPrice");
@@ -15,16 +14,26 @@ export function displayProductInfo(product) {
     const virtualAvailable = document.getElementById("productInfoVirtualAvailable");
     const variantCount = document.getElementById("productInfoVariantCount");
 
-    if (!card || !image || !name || !code || !listPrice || !purchasePrice || !qtyAvailable || !virtualAvailable || !variantCount) {
-        console.error("Missing one or more product info card DOM elements.");
-        return;
+    // Handle image replacement safely to avoid issues with re-rendering
+    const currentImageElement = document.getElementById("productInfoImage");
+    if (currentImageElement) {
+        const newElement = document.createElement(product.ImageUrl ? 'img' : 'div');
+        newElement.id = "productInfoImage";
+
+        if (product.ImageUrl) {
+            newElement.className = 'product-info-image';
+            newElement.src = product.ImageUrl;
+            newElement.alt = product.Name || "Product";
+            newElement.onerror = function() {
+                this.outerHTML = `<div id="productInfoImage" class="product-info-image image-placeholder">Chưa có hình</div>`;
+            };
+        } else {
+            newElement.className = 'product-info-image image-placeholder';
+            newElement.textContent = 'Chưa có hình';
+        }
+        currentImageElement.replaceWith(newElement);
     }
 
-    image.src = product.ImageUrl || "../../shared/assets/placeholder.png";
-    image.onerror = () => {
-        image.onerror = null; // Prevent infinite loop
-        image.src = "../../shared/assets/placeholder.png";
-    };
     name.textContent = product.Name || "-";
     code.textContent = product.DefaultCode || "-";
     listPrice.textContent = formatCurrency(product.ListPrice);
@@ -64,9 +73,9 @@ export function displayParentProduct(product) {
                 <tr>
                     <td>${product.Id}</td>
                     <td>
-                        <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                        <img src="${product.ImageUrl || ""}" 
                              class="product-image" 
-                             onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
+                             onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
                              alt="${product.Name}">
                     </td>
                     <td><strong>${product.Name || "-"}</strong></td>
@@ -116,9 +125,9 @@ export function displayVariants(variants) {
                     <tr>
                         <td>${variant.Id}</td>
                         <td>
-                            <img src="${currentProduct?.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                            <img src="${currentProduct?.ImageUrl || ""}" 
                                  class="product-image" 
-                                 onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
+                                 onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
                                  alt="${variant.NameTemplate}">
                         </td>
                         <td><strong>${variant.NameTemplate || "-"}</strong></td>
@@ -198,9 +207,9 @@ export function renderAllSavedProductsTable(savedProducts) {
             <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer; background-color: #f8fafc;">
                 <td>${product.Id}</td>
                 <td>
-                    <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                    <img src="${product.ImageUrl || ""}" 
                          class="product-image" 
-                         onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
+                         onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
                          alt="${product.Name}">
                 </td>
                 <td><strong>${product.Name || "-"}</strong></td>
@@ -218,9 +227,9 @@ export function renderAllSavedProductsTable(savedProducts) {
             <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer;">
                 <td>${variant.Id}</td>
                 <td>
-                    <img src="${product.ImageUrl || "../../shared/assets/placeholder.png"}" 
+                    <img src="${product.ImageUrl || ""}" 
                          class="product-image" 
-                         onerror="this.onerror=null; this.src='../../shared/assets/placeholder.png';"
+                         onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
                          alt="${variant.NameTemplate}">
                 </td>
                 <td style="padding-left: 30px;">${variant.NameTemplate || "-"}</td>
