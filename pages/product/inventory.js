@@ -271,15 +271,55 @@ function openEditModal() {
     // Reset and populate variant state
     editModalState.selectedVariants = { colors: new Set(), letterSizes: new Set(), numberSizes: new Set() };
     editModalState.variantSelectionOrder = [];
-    if (currentProduct.AttributeLines && Array.isArray(currentProduct.AttributeLines)) {
+
+    // Primary method: Use AttributeLines if available and populated
+    if (currentProduct.AttributeLines && currentProduct.AttributeLines.length > 0) {
+        console.log("Populating variants from AttributeLines.");
         currentProduct.AttributeLines.forEach(line => {
             const category = getCategoryFromAttributeId(line.AttributeId);
             if (category) {
                 if (!editModalState.variantSelectionOrder.includes(category)) {
                     editModalState.variantSelectionOrder.push(category);
                 }
-                line.Values.forEach(value => editModalState.selectedVariants[category].add(value.Name));
+                if (line.Values && Array.isArray(line.Values)) {
+                    line.Values.forEach(value => editModalState.selectedVariants[category].add(value.Name));
+                }
             }
+        });
+    } 
+    // Fallback method: Parse from ProductVariants if AttributeLines is empty/missing
+    else if (currentProduct.ProductVariants && currentProduct.ProductVariants.length > 0) {
+        console.log("Populating variants from ProductVariants (fallback).");
+        const attributeOrderMap = { 'Màu': 1, 'Size Chữ': 2, 'Size Số': 3 };
+        const foundCategories = new Map();
+
+        currentProduct.ProductVariants.forEach(variant => {
+            if (variant.AttributeValues && Array.isArray(variant.AttributeValues)) {
+                variant.AttributeValues.forEach(attrValue => {
+                    let category = null;
+                    switch (attrValue.AttributeName) {
+                        case 'Màu': category = 'colors'; break;
+                        case 'Size Chữ': category = 'letterSizes'; break;
+                        case 'Size Số': category = 'numberSizes'; break;
+                    }
+                    
+                    if (category) {
+                        if (!foundCategories.has(category)) {
+                            foundCategories.set(category, attributeOrderMap[attrValue.AttributeName] || 99);
+                        }
+                        editModalState.selectedVariants[category].add(attrValue.Name);
+                    }
+                });
+            }
+        });
+        
+        // Sort categories based on a predefined order for consistency
+        editModalState.variantSelectionOrder = [...foundCategories.keys()].sort((a, b) => {
+            const categoryA = Object.keys(editModalState.selectedVariants).find(key => key === a);
+            const categoryB = Object.keys(editModalState.selectedVariants).find(key => key === b);
+            const nameA = categoryA === 'colors' ? 'Màu' : (categoryA === 'letterSizes' ? 'Size Chữ' : 'Size Số');
+            const nameB = categoryB === 'colors' ? 'Màu' : (categoryB === 'letterSizes' ? 'Size Chữ' : 'Size Số');
+            return (attributeOrderMap[nameA] || 99) - (attributeOrderMap[nameB] || 99);
         });
     }
 
