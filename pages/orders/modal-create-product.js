@@ -241,7 +241,8 @@ export async function saveNewProducts() {
 
         if (!code || !name) continue;
 
-        const imageBase64 = await getImageAsBase64(imgElement);
+        const imageBase64WithPrefix = await getImageAsBase64(imgElement);
+        const imageBase64 = imageBase64WithPrefix ? imageBase64WithPrefix.split(',')[1] : null;
         const attributeLines = buildAttributeLines(row);
         const productVariants = buildProductVariants(row, name);
 
