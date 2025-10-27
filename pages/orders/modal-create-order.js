@@ -4,6 +4,7 @@ import { getProductByCode } from '../../shared/api/tpos-api.js';
 import { productSuggestions } from './state.js';
 import { formatCurrency } from './ui.js';
 import { saveOrders, loadOrders } from './api.js';
+import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 
 /**
  * Handles pasting an image from the clipboard into a dropzone.
@@ -172,17 +173,61 @@ export function updateTotals() {
 }
 
 export function updateProductCodeSuggestions(event) {
-    const query = event.target.value.toUpperCase().trim();
+    const query = event.target.value.trim();
     const datalist = document.getElementById('productSuggestionsModal');
     if (!datalist) return;
 
-    datalist.innerHTML = '';
+    datalist.innerHTML = ''; // Clear previous suggestions
 
     if (!query || !productSuggestions) return;
 
-    const filtered = productSuggestions.filter(item => 
-        item.code.toUpperCase().startsWith(query)
-    );
+    const normalizedQuery = normalizeVietnamese(query);
+    const queryWords = normalizedQuery.split(' ').filter(w => w);
+
+    const filtered = productSuggestions.filter(item => {
+        const normalizedCode = normalizeVietnamese(item.code || '');
+        const normalizedName = normalizeVietnamese(item.name || '');
+
+        // Check code: must contain the full query string
+        if (normalizedCode.includes(normalizedQuery)) {
+            return true;
+        }
+
+        // Check name: must contain all words from the query
+        if (queryWords.every(word => normalizedName.includes(word))) {
+            return true;
+        }
+
+        return false;
+    });
+
+    // Sort results for relevance
+    filtered.sort((a, b) => {
+        const normACode = normalizeVietnamese(a.code || '');
+        const normBCode = normalizeVietnamese(b.code || '');
+        const normAName = normalizeVietnamese(a.name || '');
+        const normBName = normalizeVietnamese(b.name || '');
+
+        // Scoring function for relevance
+        const score = (itemCode, itemName) => {
+            if (itemCode === normalizedQuery) return 10; // Exact code match
+            if (itemCode.startsWith(normalizedQuery)) return 9; // Code starts with query
+            if (itemName.startsWith(normalizedQuery)) return 8; // Name starts with query
+            if (queryWords.every(word => itemName.includes(word))) return 7; // Name contains all words
+            if (itemCode.includes(normalizedQuery)) return 6; // Code contains query
+            return 0;
+        };
+
+        const scoreA = score(normACode, normAName);
+        const scoreB = score(normBCode, normBName);
+
+        if (scoreA !== scoreB) {
+            return scoreB - scoreA; // Higher score comes first
+        }
+
+        // Fallback sort by name length
+        return a.name.length - b.name.length;
+    });
 
     const suggestionsToShow = filtered.slice(0, 50);
 
