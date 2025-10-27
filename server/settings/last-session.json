@@ -1,7 +1,7 @@
 {
   "pageId": "270136663390370",
   "videoId": "270136663390370_869288518765849",
-  "connectionMode": "stream",
+  "connectionMode": "polling",
   "refreshInterval": 5,
   "autoStart": false
 }
