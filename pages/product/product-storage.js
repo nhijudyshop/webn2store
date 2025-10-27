@@ -1,7 +1,7 @@
 // pages/product/product-storage.js
 
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats, renderAllSavedProductsTable } from './product-display.js';
+import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
 import { showEmptyState } from './product-utils.js';
 
 /**
@@ -80,8 +80,6 @@ export async function clearSavedData() {
     if (success) {
         window.showNotification("Đã xóa tất cả dữ liệu đã lưu trên server", "info");
         console.log("🗑️ Đã xóa tất cả dữ liệu đã lưu trên server");
-        // Re-render the table to show it's empty
-        renderAllSavedProductsTable([]);
     }
 }
 
@@ -158,7 +156,6 @@ export async function handleDataFile(event) {
 
             const success = await saveAllProducts(existingProducts);
             if (success) {
-                renderAllSavedProductsTable(existingProducts);
                 window.showNotification(`Đã import và lưu ${importCount} sản phẩm!`, "success");
             }
 

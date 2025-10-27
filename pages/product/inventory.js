@@ -1,11 +1,11 @@
-// pages/product/inventory-initializer.js
+// pages/product/inventory.js
 
 import { loadToken } from '../../shared/api/tpos-api.js';
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
 import { showEmptyState } from './product-utils.js';
-import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList, loadAllSavedProducts } from './product-storage.js';
+import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handleDataFile, loadProductFromList } from './product-storage.js';
 import { searchProduct } from './product-api.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats, switchTab, renderAllSavedProductsTable } from './product-display.js';
+import { displayProductInfo, displayParentProduct, displayVariants, updateStats, switchTab } from './product-display.js';
 import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 
 // ===== GLOBAL EXPORTS (for HTML onclicks and shared access) =====
@@ -37,7 +37,6 @@ function clearData() {
 
     showEmptyState("parentTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem thông tin');
     showEmptyState("variantsTableWrapper", 'Nhập mã sản phẩm và nhấn "Thêm" để xem danh sách biến thể');
-    showEmptyState("allProductsTableWrapper", 'Chưa có sản phẩm nào được thêm.'); // Clear the new table
 
     window.showNotification("Đã xóa dữ liệu", "info");
 }
@@ -148,7 +147,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     await autoLoadSavedData();
-    renderAllSavedProductsTable(await loadAllSavedProducts()); // Render all saved products on load
 
     // Add CSS animations (if not already in common.css)
     const style = document.createElement("style");

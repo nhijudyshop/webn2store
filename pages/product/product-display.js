@@ -2,7 +2,6 @@
 
 import { formatCurrency, showEmptyState } from './product-utils.js';
 import { currentProduct } from './inventory-state.js';
-import { loadAllSavedProducts } from './product-storage.js'; // Import loadAllSavedProducts
 
 export function displayProductInfo(product) {
     const card = document.getElementById("productInfoCard");
@@ -183,89 +182,4 @@ export function switchTab(tab) {
     document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
     document.getElementById(`${tab}Tab`).classList.add("active");
     window.lucide.createIcons();
-}
-
-/**
- * Renders a table of all saved products, including their variants.
- * @param {Array<Object>} savedProducts - An array of saved product objects.
- */
-export function renderAllSavedProductsTable(savedProducts) {
-    const wrapper = document.getElementById("allProductsTableWrapper");
-    if (!wrapper) return;
-
-    if (!savedProducts || savedProducts.length === 0) {
-        showEmptyState(wrapper.id, "Chưa có sản phẩm nào được thêm.");
-        return;
-    }
-
-    const allRows = savedProducts.flatMap(data => {
-        const product = data.product;
-        const variants = product.ProductVariants || [];
-
-        // Parent product row
-        const parentRow = `
-            <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer; background-color: #f8fafc;">
-                <td>${product.Id}</td>
-                <td>
-                    <img src="${product.ImageUrl || ""}" 
-                         class="product-image" 
-                         onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
-                         alt="${product.Name}">
-                </td>
-                <td><strong>${product.Name || "-"}</strong></td>
-                <td><span class="product-code">${product.DefaultCode || "-"}</span></td>
-                <td class="price-cell">${formatCurrency(product.ListPrice)}</td>
-                <td>${formatCurrency(product.PurchasePrice)}</td>
-                <td class="qty-cell qty-available">${product.QtyAvailable || 0}</td>
-                <td class="qty-cell qty-forecast">${product.VirtualAvailable || 0}</td>
-                <td>${data.savedAt}</td>
-            </tr>
-        `;
-
-        // Variant rows
-        const variantRows = variants.map(variant => `
-            <tr onclick="window.loadProductFromList('${data.productCode}')" style="cursor: pointer;">
-                <td>${variant.Id}</td>
-                <td>
-                    <img src="${product.ImageUrl || ""}" 
-                         class="product-image" 
-                         onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
-                         alt="${variant.NameTemplate}">
-                </td>
-                <td style="padding-left: 30px;">${variant.NameTemplate || "-"}</td>
-                <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>
-                <td class="price-cell">${formatCurrency(product.ListPrice)}</td>
-                <td>${formatCurrency(product.PurchasePrice)}</td>
-                <td class="qty-cell qty-available">${variant.QtyAvailable || 0}</td>
-                <td class="qty-cell qty-forecast">${variant.VirtualAvailable || 0}</td>
-                <td></td>
-            </tr>
-        `).join('');
-
-        return parentRow + variantRows;
-    }).join('');
-
-    const html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Hình ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Mã SP</th>
-                    <th>Giá bán</th>
-                    <th>Giá mua</th>
-                    <th>SL Thực tế</th>
-                    <th>SL Dự báo</th>
-                    <th>Đã lưu lúc</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${allRows}
-            </tbody>
-        </table>
-    `;
-
-    wrapper.innerHTML = html;
-    window.lucide.createIcons(); // Re-initialize icons
 }
