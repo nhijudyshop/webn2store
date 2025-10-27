@@ -47,60 +47,6 @@
                     </button>
                 </form>
 
-                <!-- Saved Data Management (Removed as per user request) -->
-                <!--
-                <div class="saved-data-section" id="savedDataWrapper">
-                    <div class="saved-data-header">
-                        <div class="saved-data-title">
-                            <i data-lucide="database"></i>
-                            <span>Dữ Liệu Đã Lưu</span>
-                        </div>
-                        <div class="saved-data-actions">
-                            <button
-                                type="button"
-                                class="btn-saved-data btn-export"
-                                onclick="exportToJSON()"
-                                title="Export sang file JSON"
-                            >
-                                <i data-lucide="download"></i>
-                                Export JSON
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-saved-data btn-import"
-                                onclick="importFromJSON()"
-                                title="Import từ file JSON"
-                            >
-                                <i data-lucide="upload"></i>
-                                Import JSON
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-saved-data btn-delete"
-                                onclick="clearSavedData()"
-                                title="Xóa dữ liệu đã lưu"
-                            >
-                                <i data-lucide="trash-2"></i>
-                                Xóa Tất Cả
-                            </button>
-                        </div>
-                    </div>
-                    <div id="savedDataInfo" class="saved-data-info">
-                        <div class="saved-data-empty">
-                            <i data-lucide="inbox"></i>
-                            <span>Chưa có sản phẩm nào được lưu</span>
-                        </div>
-                    </div>
-                </div>
-                <input
-                    type="file"
-                    id="dataFileInput"
-                    accept=".json"
-                    style="display: none"
-                    onchange="handleDataFile(event)"
-                />
-                -->
-
                 <div class="stats-bar">
                     <div class="stat-item">
                         <div class="stat-value" id="totalProducts">0</div>
@@ -171,6 +117,7 @@
                                 </div>
                             </div>
                             <div class="meta-item">
+                                <div class="meta-label">Số biến thể</div>
                                 <div
                                     class="meta-value"
                                     id="productInfoVariantCount"
