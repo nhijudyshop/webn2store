@@ -268,5 +268,44 @@ router.post("/products/update", async (req, res) => {
     }
 });
 
+// New proxy endpoint for updating stock quantity
+router.post("/stock/update", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const { productId, newQuantity } = req.body;
+
+        if (productId === undefined || newQuantity === undefined) {
+            return res.status(400).json({ error: "Missing productId or newQuantity" });
+        }
+
+        const wizardUrl = "https://tomato.tpos.vn/api/stock.inventory/change_product_qty/0";
+        const wizardPayload = [[productId], { "new_quantity": newQuantity }];
+        
+        console.log(`📦 Getting stock change wizard for product ${productId}`);
+        const wizardResponse = await axios.post(wizardUrl, wizardPayload, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        const wizardId = wizardResponse.data.result.res_id;
+        if (!wizardId) {
+            throw new Error("Failed to get stock change wizard ID from TPOS");
+        }
+
+        const executeUrl = `https://tomato.tpos.vn/api/stock.change.product.qty/${wizardId}/action_change_product_qty`;
+        console.log(`🚀 Executing stock change for product ${productId} to quantity ${newQuantity}`);
+        
+        const executeResponse = await axios.post(executeUrl, {}, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log(`✅ Stock updated successfully for product ${productId}`);
+        res.json({ success: true, data: executeResponse.data });
+
+    } catch (error) {
+        console.error("❌ Error updating stock on TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ error: "Failed to update stock on TPOS", details: error.response?.data });
+    }
+});
 
 module.exports = router;
