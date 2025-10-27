@@ -1,7 +1,7 @@
 // pages/product/product-storage.js
 
 import { setCurrentProduct, setCurrentVariants } from './inventory-state.js';
-import { displayProductInfo, displayParentProduct, displayVariants, updateStats } from './product-display.js';
+import { displayProductInfo, displayVariants, updateStats } from './product-display.js';
 import { showEmptyState } from './product-utils.js';
 
 /**
@@ -179,7 +179,6 @@ export async function loadProductFromList(productCode) {
     setCurrentVariants(savedData.product.ProductVariants || []);
 
     displayProductInfo(savedData.product);
-    displayParentProduct(savedData.product);
     displayVariants(savedData.product.ProductVariants || []);
     updateStats(savedData.product);
 
@@ -201,7 +200,6 @@ export async function autoLoadSavedData() {
     setCurrentVariants(latestProduct.product.ProductVariants || []);
 
     displayProductInfo(latestProduct.product);
-    displayParentProduct(latestProduct.product);
     displayVariants(latestProduct.product.ProductVariants || []);
     updateStats(latestProduct.product);
 
