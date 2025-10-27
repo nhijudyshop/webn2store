@@ -106,6 +106,9 @@ export function setupEventListeners() {
     document.getElementById("clearOrderFormBtn")?.addEventListener("click", clearOrderForm);
     document.getElementById("addProductRowBtn")?.addEventListener("click", addProductRow);
     document.getElementById("submitOrderBtn")?.addEventListener("click", submitOrder);
+    document.getElementById("createNewProductBtn")?.addEventListener("click", () => {
+        window.showNotification("Tính năng tạo sản phẩm mới đang được phát triển.", "info");
+    });
 
     // Expose functions to window for inline event handlers
     window.updateProductCodeSuggestions = updateProductCodeSuggestions;
