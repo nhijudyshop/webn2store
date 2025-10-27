@@ -25,6 +25,7 @@ function handlePaste(event) {
                 
                 dropzone.innerHTML = '';
                 dropzone.appendChild(img);
+                dropzone.classList.add('has-image');
             };
             reader.readAsDataURL(file);
             
@@ -108,8 +109,8 @@ export function addProductRow() {
         <td><input type="text" value="0" oninput="window.updateTotals()"></td>
         <td><input type="text" value="0"></td>
         <td>0 ₫</td>
-        <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
-        <td><div class="image-dropzone"><i data-lucide="image"></i></div></td>
+        <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i></div></td>
+        <td><div class="image-dropzone" tabindex="0"><i data-lucide="image"></i></div></td>
         <td><div class="tooltip-host" data-tooltip=""><select onchange="this.parentElement.dataset.tooltip = this.options[this.selectedIndex].text"><option>Chọn biến thể...</option></select></div></td>
         <td class="action-cell">
             <button class="btn-action" title="Gợi ý thông minh" onclick="window.fetchProductAndPopulateRow(event)"><i data-lucide="sparkles"></i></button>
@@ -119,7 +120,11 @@ export function addProductRow() {
     tbody.appendChild(newRow);
 
     const dropzones = newRow.querySelectorAll('.image-dropzone');
-    dropzones.forEach(dz => dz.addEventListener('paste', handlePaste));
+    dropzones.forEach(dz => {
+        dz.addEventListener('paste', handlePaste);
+        dz.addEventListener('mouseenter', (e) => e.currentTarget.focus());
+        dz.addEventListener('mouseleave', (e) => e.currentTarget.blur());
+    });
 
     updateRowNumbers();
     window.lucide.createIcons();
@@ -271,6 +276,7 @@ export async function fetchProductAndPopulateRow(event) {
 
         if (imageDropzone && product.ImageUrl) {
             imageDropzone.innerHTML = `<img src="${product.ImageUrl}" alt="${product.Name}" onerror="this.parentElement.innerHTML = '<i data-lucide=\\'image-off\\'></i>'; window.lucide.createIcons();">`;
+            imageDropzone.classList.add('has-image');
         }
 
         if (variantSelect && product.ProductVariants && product.ProductVariants.length > 0) {
