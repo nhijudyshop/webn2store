@@ -224,4 +224,27 @@ router.get("/stream", async (req, res) => {
     }
 });
 
+// Proxy endpoint for creating a new product
+router.post("/products/insert", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const productData = req.body;
+        const url = "https://tomato.tpos.vn/odata/ProductTemplate/ODataService.InsertV2?$expand=ProductVariants,UOM,UOMPO";
+
+        console.log(`🚀 Creating new product on TPOS: ${productData.Name}`);
+
+        const response = await axios.post(url, productData, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log(`✅ Product created successfully on TPOS: ${response.data.Name}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error("❌ Error creating product on TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ error: "Failed to create product on TPOS", details: error.response?.data });
+    }
+});
+
+
 module.exports = router;
