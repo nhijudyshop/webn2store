@@ -10,7 +10,8 @@ const inventoryRoutes = require("./routes/inventory-routes");
 const ordersRoutes = require("./routes/orders-routes");
 const tposAuthRoutes = require("./routes/tpos-auth-routes");
 const variantRoutes = require("./routes/variant-routes");
-const authRoutes = require("./routes/auth-routes"); // New
+const authRoutes = require("./routes/auth-routes");
+const userManagementRoutes = require("./routes/user-management-routes"); // New
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,7 +32,8 @@ app.use("/api", inventoryRoutes);
 app.use("/api", ordersRoutes);
 app.use("/api", tposAuthRoutes);
 app.use("/api", variantRoutes);
-app.use("/api", authRoutes); // New
+app.use("/api", authRoutes);
+app.use("/api", userManagementRoutes); // New
 
 // Redirect root to the login page
 app.get('/', (req, res) => {

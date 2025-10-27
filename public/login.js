@@ -24,14 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
+            
+            const result = await response.json();
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Tên đăng nhập hoặc mật khẩu không đúng.');
+                throw new Error(result.message || 'Tên đăng nhập hoặc mật khẩu không đúng.');
             }
 
-            // Set login flag
+            // Set login flag and user role
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', result.role);
 
             // Check for TPOS token, if not present, fetch it
             if (!localStorage.getItem('tpos_bearer_token')) {

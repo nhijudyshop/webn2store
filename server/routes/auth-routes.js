@@ -22,7 +22,8 @@ router.post("/app-login", (req, res) => {
         const foundUser = users.find(user => user.username === username && user.password === password);
 
         if (foundUser) {
-            res.json({ success: true, message: "Đăng nhập thành công." });
+            // Return user role on successful login
+            res.json({ success: true, message: "Đăng nhập thành công.", role: foundUser.role });
         } else {
             res.status(401).json({ success: false, message: "Tên đăng nhập hoặc mật khẩu không đúng." });
         }

@@ -114,10 +114,26 @@ function showNotification(message, type = "info") {
 function logout() {
     if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
         localStorage.removeItem('isLoggedIn');
-        // It's good practice to also clear the session token on logout
+        localStorage.removeItem('userRole');
         localStorage.removeItem('tpos_bearer_token');
         window.location.href = '/public/login.html';
     }
+}
+
+/**
+ * Filters sidebar menu items based on user role.
+ */
+function filterSidebarByRole() {
+    const userRole = localStorage.getItem('userRole');
+    if (!userRole) return;
+
+    const navItems = document.querySelectorAll('.nav-item[data-roles]');
+    navItems.forEach(item => {
+        const allowedRoles = item.dataset.roles.split(',');
+        if (!allowedRoles.includes(userRole)) {
+            item.style.display = 'none';
+        }
+    });
 }
 
 /**
@@ -125,34 +141,30 @@ function logout() {
  */
 async function initSidebar() {
     try {
-        // Always fetch sidebar from the absolute path
         const sidebarPath = '/shared/sidebar/sidebar.html';
         
-        // Load sidebar HTML
         const response = await fetch(sidebarPath);
         if (!response.ok) {
             throw new Error(`Failed to load sidebar: ${response.statusText}`);
         }
         const sidebarHTML = await response.text();
 
-        // Insert sidebar at the beginning of body
         document.body.insertAdjacentHTML("afterbegin", sidebarHTML);
 
-        // Setup navigation links with correct paths
         setupNavigationLinks();
 
-        // Setup logout button
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', logout);
         }
 
-        // Initialize Lucide icons for sidebar
+        // Filter menu items based on role
+        filterSidebarByRole();
+
         if (typeof lucide !== "undefined") {
             lucide.createIcons();
         }
 
-        // Highlight active menu item
         highlightActiveMenuItem();
 
         console.log("✅ Sidebar initialized successfully");
@@ -169,7 +181,6 @@ if (document.readyState === "loading") {
 }
 
 // ===== EXPORT FUNCTIONS =====
-// Make functions available globally
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
 window.showNotification = showNotification;

@@ -21,15 +21,15 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-section-title">Chính</div>
-            <a href="#" class="nav-item" data-page="comments" data-path="/facebookcomment/index.html">
+            <a href="#" class="nav-item" data-page="comments" data-path="/facebookcomment/index.html" data-roles="admin,manager,mod,staff,member">
                 <i data-lucide="message-circle"></i>
                 <span>Comments Viewer</span>
             </a>
-            <a href="#" class="nav-item" data-page="inventory" data-path="/pages/product/inventory.html">
+            <a href="#" class="nav-item" data-page="inventory" data-path="/pages/product/inventory.html" data-roles="admin,manager,mod,staff">
                 <i data-lucide="package"></i>
                 <span>Kho Sản Phẩm</span>
             </a>
-            <a href="#" class="nav-item" data-page="orders" data-path="/pages/orders/orders.html">
+            <a href="#" class="nav-item" data-page="orders" data-path="/pages/orders/orders.html" data-roles="admin,manager,mod,staff">
                 <i data-lucide="shopping-cart"></i>
                 <span>Quản Lý Đặt Hàng</span>
             </a>
@@ -37,11 +37,15 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Công cụ</div>
-            <a href="#" class="nav-item" data-page="settings" data-path="/facebookcomment/settings.html">
+            <a href="#" class="nav-item" data-page="settings" data-path="/facebookcomment/settings.html" data-roles="admin,manager">
                 <i data-lucide="settings"></i>
                 <span>Cài đặt</span>
             </a>
-            <div class="nav-item" onclick="showNotification('Đang phát triển', 'info')">
+            <a href="#" class="nav-item" data-page="users" data-path="/pages/users/users.html" data-roles="admin">
+                <i data-lucide="users"></i>
+                <span>Quản lý User</span>
+            </a>
+            <div class="nav-item" onclick="showNotification('Đang phát triển', 'info')" data-roles="admin,manager,mod">
                 <i data-lucide="bar-chart-3"></i>
                 <span>Thống kê</span>
             </div>

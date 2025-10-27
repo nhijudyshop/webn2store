@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý User - FB Manager</title>
+    <script src="/shared/auth/auth-guard.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/shared/styles/common.css" />
+    <link rel="stylesheet" href="/pages/users/users.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Quản Lý Người Dùng</h1>
+            <p>Thêm, sửa, xóa và phân quyền cho người dùng hệ thống</p>
+        </div>
+
+        <div class="main-content">
+            <div class="toolbar">
+                <button class="btn btn-primary" id="addUserBtn">
+                    <i data-lucide="plus"></i> Thêm người dùng mới
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Vai trò</th>
+                            <th>Ngày tạo</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- User rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm người dùng mới</h2>
+                <button class="btn-close" id="closeModalBtn"><i data-lucide="x"></i></button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password">
+                        <small id="passwordHelp">Để trống nếu không muốn thay đổi mật khẩu.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Vai trò</label>
+                        <select id="role" required>
+                            <option value="member">Member</option>
+                            <option value="staff">Staff</option>
+                            <option value="mod">Mod</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Hủy</button>
+                    <button type="submit" class="btn-primary" id="saveBtn">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/shared/sidebar/sidebar.js"></script>
+    <script type="module" src="/pages/users/users.js"></script>
+</body>
+</html>
