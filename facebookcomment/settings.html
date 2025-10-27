@@ -293,7 +293,7 @@
                 <div class="form-group">
                     <label for="bearerTokenSettings">
                         <i data-lucide="key"></i>
-                        Bearer Token (bắt buộc):
+                        Bearer Token (hiện tại):
                     </label>
                     <div style="display: flex; gap: 12px; align-items: flex-end;">
                         <input
@@ -326,19 +326,29 @@
                 </div>
             </div>
             
-            <!-- New TPOS Account Section -->
+            <!-- TPOS Account Management Section -->
             <div class="content-section">
-                <h2>👤 Tài khoản TPOS</h2>
-                <div class="form-group">
-                    <label for="tposUsername"><i data-lucide="user"></i> Tên đăng nhập:</label>
-                    <input type="text" id="tposUsername" placeholder="Nhập username TPOS">
+                <h2>👤 Quản lý tài khoản TPOS</h2>
+                <div class="printer-form" style="margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label for="tposUsername"><i data-lucide="user"></i> Tên đăng nhập:</label>
+                        <input type="text" id="tposUsername" placeholder="Nhập username TPOS">
+                    </div>
+                    <div class="form-group">
+                        <label for="tposPassword"><i data-lucide="lock"></i> Mật khẩu:</label>
+                        <input type="password" id="tposPassword" placeholder="Nhập mật khẩu TPOS">
+                    </div>
+                    <button onclick="addTposAccount()" class="btn btn-primary" style="grid-column: 1 / -1;">
+                        <i data-lucide="plus-circle"></i> Thêm tài khoản
+                    </button>
                 </div>
-                <div class="form-group" style="margin-top: 12px;">
-                    <label for="tposPassword"><i data-lucide="lock"></i> Mật khẩu:</label>
-                    <input type="password" id="tposPassword" placeholder="Nhập mật khẩu TPOS">
+
+                <div id="tposAccountList" class="printer-list">
+                    <!-- Account list will be rendered here -->
                 </div>
+
                 <button onclick="loginAndSaveToken()" id="loginTposBtn" class="btn btn-primary" style="margin-top: 16px; width: 100%;">
-                    <i data-lucide="log-in"></i> Đăng nhập & Lấy Token
+                    <i data-lucide="log-in"></i> Đăng nhập & Lấy Token (từ tài khoản Active)
                 </button>
                 <small style="color: #64748b; margin-top: 8px; display: block;">
                     Tài khoản sẽ được lưu trên server để tự động lấy token.

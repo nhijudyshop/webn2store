@@ -1,11 +1,11 @@
 // facebookcomment/utils/settings-page-initializer.js
 
 import { loadPrinters, addPrinter, deletePrinter, setActivePrinter, testPrinterConnection } from './settings/printer-management.js';
-import { loadTemplateSettings, populateTemplateForm, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate } from './settings/template-management.js';
+import { loadTemplateSettings, saveTemplateSettings, resetTemplateSettings, setAlignment, previewTemplate } from './settings/template-management.js';
 import { checkServerStatus } from './settings/server-status.js';
-import { toggleTokenVisibilitySettings, saveTokenSettings, loadTposAccount, loginAndSaveToken } from './settings/token-management.js';
-import { loadToken, saveToken } from '../../shared/api/tpos-api.js'; // Import loadToken and saveToken directly
-import { generateBillHTML } from '../../shared/utils/printer-template-generator.js'; // Import generateBillHTML from shared utils
+import { toggleTokenVisibilitySettings, saveTokenSettings, loadTposAccount, loginAndSaveToken, addTposAccount, deleteTposAccount, setActiveTposAccount } from './settings/token-management.js';
+import { loadToken } from '../../shared/api/tpos-api.js';
+import { generateBillHTML } from '../../shared/utils/printer-template-generator.js';
 
 /**
  * Initiates a test print using the active printer and current template settings.
@@ -117,8 +117,8 @@ export function initializeSettingsPage(appState) {
     });
 
     // Load token for settings page
-    loadToken('bearerTokenSettings'); // Use imported loadToken directly
-    loadTposAccount(); // Load saved TPOS credentials
+    loadToken('bearerTokenSettings');
+    loadTposAccount();
 
     // Expose functions globally for onclick attributes in HTML
     window.setActivePrinter = (index) => setActivePrinter(index, appState);
@@ -129,7 +129,11 @@ export function initializeSettingsPage(appState) {
     window.setAlignment = (align) => setAlignment(align, appState);
     window.previewTemplate = () => previewTemplate(appState);
     window.toggleTokenVisibilitySettings = toggleTokenVisibilitySettings;
-    window.saveTokenSettings = () => saveTokenSettings('bearerTokenSettings'); // Pass inputId
-    window.loginAndSaveToken = loginAndSaveToken; // New
+    window.saveTokenSettings = () => saveTokenSettings('bearerTokenSettings');
+    window.loginAndSaveToken = loginAndSaveToken;
     window.testPrint = () => testPrint(appState);
+    // Expose new TPOS account management functions
+    window.addTposAccount = addTposAccount;
+    window.deleteTposAccount = deleteTposAccount;
+    window.setActiveTposAccount = setActiveTposAccount;
 }
