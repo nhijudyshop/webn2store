@@ -179,6 +179,24 @@
     border-radius: 6px;
 }
 
+.product-table-wrapper td.product-code-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+}
+
+.product-table-wrapper td.product-code-cell input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.product-table-wrapper td.product-code-cell input[type="text"] {
+    flex-grow: 1;
+}
+
 .product-table-wrapper td.image-cell {
     position: relative;
 }

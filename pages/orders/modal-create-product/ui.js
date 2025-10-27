@@ -43,7 +43,10 @@ export function addProductRowProductModal() {
     
     newRow.innerHTML = `
         <td></td>
-        <td><input type="text" placeholder="Mã SP"></td>
+        <td class="product-code-cell">
+            <input type="checkbox" class="product-code-toggle" checked onchange="this.nextElementSibling.disabled = this.checked;">
+            <input type="text" placeholder="Mã SP" disabled>
+        </td>
         <td><input type="text" placeholder="Tên sản phẩm"></td>
         <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
         <td><div class="tooltip-host tooltip-always-visible"><input type="text" value="0" oninput="window.handlePriceInput(event)"></div></td>
