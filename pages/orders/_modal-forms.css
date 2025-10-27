@@ -35,6 +35,19 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
+.value-display {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f8fafc;
+    color: #334155;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
 .image-dropzone {
     border: 2px dashed #cbd5e1;
     border-radius: 8px;

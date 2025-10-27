@@ -327,8 +327,8 @@ function openEditModal() {
     document.getElementById('editProductName').value = currentProduct.Name || '';
     document.getElementById('editPurchasePrice').value = currentProduct.PurchasePrice || 0;
     document.getElementById('editListPrice').value = currentProduct.ListPrice || 0;
-    document.getElementById('editQtyAvailable').value = currentProduct.QtyAvailable || 0;
-    document.getElementById('editVirtualAvailable').value = currentProduct.VirtualAvailable || 0;
+    document.getElementById('editQtyAvailable').textContent = currentProduct.QtyAvailable || 0;
+    document.getElementById('editVirtualAvailable').textContent = currentProduct.VirtualAvailable || 0;
     updateVariantInput(document.getElementById('editVariants'), editModalState);
 
     // Populate image dropzone
@@ -361,8 +361,6 @@ async function saveProductChanges(event) {
     currentProduct.Name = document.getElementById('editProductName').value;
     currentProduct.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
     currentProduct.ListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
-    currentProduct.QtyAvailable = parseInt(document.getElementById('editQtyAvailable').value) || 0;
-    currentProduct.VirtualAvailable = parseInt(document.getElementById('editVirtualAvailable').value) || 0;
 
     // Update image
     const imgElement = document.querySelector('#editImageDropzone img');
