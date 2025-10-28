@@ -75,6 +75,19 @@ export function setupEventListeners() {
         window.handleViewInfo = handleViewInfo;
         window.goToPage = (pageNumber) => goToPage(pageNumber, appState);
 
+        // NEW: Toggle fullscreen for comments container
+        const fsBtn = document.getElementById("toggleFullscreenBtn");
+        const commentsContainer = document.querySelector(".comments-container");
+        if (fsBtn && commentsContainer) {
+            fsBtn.addEventListener("click", () => {
+                const isFull = commentsContainer.classList.toggle("fullscreen");
+                document.body.classList.toggle("no-scroll", isFull);
+                fsBtn.innerHTML = isFull ? '<i data-lucide="minimize-2"></i>' : '<i data-lucide="maximize-2"></i>';
+                // Re-init icons after changing innerHTML
+                window.lucide && window.lucide.createIcons();
+            });
+        }
+
         console.log("Facebook Comments Viewer initialized");
     });
 }
