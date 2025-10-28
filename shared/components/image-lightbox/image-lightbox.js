@@ -2,7 +2,11 @@
 
 let lightboxOverlay = null;
 let lightboxImage = null;
-let hideTimeout = null; // To store the timeout ID
+let hideTimeout = null;
+let mouseMoveListener = null; // To store the mousemove handler
+let initialMouseX = 0;
+let initialMouseY = 0;
+const distanceThreshold = 10; // Pixels - Ngưỡng di chuyển chuột để ẩn lightbox
 
 /**
  * Initializes the image lightbox functionality.
@@ -15,7 +19,7 @@ export function initImageLightbox() {
         lightboxOverlay.className = 'lightbox-overlay';
         lightboxOverlay.addEventListener('click', hideLightbox); // Hide on click anywhere on overlay
         
-        // NEW: Add mouseenter/mouseleave to the overlay itself
+        // Add mouseenter/mouseleave to the overlay itself to handle delayed hide
         lightboxOverlay.addEventListener('mouseenter', cancelHide); // Cancel hide if mouse enters overlay
         lightboxOverlay.addEventListener('mouseleave', delayedHideLightbox); // Delayed hide if mouse leaves overlay
 
@@ -39,7 +43,7 @@ export function initImageLightbox() {
         // Ensure listeners are not added multiple times
         if (!img.dataset.lightboxListenerAdded) {
             img.addEventListener('mouseenter', showLightbox);
-            // ĐÃ XÓA: img.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi ảnh gốc
+            // REMOVED: img.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi ảnh gốc
             img.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -62,7 +66,7 @@ export function initImageLightbox() {
                     showLightbox(event);
                 }
             });
-            // ĐÃ XÓA: placeholder.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi placeholder
+            // REMOVED: placeholder.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi placeholder
             placeholder.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -94,6 +98,39 @@ function showLightbox(event) {
     if (imgSrc) {
         lightboxImage.src = imgSrc;
         lightboxOverlay.classList.add('show');
+
+        // Record initial mouse position when lightbox is shown
+        initialMouseX = event.clientX;
+        initialMouseY = event.clientY;
+
+        // Add mousemove listener to the document to track any movement
+        if (!mouseMoveListener) { // Prevent adding multiple listeners
+            mouseMoveListener = handleMouseMove;
+            document.addEventListener('mousemove', mouseMoveListener);
+        }
+    }
+}
+
+/**
+ * Handles mouse movement to determine if lightbox should be hidden.
+ * @param {MouseEvent} event - The mousemove event.
+ */
+function handleMouseMove(event) {
+    // Only track movement if the lightbox is actually visible
+    if (!lightboxOverlay.classList.contains('show')) {
+        hideLightbox(); // Should not happen, but as a safeguard
+        return;
+    }
+
+    const currentX = event.clientX;
+    const currentY = event.clientY;
+
+    const distance = Math.sqrt(
+        Math.pow(currentX - initialMouseX, 2) + Math.pow(currentY - initialMouseY, 2)
+    );
+
+    if (distance > distanceThreshold) {
+        hideLightbox();
     }
 }
 
@@ -103,7 +140,13 @@ function showLightbox(event) {
 function hideLightbox() {
     lightboxOverlay.classList.remove('show');
     lightboxImage.src = ''; // Clear image source
-    hideTimeout = null; // Clear the timeout ID
+    cancelHide(); // Clear any pending delayed hide
+
+    // Remove the mousemove listener from the document
+    if (mouseMoveListener) {
+        document.removeEventListener('mousemove', mouseMoveListener);
+        mouseMoveListener = null;
+    }
 }
 
 /**
