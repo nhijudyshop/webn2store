@@ -37,27 +37,31 @@ export function displayOrders(ordersToDisplay = orders) {
 
     let html = '';
     
-    // First pass: Prepare data with rowspan information for consecutive supplier groups
+    // First pass: Prepare data with rowspan and total quantity information for consecutive supplier groups
     const processedOrders = [];
     for (let i = 0; i < ordersToDisplay.length; i++) {
         const item = { ...ordersToDisplay[i] }; // Clone to add properties
         item.isFirstInConsecutiveSupplierGroup = false;
         item.supplierRowspan = 1; // Default rowspan
+        item.groupTotalQty = 0; // Initialize group total quantity
 
         if (i === 0 || item.supplier !== ordersToDisplay[i-1].supplier) {
             // This is the start of a new consecutive supplier group
             item.isFirstInConsecutiveSupplierGroup = true;
             
-            // Calculate rowspan for this new group
+            // Calculate rowspan and total quantity for this new group
             let count = 0;
+            let currentGroupTotalQty = 0;
             for (let j = i; j < ordersToDisplay.length; j++) {
                 if (ordersToDisplay[j].supplier === item.supplier) {
                     count++;
+                    currentGroupTotalQty += ordersToDisplay[j].quantity || 0;
                 } else {
                     break; // Stop counting when supplier changes
                 }
             }
             item.supplierRowspan = count;
+            item.groupTotalQty = currentGroupTotalQty;
         }
         processedOrders.push(item);
     }
@@ -75,7 +79,7 @@ export function displayOrders(ordersToDisplay = orders) {
         const salePriceHtml = `
             ${item.productImageUrl
                 ? `<img src="${item.productImageUrl}" class="price-image" alt="Product Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
-                : `<div class="image-placeholder price-image\\'>Chưa có hình</div>`
+                : `<div class="image-placeholder price-image">Chưa có hình</div>`
             }
             <div class="price">${item.salePrice}</div>
         `;
@@ -83,7 +87,7 @@ export function displayOrders(ordersToDisplay = orders) {
         const invoiceHtml = `
             ${item.invoiceImageUrl
                 ? `<img src="${item.invoiceImageUrl}" class="invoice-image" alt="Invoice" onerror="this.outerHTML='<div class=\\'image-placeholder invoice-image\\'>Chưa có hình</div>'">`
-                : `<div class="image-placeholder invoice-image\\'>Chưa có hình</div>`
+                : `<div class="image-placeholder invoice-image">Chưa có hình</div>`
             }
             <div class="invoice-value">${item.invoice}</div>
         `;
@@ -108,7 +112,7 @@ export function displayOrders(ordersToDisplay = orders) {
             html += `
                 <td class="align-left" rowspan="${item.supplierRowspan}">
                     <div class="supplier-info">${item.supplier}</div>
-                    <div class="supplier-qty">Tổng SL: ${item.totalQty}</div>
+                    <div class="supplier-qty">Tổng SL: ${item.groupTotalQty}</div>
                 </td>
             `;
         }
