@@ -75,10 +75,13 @@ export function displayVariants(variants) {
                     <tr>
                         <td>${variant.Id}</td>
                         <td>
-                            <img src="${currentProduct?.ImageUrl || ""}" 
-                                 class="product-image" 
-                                 onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
-                                 alt="${variant.Name}">
+                            ${currentProduct?.ImageUrl 
+                                ? `<img src="${currentProduct.ImageUrl}" 
+                                     class="product-image" 
+                                     onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
+                                     alt="${variant.Name}">`
+                                : `<div class="product-image image-placeholder">Chưa có hình</div>`
+                            }
                         </td>
                         <td><strong>${variant.Name || "-"}</strong></td>
                         <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>

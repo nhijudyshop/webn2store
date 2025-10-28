@@ -51,6 +51,8 @@ tbody td {
     padding: 16px;
     color: #334155;
     border-bottom: 1px solid #f1f5f9;
+    overflow: visible; /* Cho phép ảnh zoom tràn ra ngoài */
+    position: relative; /* Thêm để căn giữa ảnh zoom */
 }
 
 tbody tr:hover {
@@ -63,6 +65,23 @@ tbody tr:hover {
     border-radius: 8px;
     object-fit: cover;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* Thêm để căn giữa ảnh zoom */
+    z-index: 1; /* Đảm bảo ảnh hiển thị trên cùng khi không hover */
+}
+
+.product-image:hover {
+    position: absolute;
+    width: 320px; /* Kích thước nhất quán */
+    height: 320px; /* Kích thước nhất quán */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    object-fit: contain;
+    border: 2px solid white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    background-color: #fff;
 }
 
 .product-code {
