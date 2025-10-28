@@ -107,8 +107,8 @@
 /* NEW: comment block on line 2, larger font */
 .comment-message {
     color: #1f2937;
-    font-size: 17px;
-    line-height: 1.5;
+    font-size: 20px;
+    line-height: 1.6;
     margin-top: 2px;
     word-wrap: break-word;
 }
