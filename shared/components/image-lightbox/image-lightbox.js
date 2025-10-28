@@ -39,7 +39,7 @@ export function initImageLightbox() {
         // Ensure listeners are not added multiple times
         if (!img.dataset.lightboxListenerAdded) {
             img.addEventListener('mouseenter', showLightbox);
-            img.addEventListener('mouseleave', delayedHideLightbox); // Keep delayed hide on original image
+            // ĐÃ XÓA: img.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi ảnh gốc
             img.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -62,7 +62,7 @@ export function initImageLightbox() {
                     showLightbox(event);
                 }
             });
-            placeholder.addEventListener('mouseleave', delayedHideLightbox); // Keep delayed hide on placeholder
+            // ĐÃ XÓA: placeholder.addEventListener('mouseleave', delayedHideLightbox); // Loại bỏ sự kiện này khỏi placeholder
             placeholder.dataset.lightboxListenerAdded = 'true';
         }
     });
