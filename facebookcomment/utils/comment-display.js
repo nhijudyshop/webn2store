@@ -87,13 +87,10 @@ export function createCommentElement(comment, isNew = false, appState) {
         avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
     }
     
-    const avatarBadge = orderInfo ? `<div class="avatar-badge">${orderInfo.sessionIndex}</div>` : '';
-    
     const avatarBlockHTML = `
         <div class="avatar">
             ${avatarHTML}
             <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
-            ${avatarBadge}
         </div>
     `;
 
@@ -205,13 +202,10 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
     }
     
-    const avatarBadge = orderInfo ? `<div class="avatar-badge">${highlightText(String(orderInfo.sessionIndex), searchTerm)}</div>` : '';
-    
     const avatarBlockHTML = `
         <div class="avatar">
             ${avatarHTML}
             <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
-            ${avatarBadge}
         </div>
     `;
 
