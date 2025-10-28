@@ -1,4 +1,3 @@
-customer info.">
 // facebookcomment/utils/app-state.js
 
 /**
