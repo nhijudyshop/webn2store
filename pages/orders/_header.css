@@ -1,10 +1,13 @@
 /* Header */
 .orders-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    /* Removed flex properties as button is now fixed */
     margin-bottom: 32px;
     padding: 24px 0;
+}
+
+.orders-header .header-content {
+    /* Add margin-right to make space for the fixed button */
+    margin-right: 150px; /* Adjust as needed for button width + spacing */
 }
 
 .header-content h1 {
@@ -20,7 +23,14 @@
     margin: 0;
 }
 
+/* Styles for the fixed 'Create Order' button */
 .btn-create-order {
+    position: fixed;
+    top: 20px; /* Aligns with body padding */
+    right: 20px; /* Aligns with body padding */
+    z-index: 1001; /* Ensure it's above other content */
+    
+    /* Keep existing button styles */
     display: flex;
     align-items: center;
     gap: 8px;
@@ -39,4 +49,12 @@
 .btn-create-order:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsive adjustments for header content */
+@media (max-width: 768px) {
+    .orders-header .header-content {
+        margin-right: 0; /* Remove margin on small screens */
+    }
+    /* The fixed button will naturally overlap less or be positioned fine */
 }
