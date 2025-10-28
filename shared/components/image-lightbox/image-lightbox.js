@@ -6,7 +6,7 @@ let hideTimeout = null;
 let mouseMoveListener = null; // To store the mousemove handler
 let initialMouseX = 0;
 let initialMouseY = 0;
-const distanceThreshold = 10; // Pixels - Ngưỡng di chuyển chuột để ẩn lightbox
+const distanceThreshold = 20; // Pixels - Ngưỡng di chuyển chuột để ẩn lightbox (Đã thay đổi từ 10px lên 20px)
 
 /**
  * Initializes the image lightbox functionality.
