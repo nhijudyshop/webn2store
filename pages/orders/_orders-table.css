@@ -1,37 +1,60 @@
 /* Orders Table */
 .orders-table {
-    overflow-x: auto;
+    overflow-x: auto; /* Keep for fallback, but aim to avoid */
 }
 
 .orders-table table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Ensure columns respect specified widths */
+}
+
+.orders-table thead th,
+.orders-table tbody td {
+    padding: 12px 8px; /* Reduced padding for more space */
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    word-wrap: break-word; /* Allow long text to wrap */
+    overflow: hidden; /* Hide overflow if content is too large */
+    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
 }
 
 .orders-table thead th {
     background: #f8fafc;
-    padding: 16px 12px;
-    text-align: left;
     font-weight: 600;
     color: #475569;
-    font-size: 13px;
+    font-size: 12px; /* Slightly smaller font for headers */
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid #e2e8f0;
-    white-space: nowrap;
+    white-space: normal; /* Allow header text to wrap */
 }
 
 .orders-table tbody td {
-    padding: 16px 12px;
     color: #334155;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-    text-align: center;
+    font-size: 13px; /* Slightly smaller font for content */
 }
 
 .orders-table tbody td.align-left {
     text-align: left;
 }
+
+/* Column Widths */
+.orders-table th:nth-child(1), .orders-table td:nth-child(1) { width: 90px; } /* Ngày đặt */
+.orders-table th:nth-child(2), .orders-table td:nth-child(2) { width: 110px; } /* Nhà cung cấp */
+.orders-table th:nth-child(3), .orders-table td:nth-child(3) { width: 90px; } /* Hóa đơn (VND) */
+.orders-table th:nth-child(4), .orders-table td:nth-child(4) { width: 160px; } /* Tên sản phẩm */
+.orders-table th:nth-child(5), .orders-table td:nth-child(5) { width: 90px; } /* Mã sản phẩm */
+.orders-table th:nth-child(6), .orders-table td:nth-child(6) { width: 110px; } /* Biến thể */
+.orders-table th:nth-child(7), .orders-table td:nth-child(7) { width: 50px; } /* Số lượng */
+.orders-table th:nth-child(8), .orders-table td:nth-child(8) { width: 90px; } /* Giá mua (VND) */
+.orders-table th:nth-child(9), .orders-table td:nth-child(9) { width: 90px; } /* Giá bán (VND) */
+.orders-table th:nth-child(10), .orders-table td:nth-child(10) { width: 110px; } /* Ghi chú */
+.orders-table th:nth-child(11), .orders-table td:nth-child(11) { width: 90px; } /* Trạng thái */
+.orders-table th:nth-child(12), .orders-table td:nth-child(12) { width: 50px; } /* Chỉnh sửa ĐH */
+.orders-table th:nth-child(13), .orders-table td:nth-child(13) { width: 70px; } /* Thao tác */
+
 
 /* Separator for different suppliers */
 .orders-table .supplier-separator {
@@ -44,35 +67,37 @@
 /* Table specific styles */
 .order-date {
     display: flex;
+    flex-direction: column; /* Stack date and time */
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 4px; /* Reduced gap */
+    font-size: 13px;
     justify-content: center;
 }
 
 .order-date i {
     color: #6b7280;
-    width: 16px;
-    height: 16px;
+    width: 14px; /* Smaller icon */
+    height: 14px;
 }
 
 .supplier-info {
-    font-size: 14px;
+    font-size: 13px; /* Slightly smaller font */
     font-weight: 600;
     color: #1e293b;
 }
 
 .supplier-qty {
-    font-size: 12px;
+    font-size: 11px; /* Smaller font */
     color: #64748b;
     margin-top: 2px;
 }
 
 .invoice-info {
     display: flex;
+    flex-direction: column; /* Stack image and value */
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
 }
 
 .invoice-images {
@@ -81,8 +106,8 @@
 }
 
 .invoice-image {
-    width: 80px;
-    height: 80px;
+    width: 50px; /* Smaller image */
+    height: 50px; /* Smaller image */
     border-radius: 6px;
     object-fit: cover;
     border: 1px solid #e2e8f0;
@@ -91,39 +116,44 @@
 .invoice-value {
     font-weight: 600;
     color: #059669;
+    font-size: 13px; /* Smaller font */
 }
 
 .product-name {
     font-weight: 600;
     color: #1e293b;
-    font-size: 14px;
+    font-size: 13px; /* Smaller font */
     line-height: 1.4;
 }
 
 .product-code {
     font-family: monospace;
     background: #f1f5f9;
-    padding: 2px 6px;
+    padding: 2px 4px; /* Reduced padding */
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px; /* Smaller font */
     color: #3b82f6;
     font-weight: 600;
+    white-space: normal; /* Allow code to wrap */
 }
 
 .variant {
     color: #64748b;
-    font-size: 14px;
+    font-size: 12px; /* Smaller font */
+    white-space: normal; /* Allow variant to wrap */
 }
 
 .quantity {
     font-weight: 600;
     color: #1e293b;
     text-align: center;
+    font-size: 13px; /* Smaller font */
 }
 
 .price {
     font-weight: 600;
     color: #059669;
+    font-size: 13px; /* Smaller font */
 }
 
 .price-cell {
@@ -134,40 +164,41 @@
 }
 
 .price-image {
-    width: 80px;
-    height: 80px;
+    width: 50px; /* Smaller image */
+    height: 50px; /* Smaller image */
     border-radius: 6px;
     object-fit: cover;
     border: 1px solid #e2e8f0;
 }
 
 .image-placeholder {
-    width: 80px;
-    height: 80px;
+    width: 50px; /* Smaller placeholder */
+    height: 50px; /* Smaller placeholder */
     border-radius: 6px;
     border: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 10px; /* Smaller font for placeholder text */
     color: #94a3b8;
     background-color: #f8fafc;
     text-align: center;
 }
 
 .price-text {
-    font-size: 12px;
+    font-size: 11px; /* Smaller font */
     color: #64748b;
 }
 
 .status-badge {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 3px 8px; /* Reduced padding */
+    border-radius: 10px; /* Smaller border-radius */
+    font-size: 11px; /* Smaller font */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap; /* Prevent status badge from wrapping */
 }
 
 .status-waiting {
@@ -189,51 +220,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px; /* Reduced gap */
 }
 
-.btn-edit {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: #f8fafc;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.btn-edit, .btn-delete {
+    width: 28px; /* Smaller buttons */
+    height: 28px; /* Smaller buttons */
+    padding: 0; /* Remove padding */
 }
 
-.btn-edit:hover {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-}
-
-.btn-delete {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: #f8fafc;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-delete:hover {
-    background: #ef4444;
-    color: white;
-    border-color: #ef4444;
+.btn-edit i, .btn-delete i {
+    width: 16px; /* Smaller icons */
+    height: 16px;
 }
 
 .checkbox {
-    width: 18px;
-    height: 18px;
+    width: 16px; /* Smaller checkbox */
+    height: 16px;
     cursor: pointer;
 }
