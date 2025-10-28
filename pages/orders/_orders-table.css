@@ -33,6 +33,14 @@
     text-align: left;
 }
 
+/* Separator for different suppliers */
+.orders-table .supplier-separator {
+    height: 1px; /* Make the row very thin */
+    padding: 0;
+    background-color: transparent;
+    border-bottom: 2px dashed #cbd5e1; /* Dashed line */
+}
+
 /* Table specific styles */
 .order-date {
     display: flex;

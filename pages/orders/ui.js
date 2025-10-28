@@ -67,7 +67,12 @@ export function displayOrders(ordersToDisplay = orders) {
     }
 
     // Second pass: Render HTML based on the processed data
-    processedOrders.forEach(item => {
+    processedOrders.forEach((item, index) => {
+        // Add a separator before a new supplier group, but not before the very first item
+        if (item.isFirstInConsecutiveSupplierGroup && index > 0) {
+            html += `<tr><td colspan="13" class="supplier-separator"></td></tr>`;
+        }
+
         const purchasePriceHtml = `
             ${item.purchasePriceImageUrl
                 ? `<img src="${item.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
