@@ -294,6 +294,26 @@
 
         <!-- General Tab -->
         <div class="tab-content active" id="general">
+            <!-- Display Settings Section -->
+            <div class="content-section">
+                <h2>🎨 Hiển thị Comment</h2>
+                <div class="template-form">
+                    <div class="form-group">
+                        <label for="commentMessageFontSize">
+                            <i data-lucide="type"></i>
+                            Kích thước chữ Comment Message (px)
+                        </label>
+                        <input type="number" id="commentMessageFontSize" value="18" min="12" max="32" step="1" />
+                        <small style="color: #64748b; margin-top: 8px; display: block;">
+                            Điều chỉnh kích thước chữ của nội dung comment hiển thị trên trang chính.
+                        </small>
+                    </div>
+                    <button onclick="saveDisplaySettings()" class="btn btn-success">
+                        <i data-lucide="save"></i> Lưu cài đặt hiển thị
+                    </button>
+                </div>
+            </div>
+
             <div class="content-section">
                 <h2>🔑 Bearer Token</h2>
                 <div class="form-group">

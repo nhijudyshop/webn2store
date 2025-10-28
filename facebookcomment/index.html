@@ -167,7 +167,16 @@
     <script type="module" src="/shared/api/tpos-api.js"></script>
     
     <!-- Page JS -->
-    <script type="module" src="/facebookcomment/app.js"></script>
+    <script type="module">
+        import { initializeApp } from '/facebookcomment/app.js';
+        import { loadDisplaySettings } from '/facebookcomment/utils/settings/display-management.js';
+        
+        // Load display settings first
+        loadDisplaySettings();
+        
+        // Then initialize app
+        initializeApp();
+    </script>
 
     <!-- Image Lightbox JS -->
     <script type="module" src="/shared/components/image-lightbox/image-lightbox.js"></script>

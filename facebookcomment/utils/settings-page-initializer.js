@@ -6,6 +6,7 @@ import { checkServerStatus } from './settings/server-status.js';
 import { toggleTokenVisibilitySettings, saveTokenSettings, loadTposAccount, loginAndSaveToken, addTposAccount, deleteTposAccount, setActiveTposAccount } from './settings/token-management.js';
 import { loadHeaderTemplate, saveHeaderTemplate } from './settings/header-management.js';
 import { initializeSuggestionsImport } from './settings/suggestions-import.js'; // New
+import { loadDisplaySettings, saveDisplaySettings } from './settings/display-management.js';
 import { loadToken } from '../../shared/api/tpos-api.js';
 import { generateBillHTML } from '../../shared/utils/printer-template-generator.js';
 
@@ -83,6 +84,7 @@ export async function testPrint(appState) {
 export function initializeSettingsPage(appState) {
     loadPrinters(appState);
     loadTemplateSettings(appState);
+    loadDisplaySettings(); // NEW
     checkServerStatus(appState);
     
     // Check server status every 5 seconds
@@ -136,10 +138,9 @@ export function initializeSettingsPage(appState) {
     window.saveTokenSettings = () => saveTokenSettings('bearerTokenSettings');
     window.loginAndSaveToken = loginAndSaveToken;
     window.testPrint = () => testPrint(appState);
-    // Expose new TPOS account management functions
     window.addTposAccount = addTposAccount;
     window.deleteTposAccount = deleteTposAccount;
     window.setActiveTposAccount = setActiveTposAccount;
-    // Expose new header management functions
     window.saveHeaderTemplate = saveHeaderTemplate;
+    window.saveDisplaySettings = saveDisplaySettings; // NEW
 }
