@@ -96,6 +96,40 @@
 
 .comment-header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .comment-author { font-weight: 800; color: #1e293b; font-size: 18px; }
+
+/* NEW: phone inline next to author */
+.phone-inline {
+    margin-left: 6px;
+    color: #334155;
+    font-weight: 700;
+}
+
+/* NEW: comment block on line 2, larger font */
+.comment-message {
+    color: #1f2937;
+    font-size: 17px;
+    line-height: 1.5;
+    margin-top: 2px;
+    word-wrap: break-word;
+}
+
+/* NEW: inline status next to phone (colors follow existing scheme) */
+.inline-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin-left: 6px;
+    background: #8bc34a; /* default: Bình thường */
+}
+.inline-status.warning { background: #f0ad4e; }
+.inline-status.vip { background: #f59e0b; }
+.inline-status.blacklist { background: #ef4444; }
+
+/* Legacy inline message (not used anymore) */
 .comment-message-inline { color: #374151; font-size: 16px; line-height: 1.4; word-wrap: break-word; flex: 1; }
 
 .comment-time {

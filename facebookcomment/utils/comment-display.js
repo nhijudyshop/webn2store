@@ -171,9 +171,18 @@ export function createCommentElement(comment, isNew = false, appState) {
     }
 
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
-    const iconsRow = buildIconsRow();
-    const sessionPhoneBadge = buildSessionPhoneBadge(orderInfo);
-    const actionsRow = buildActionsRow(comment, name, message, time, orderInfo);
+
+    // NEW: phone + status inline on line 1
+    const phoneInline = orderInfo?.telephone
+        ? `<span class="phone-inline phone-value">${orderInfo.telephone}</span>`
+        : '';
+    const statusInfo = mapStatus(orderInfo);
+    const statusInline = statusInfo
+        ? `<span class="inline-status ${statusInfo.cls}">${statusInfo.label}</span>`
+        : '';
+
+    // NEW: comment shown on line 2 (larger font)
+    const commentBlock = `<div class="comment-message">${message}</div>`;
 
     const newClass = isNew ? "new" : "";
 
@@ -184,11 +193,10 @@ export function createCommentElement(comment, isNew = false, appState) {
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${name}</span>
-                    <span class="comment-message-inline">${message}</span>
+                    ${phoneInline}
+                    ${statusInline}
                 </div>
-                ${iconsRow}
-                ${sessionPhoneBadge}
-                ${actionsRow}
+                ${commentBlock}
             </div>
         </div>
     `;
@@ -217,26 +225,18 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
 
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
 
-    // Build session + phone badge with highlights
-    let sessionPhoneBadge = '';
-    if (orderInfo) {
-        const parts = [];
-        if (orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
-            parts.push(`#${highlightText(String(orderInfo.sessionIndex), searchTerm)}.`);
-        }
-        if (orderInfo.telephone) {
-            parts.push(highlightText(orderInfo.telephone, searchTerm));
-        }
-        if (parts.length) {
-            sessionPhoneBadge = `
-                <div class="comment-badges">
-                    <span class="session-phone-badge">${parts.join(' ')}</span>
-                </div>
-            `;
-        }
-    }
+    // NEW: phone + status inline (phone highlighted)
+    const phoneInline = orderInfo?.telephone
+        ? `<span class="phone-inline phone-value">${highlightText(orderInfo.telephone, searchTerm)}</span>`
+        : '';
+    const statusInfo = mapStatus(orderInfo);
+    const statusInline = statusInfo
+        ? `<span class="inline-status ${statusInfo.cls}">${statusInfo.label}</span>`
+        : '';
 
-    const actionsRow = buildActionsRow(comment, name, message, time, orderInfo);
+    // NEW: comment shown on line 2 (larger font, highlighted)
+    const commentBlock = `<div class="comment-message">${highlightedMessage}</div>`;
+
     const newClass = isNew ? "new" : "";
 
     return `
@@ -246,11 +246,10 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${highlightedName}</span>
-                    <span class="comment-message-inline">${highlightedMessage}</span>
+                    ${phoneInline}
+                    ${statusInline}
                 </div>
-                ${buildIconsRow()}
-                ${sessionPhoneBadge}
-                ${actionsRow}
+                ${commentBlock}
             </div>
         </div>
     `;
