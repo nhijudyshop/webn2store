@@ -97,21 +97,18 @@ export function createCommentElement(comment, isNew = false, appState) {
         </div>
     `;
 
-    // Icons (phone and messenger)
-    const iconsHTML = `
-        <div class="comment-icons">
-            <i data-lucide="phone" class="comment-icon"></i>
-            <i data-lucide="message-circle" class="comment-icon messenger"></i>
-        </div>
-    `;
+    // Build phone next to name
+    let phoneInline = '';
+    if (orderInfo && orderInfo.telephone) {
+        phoneInline = `<span class="phone-inline phone-value">${orderInfo.telephone}</span>`;
+    }
 
-    // Session and phone badge
-    let sessionPhoneBadge = '';
-    if (orderInfo) {
-        const phone = orderInfo.telephone || 'N/A';
-        sessionPhoneBadge = `
+    // Session badge shown separately (only session index)
+    let sessionBadge = '';
+    if (orderInfo && orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
+        sessionBadge = `
             <div class="comment-badges">
-                <span class="session-phone-badge">#${orderInfo.sessionIndex}. ${phone}</span>
+                <span class="session-badge">#${orderInfo.sessionIndex}</span>
             </div>
         `;
     }
@@ -162,10 +159,10 @@ export function createCommentElement(comment, isNew = false, appState) {
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${name}</span>
-                    <span class="comment-message-inline">${message}</span>
+                    ${phoneInline}
                 </div>
-                ${iconsHTML}
-                ${sessionPhoneBadge}
+                <div class="comment-message">${message}</div>
+                ${sessionBadge}
                 ${customerDetailsHTML}
             </div>
         </div>
@@ -218,62 +215,22 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         </div>
     `;
 
-    // Icons (phone and messenger)
-    const iconsHTML = `
-        <div class="comment-icons">
-            <i data-lucide="phone" class="comment-icon"></i>
-            <i data-lucide="message-circle" class="comment-icon messenger"></i>
-        </div>
-    `;
-
-    // Session and phone badge
-    let sessionPhoneBadge = '';
-    if (orderInfo) {
-        const phone = orderInfo.telephone || 'N/A';
-        const highlightedPhone = highlightText(phone, searchTerm);
-        const highlightedSession = highlightText(String(orderInfo.sessionIndex), searchTerm);
-        sessionPhoneBadge = `
-            <div class="comment-badges">
-                <span class="session-phone-badge">#${highlightedSession}. ${highlightedPhone}</span>
-            </div>
-        `;
+    // Phone next to name (highlighted)
+    let phoneInline = '';
+    if (orderInfo && orderInfo.telephone) {
+        const highlightedPhone = highlightText(orderInfo.telephone, searchTerm);
+        phoneInline = `<span class="phone-inline phone-value">${highlightedPhone}</span>`;
     }
 
-    // Customer details (address, partner name, etc.)
-    let customerDetailsHTML = '';
-    if (orderInfo) {
-        const details = [];
-
-        if (orderInfo.printCount) {
-            details.push(`
-                <div class="customer-detail-item" style="border-left-color: #10b981; background: #d1fae5;">
-                    <span class="icon">🛒</span>
-                    <span class="value" style="color: #047857;">${orderInfo.printCount}</span>
-                </div>
-            `);
-        }
-
-        if (orderInfo.address) {
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">📍</span>
-                    <span class="value">${highlightText(orderInfo.address, searchTerm)}</span>
-                </div>
-            `);
-        }
-
-        if (orderInfo.partnerName) {
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">🤝</span>
-                    <span class="value">${highlightText(orderInfo.partnerName, searchTerm)}</span>
-                </div>
-            `);
-        }
-
-        if (details.length > 0) {
-            customerDetailsHTML = `<div class="comment-badges">${details.join('')}</div>`;
-        }
+    // Session badge shown separately (highlighted session only)
+    let sessionBadge = '';
+    if (orderInfo && orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
+        const highlightedSession = highlightText(String(orderInfo.sessionIndex), searchTerm);
+        sessionBadge = `
+            <div class="comment-badges">
+                <span class="session-badge">#${highlightedSession}</span>
+            </div>
+        `;
     }
 
     const newClass = isNew ? "new" : "";
@@ -285,10 +242,10 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${highlightedName}</span>
-                    <span class="comment-message-inline">${highlightedMessage}</span>
+                    ${phoneInline}
                 </div>
-                ${iconsHTML}
-                ${sessionPhoneBadge}
+                <div class="comment-message">${highlightedMessage}</div>
+                ${sessionBadge}
                 ${customerDetailsHTML}
             </div>
         </div>
