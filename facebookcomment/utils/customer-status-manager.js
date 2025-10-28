@@ -82,31 +82,60 @@ export async function fetchCustomerByPhone(phone, appState) {
 
 /**
  * Sau khi render comments, đảm bảo các status theo phone được load và cập nhật UI.
+ * Đưa tất cả phone chưa có vào hàng đợi và xử lý tuần tự.
  * @param {Array} comments
  * @param {object} appState
  */
 export async function ensureCustomerStatusesForComments(comments, appState) {
   if (!Array.isArray(comments) || comments.length === 0) return;
 
-  const phonesToFetch = new Set();
+  const toEnqueue = new Set();
 
   comments.forEach((c) => {
     const msg = c.message || "";
     const phones = extractPhonesFromText(msg);
     phones.forEach((p) => {
-      if (!appState.customersMap.has(p)) {
-        phonesToFetch.add(p);
+      if (!appState.customersMap.has(p) && !appState.customerFetchQueue.has(p)) {
+        toEnqueue.add(p);
       }
     });
   });
 
-  // Fetch tuần tự để đơn giản (số lượng thường ít); có thể tối ưu song song nếu cần
-  for (const phone of phonesToFetch) {
-    const rec = await fetchCustomerByPhone(phone, appState);
-    if (rec) {
-      updateStatusBadgesForPhone(phone, rec.StatusText);
-    }
+  // Thêm vào queue
+  toEnqueue.forEach(p => appState.customerFetchQueue.add(p));
+  if (toEnqueue.size > 0) {
+    console.log(`📞 Queued ${toEnqueue.size} phone(s) for customer status fetch`);
   }
+
+  // Bắt đầu xử lý queue nếu chưa chạy
+  processCustomerQueue(appState);
+}
+
+/**
+ * Xử lý hàng đợi số điện thoại tuần tự để tránh đụng độ/đè cache.
+ * @param {object} appState
+ */
+function processCustomerQueue(appState) {
+  if (appState.isFetchingCustomers) return;
+  const next = appState.customerFetchQueue.values().next().value;
+  if (!next) {
+    appState.isFetchingCustomers = false;
+    return;
+  }
+  appState.isFetchingCustomers = true;
+  appState.customerFetchQueue.delete(next);
+
+  fetchCustomerByPhone(next, appState)
+    .then(rec => {
+      if (rec) {
+        updateStatusBadgesForPhone(next, rec.StatusText);
+      }
+    })
+    .finally(() => {
+      // Nhả slot, tiếp tục số tiếp theo (thêm delay nhỏ để nhẹ server)
+      appState.isFetchingCustomers = false;
+      setTimeout(() => processCustomerQueue(appState), 60);
+    });
 }
 
 /**

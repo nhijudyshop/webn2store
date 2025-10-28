@@ -18,10 +18,9 @@ export const appState = {
     ordersMap: new Map(), // Maps commentId/userId to order details
     ordersFetched: false, // Flag to indicate if orders have been fetched for the current video
     customersMap: new Map(), // Maps phone -> customer info (Id, Name, Street, Phone, Credit, StatusText)
-    lastSession: {}, // Stores last saved session settings
-    printers: [], // Stores printer configurations
-    templateSettings: {}, // Stores print template settings
-    serverOnline: false, // Status of the print bridge server
+    // Thêm queue xử lý khách hàng
+    customerFetchQueue: new Set(),
+    isFetchingCustomers: false,
     currentSearchTerm: "", // Current search term
     currentPage: 1, // Current page for polling mode
     commentsPerPage: 50, // Number of comments per page for polling mode
