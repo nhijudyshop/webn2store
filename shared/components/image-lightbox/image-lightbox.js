@@ -14,15 +14,14 @@ export function initImageLightbox() {
         lightboxOverlay = document.createElement('div');
         lightboxOverlay.className = 'lightbox-overlay';
         lightboxOverlay.addEventListener('click', hideLightbox); // Hide on click anywhere on overlay
-        // REMOVED: lightboxOverlay.addEventListener('mouseleave', hideLightbox); // This was problematic
+        
+        // NEW: Add mouseenter/mouseleave to the overlay itself
+        lightboxOverlay.addEventListener('mouseenter', cancelHide); // Cancel hide if mouse enters overlay
+        lightboxOverlay.addEventListener('mouseleave', delayedHideLightbox); // Delayed hide if mouse leaves overlay
 
         lightboxImage = document.createElement('img');
         lightboxImage.className = 'lightbox-image';
         lightboxOverlay.appendChild(lightboxImage);
-
-        // NEW: Add mouseenter/mouseleave listeners to the lightbox image itself
-        lightboxImage.addEventListener('mouseenter', cancelHide);
-        lightboxImage.addEventListener('mouseleave', delayedHideLightbox);
 
         document.body.appendChild(lightboxOverlay);
     }
@@ -40,7 +39,7 @@ export function initImageLightbox() {
         // Ensure listeners are not added multiple times
         if (!img.dataset.lightboxListenerAdded) {
             img.addEventListener('mouseenter', showLightbox);
-            img.addEventListener('mouseleave', delayedHideLightbox); // Put mouseleave back on the image
+            img.addEventListener('mouseleave', delayedHideLightbox); // Keep delayed hide on original image
             img.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -63,7 +62,7 @@ export function initImageLightbox() {
                     showLightbox(event);
                 }
             });
-            placeholder.addEventListener('mouseleave', delayedHideLightbox); // Put mouseleave back on the placeholder
+            placeholder.addEventListener('mouseleave', delayedHideLightbox); // Keep delayed hide on placeholder
             placeholder.dataset.lightboxListenerAdded = 'true';
         }
     });
