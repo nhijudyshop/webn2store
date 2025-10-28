@@ -26,13 +26,12 @@ export function formatTimeToGMT7(isoString) {
 
     const hours = String(gmt7Time.getUTCHours()).padStart(2, "0");
     const minutes = String(gmt7Time.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(gmt7Time.getUTCSeconds()).padStart(2, "0");
 
     const day = String(gmt7Time.getUTCDate()).padStart(2, "0");
     const month = String(gmt7Time.getUTCMonth() + 1).padStart(2, "0");
     const year = gmt7Time.getUTCFullYear();
 
-    return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
 /**
@@ -70,62 +69,63 @@ export function createCommentElement(comment, isNew = false, appState) {
     const userId = comment.from?.id;
     const commentId = comment.id;
 
-    let avatarBlockHTML = '';
-    if (appState.connectionMode !== 'polling') { // Only show avatar if not in polling mode
-        let avatarHTML = "";
-        const avatarUrl = comment.from?.picture?.data?.url;
-
-        if (avatarUrl) {
-            avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-        } else if (userId) {
-            avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-        } else {
-            avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
-        }
-        avatarBlockHTML = `<div class="avatar">${avatarHTML}</div>`;
-    }
-
     // Check if user has order
-    let orderHTML = "";
-    let nameClass = "";
     let orderInfo = null;
-    let inlineCustomerDetails = ""; // New variable for inline details
-
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
     } else if (userId && appState.ordersMap.has(userId)) {
         orderInfo = appState.ordersMap.get(userId);
     }
 
+    // Avatar with badge
+    let avatarHTML = "";
+    const avatarUrl = comment.from?.picture?.data?.url;
+    
+    if (avatarUrl) {
+        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    } else if (userId) {
+        avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    }
+    
+    const avatarBadge = orderInfo ? `<div class="avatar-badge">${orderInfo.sessionIndex}</div>` : '';
+    
+    const avatarBlockHTML = `
+        <div class="avatar">
+            ${avatarHTML}
+            <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
+            ${avatarBadge}
+        </div>
+    `;
+
+    // Icons (phone and messenger)
+    const iconsHTML = `
+        <div class="comment-icons">
+            <i data-lucide="phone" class="comment-icon"></i>
+            <i data-lucide="message-circle" class="comment-icon messenger"></i>
+        </div>
+    `;
+
+    // Session and phone badge
+    let sessionPhoneBadge = '';
     if (orderInfo) {
-        orderHTML = `
-            <span class="order-badge">
-                <span class="crown-icon">👑</span>
-                <span>#${orderInfo.sessionIndex}</span>
-            </span>
-            <span class="verified-icon">✓</span>
+        const phone = orderInfo.telephone || 'N/A';
+        sessionPhoneBadge = `
+            <div class="comment-badges">
+                <span class="session-phone-badge">#${orderInfo.sessionIndex}. ${phone}</span>
+            </div>
         `;
+    }
 
-        nameClass = "has-order";
-
+    // Customer details (address, partner name, etc.)
+    let customerDetailsHTML = '';
+    if (orderInfo) {
         const details = [];
 
         if (orderInfo.printCount) {
             details.push(`
-                <div class="customer-detail-item" style="border-left: 2px solid #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);">
+                <div class="customer-detail-item" style="border-left-color: #10b981; background: #d1fae5;">
                     <span class="icon">🛒</span>
-                    <span class="value" style="color: #047857; font-weight: 700;">${orderInfo.printCount}</span>
-                </div>
-            `);
-        }
-
-        // Always display phone number if orderInfo exists, with N/A fallback
-        if (orderInfo.telephone !== undefined) {
-            const displayPhone = orderInfo.telephone ? orderInfo.telephone : 'N/A';
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">📱</span>
-                    <span class="value phone-value">${displayPhone}</span>
+                    <span class="value" style="color: #047857;">${orderInfo.printCount}</span>
                 </div>
             `);
         }
@@ -147,32 +147,41 @@ export function createCommentElement(comment, isNew = false, appState) {
                 </div>
             `);
         }
-        
-        // Add PartnerStatus badge
-        if (orderInfo.partnerStatus) {
-            const statusClass = orderInfo.partnerStatus.toLowerCase(); // e.g., "vip", "normal", "blacklist"
-            details.push(`
-                <div class="customer-detail-item status-badge status-${statusClass}">
-                    <span class="icon">⭐</span>
-                    <span class="value">${orderInfo.partnerStatus}</span>
-                </div>
-            `);
-        }
 
-        // New: put details directly into inlineCustomerDetails
         if (details.length > 0) {
-            inlineCustomerDetails = details.join("");
+            customerDetailsHTML = `<div class="comment-badges">${details.join('')}</div>`;
         }
     }
 
-    // Action buttons - icon only, no text
+    // Status badge (Bình thường, VIP, Blacklist)
+    let statusBadge = 'Bình thường';
+    let statusClass = 'normal';
+    if (orderInfo && orderInfo.partnerStatus) {
+        const status = orderInfo.partnerStatus.toLowerCase();
+        if (status === 'vip') {
+            statusBadge = 'VIP';
+            statusClass = 'vip';
+        } else if (status === 'blacklist') {
+            statusBadge = 'Blacklist';
+            statusClass = 'blacklist';
+        }
+    }
+
+    // Action buttons with text
     const actionsHTML = `
         <div class="comment-actions">
-            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')" title="Tạo đơn hàng">
-                <i data-lucide="shopping-cart"></i>
+            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')">
+                Tạo đơn hàng
             </button>
-            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')" title="Thông tin">
-                <i data-lucide="info"></i>
+            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')">
+                Thông tin
+            </button>
+            <button class="action-btn action-message">
+                Tin nhắn
+                <i data-lucide="chevron-down"></i>
+            </button>
+            <button class="action-btn action-status ${statusClass}">
+                ${statusBadge}
             </button>
         </div>
     `;
@@ -183,15 +192,14 @@ export function createCommentElement(comment, isNew = false, appState) {
         <div class="comment-item ${newClass}">
             ${avatarBlockHTML}
             <div class="comment-content">
+                <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
-                    <span class="comment-author ${nameClass}">${name}</span>
-                    ${orderHTML}
-                    ${inlineCustomerDetails}
+                    <span class="comment-author">${name}</span>
+                    <span class="comment-message-inline">${message}</span>
                 </div>
-                <div class="comment-message">
-                    <span class="message-text">${message}</span>
-                    <span class="comment-time">${time ? formatTimeToGMT7(time) : ""}</span>
-                </div>
+                ${iconsHTML}
+                ${sessionPhoneBadge}
+                ${customerDetailsHTML}
                 ${actionsHTML}
             </div>
         </div>
@@ -216,61 +224,65 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
     const highlightedName = highlightText(name, searchTerm);
     const highlightedMessage = highlightText(message, searchTerm);
 
-    let avatarBlockHTML = '';
-    if (appState.connectionMode !== 'polling') { // Only show avatar if not in polling mode
-        let avatarHTML = "";
-        const avatarUrl = comment.from?.picture?.data?.url;
-
-        if (avatarUrl) {
-            avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-        } else if (userId) {
-            avatarHTML = `<img src="/api/avatar/${userId}?size=50" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-fallback\\'>${getInitials(name)}</div>';">`;
-        } else {
-            avatarHTML = `<div class="avatar-fallback">${getInitials(name)}</div>`;
-        }
-        avatarBlockHTML = `<div class="avatar">${avatarHTML}</div>`;
-    }
-
-    let orderHTML = "";
-    let nameClass = "";
+    // Check if user has order
     let orderInfo = null;
-    let inlineCustomerDetails = ""; // New variable for inline details
-
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
     } else if (userId && appState.ordersMap.has(userId)) {
         orderInfo = appState.ordersMap.get(userId);
     }
 
+    // Avatar with badge
+    let avatarHTML = "";
+    const avatarUrl = comment.from?.picture?.data?.url;
+    
+    if (avatarUrl) {
+        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    } else if (userId) {
+        avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    }
+    
+    const avatarBadge = orderInfo ? `<div class="avatar-badge">${highlightText(String(orderInfo.sessionIndex), searchTerm)}</div>` : '';
+    
+    const avatarBlockHTML = `
+        <div class="avatar">
+            ${avatarHTML}
+            <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
+            ${avatarBadge}
+        </div>
+    `;
+
+    // Icons (phone and messenger)
+    const iconsHTML = `
+        <div class="comment-icons">
+            <i data-lucide="phone" class="comment-icon"></i>
+            <i data-lucide="message-circle" class="comment-icon messenger"></i>
+        </div>
+    `;
+
+    // Session and phone badge
+    let sessionPhoneBadge = '';
     if (orderInfo) {
-        orderHTML = `
-            <span class="order-badge">
-                <span class="crown-icon">👑</span>
-                <span>#${highlightText(String(orderInfo.sessionIndex), searchTerm)}</span>
-            </span>
-            <span class="verified-icon">✓</span>
+        const phone = orderInfo.telephone || 'N/A';
+        const highlightedPhone = highlightText(phone, searchTerm);
+        const highlightedSession = highlightText(String(orderInfo.sessionIndex), searchTerm);
+        sessionPhoneBadge = `
+            <div class="comment-badges">
+                <span class="session-phone-badge">#${highlightedSession}. ${highlightedPhone}</span>
+            </div>
         `;
+    }
 
-        nameClass = "has-order";
-
+    // Customer details (address, partner name, etc.)
+    let customerDetailsHTML = '';
+    if (orderInfo) {
         const details = [];
 
         if (orderInfo.printCount) {
             details.push(`
-                <div class="customer-detail-item" style="border-left: 2px solid #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);">
+                <div class="customer-detail-item" style="border-left-color: #10b981; background: #d1fae5;">
                     <span class="icon">🛒</span>
-                    <span class="value" style="color: #047857; font-weight: 700;">${orderInfo.printCount}</span>
-                </div>
-            `);
-        }
-
-        // Always display phone number if orderInfo exists, with N/A fallback
-        if (orderInfo.telephone !== undefined) {
-            const displayPhone = orderInfo.telephone ? orderInfo.telephone : 'N/A';
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">📱</span>
-                    <span class="value phone-value">${highlightText(displayPhone, searchTerm)}</span>
+                    <span class="value" style="color: #047857;">${orderInfo.printCount}</span>
                 </div>
             `);
         }
@@ -293,30 +305,40 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
             `);
         }
 
-        // Add PartnerStatus badge
-        if (orderInfo.partnerStatus) {
-            const statusClass = orderInfo.partnerStatus.toLowerCase(); // e.g., "vip", "normal", "blacklist"
-            details.push(`
-                <div class="customer-detail-item status-badge status-${statusClass}">
-                    <span class="icon">⭐</span>
-                    <span class="value">${highlightText(orderInfo.partnerStatus, searchTerm)}</span>
-                </div>
-            `);
-        }
-
         if (details.length > 0) {
-            inlineCustomerDetails = details.join("");
+            customerDetailsHTML = `<div class="comment-badges">${details.join('')}</div>`;
         }
     }
 
-    // Action buttons - icon only, no text
+    // Status badge (Bình thường, VIP, Blacklist)
+    let statusBadge = 'Bình thường';
+    let statusClass = 'normal';
+    if (orderInfo && orderInfo.partnerStatus) {
+        const status = orderInfo.partnerStatus.toLowerCase();
+        if (status === 'vip') {
+            statusBadge = 'VIP';
+            statusClass = 'vip';
+        } else if (status === 'blacklist') {
+            statusBadge = 'Blacklist';
+            statusClass = 'blacklist';
+        }
+    }
+
+    // Action buttons with text
     const actionsHTML = `
         <div class="comment-actions">
-            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')" title="Tạo đơn hàng">
-                <i data-lucide="shopping-cart"></i>
+            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')">
+                Tạo đơn hàng
             </button>
-            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')" title="Thông tin">
-                <i data-lucide="info"></i>
+            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')">
+                Thông tin
+            </button>
+            <button class="action-btn action-message">
+                Tin nhắn
+                <i data-lucide="chevron-down"></i>
+            </button>
+            <button class="action-btn action-status ${statusClass}">
+                ${statusBadge}
             </button>
         </div>
     `;
@@ -327,15 +349,14 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         <div class="comment-item ${newClass}">
             ${avatarBlockHTML}
             <div class="comment-content">
+                <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
-                    <span class="comment-author ${nameClass}">${highlightedName}</span>
-                    ${orderHTML}
-                    ${inlineCustomerDetails}
+                    <span class="comment-author">${highlightedName}</span>
+                    <span class="comment-message-inline">${highlightedMessage}</span>
                 </div>
-                <div class="comment-message">
-                    <span class="message-text">${highlightedMessage}</span>
-                    <span class="comment-time">${time ? formatTimeToGMT7(time) : ""}</span>
-                </div>
+                ${iconsHTML}
+                ${sessionPhoneBadge}
+                ${customerDetailsHTML}
                 ${actionsHTML}
             </div>
         </div>
