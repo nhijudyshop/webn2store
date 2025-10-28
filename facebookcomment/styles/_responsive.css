@@ -1,0 +1,78 @@
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    body.sidebar-open {
+        padding-left: 0;
+    }
+
+    .sidebar-toggle.open {
+        left: 20px;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-bar {
+        flex-direction: column;
+    }
+
+    .comment-item {
+        flex-direction: column;
+    }
+
+    .avatar {
+        align-self: flex-start;
+    }
+    
+    .comment-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .comment-time {
+        position: static;
+        margin-top: 8px;
+    }
+
+    /* Settings page responsive */
+    .printer-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .printer-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .printer-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .alignment-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .pagination-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pagination-controls button {
+        width: 100%;
+    }
+}

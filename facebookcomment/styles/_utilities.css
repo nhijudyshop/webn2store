@@ -1,0 +1,52 @@
+/* ===== UTILITY CLASSES ===== */
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.mb-4 {
+    margin-bottom: 16px;
+}
+
+.text-sm {
+    font-size: 14px;
+}
+
+.text-gray-600 {
+    color: #64748b;
+}
+
+.mt-2 {
+    margin-top: 8px;
+}
+
+/* ===== ANIMATIONS ===== */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== ERROR ===== */
+.error {
+    background: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 15px;
+    border-radius: 4px;
+    color: #c62828;
+    margin-bottom: 15px;
+}

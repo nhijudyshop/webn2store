@@ -1,0 +1,149 @@
+/* ===== BUTTONS ===== */
+.button-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.btn-primary,
+#startBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled),
+#startBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+#startBtn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+#stopBtn {
+    background: #f44336;
+    color: white;
+}
+
+#stopBtn:hover:not(:disabled) {
+    background: #d32f2f;
+}
+
+#stopBtn:disabled {
+    background: #ffcdd2;
+    cursor: not-allowed;
+}
+
+#clearBtn {
+    background: #ff9800;
+    color: white;
+}
+
+#clearBtn:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+}
+
+#refreshOrdersBtn {
+    background: #2196f3;
+    color: white;
+}
+
+#refreshOrdersBtn:hover:not(:disabled) {
+    background: #1976d2;
+    transform: translateY(-2px);
+}
+
+#refreshOrdersBtn:disabled {
+    background: #90caf9;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+}
+
+.btn-large {
+    padding: 14px 28px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-set-active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.btn-set-active:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+}
+
+.btn-test {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-test:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+}
