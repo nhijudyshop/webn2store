@@ -21,8 +21,17 @@ export async function loadOrders() {
         const response = await fetch('/api/orders');
         const result = await response.json();
         if (result.success) {
-            // Sort by date descending before setting state
-            const sortedOrders = result.data.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+            // Sort by supplier name (ascending) first, then by rawDate (descending)
+            const sortedOrders = result.data.sort((a, b) => {
+                const supplierA = a.supplier.toLowerCase();
+                const supplierB = b.supplier.toLowerCase();
+
+                if (supplierA < supplierB) return -1;
+                if (supplierA > supplierB) return 1;
+
+                // If suppliers are the same, sort by rawDate descending
+                return new Date(b.rawDate) - new Date(a.rawDate);
+            });
             setOrders(sortedOrders);
             displayOrders();
             updateStats();
