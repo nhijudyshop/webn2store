@@ -76,6 +76,9 @@ export async function clearLastSession(appState) {
             document.getElementById("connectionMode").value = "stream";
             document.getElementById("refreshInterval").value = "10";
             
+            // Ensure refresh interval group is hidden if mode is stream
+            document.getElementById("refreshIntervalGroup").style.display = "none";
+
             window.showNotification('🗑️ Đã xóa session đã lưu!', 'success');
             console.log('✅ Last session cleared');
         }
@@ -122,6 +125,8 @@ export async function restoreLastSession(appState, startFetching) {
     if (connectionModeSelector && session.connectionMode) {
         connectionModeSelector.value = session.connectionMode;
         appState.connectionMode = session.connectionMode; // Update global variable
+        // NEW: Hide/show refresh interval group based on restored connection mode
+        document.getElementById("refreshIntervalGroup").style.display = appState.connectionMode === "stream" ? "none" : "flex";
     }
     
     // Set refresh interval
