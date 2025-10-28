@@ -1,10 +1,15 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// NOTE: These are public keys, but in a production environment,
-// you should use environment variables and the Service Role Key for server-side operations.
 const SUPABASE_URL = "https://iutxzuwexyiggenuebxw.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1dHh6dXdleHlpZ2dlbnVlYnh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTUzNjIsImV4cCI6MjA3NzE5MTM2Mn0.i-eAiUQcHUE3quzTiOg7kJcehLkLl-DIiSUxPcFWBM";
+// Sử dụng Service Role Key cho các hoạt động phía server để bỏ qua RLS và đảm bảo toàn quyền truy cập.
+// Khóa này phải được giữ bí mật và lý tưởng nhất là được tải từ các biến môi trường.
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; 
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  console.error("❌ SUPABASE_SERVICE_ROLE_KEY chưa được thiết lập. Các hoạt động Supabase phía server có thể thất bại.");
+  // Trong một ứng dụng thực tế, bạn có thể muốn báo lỗi hoặc thoát tại đây.
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 module.exports = { supabase };
