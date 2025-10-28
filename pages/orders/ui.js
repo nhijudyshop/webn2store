@@ -46,83 +46,82 @@ export function displayOrders(ordersToDisplay = orders) {
     }, {});
 
     let html = '';
-
-    // Use a set to track which groups have been rendered to maintain original sort order
     const processedGroups = new Set();
 
-    ordersToDisplay.forEach(order => {
-        const key = `${order.supplier}-${order.rawDate}`;
-        if (processedGroups.has(key)) {
-            return; // This group's rows have already been added
+    ordersToDisplay.forEach(item => {
+        const key = `${item.supplier}-${item.rawDate}`;
+        const isFirstInGroup = !processedGroups.has(key);
+        
+        const purchasePriceHtml = `
+            ${item.purchasePriceImageUrl
+                ? `<img src="${item.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder price-image">Chưa có hình</div>`
+            }
+            <div class="price">${item.purchasePrice}</div>
+        `;
+
+        const salePriceHtml = `
+            ${item.productImageUrl
+                ? `<img src="${item.productImageUrl}" class="price-image" alt="Product Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder price-image">Chưa có hình</div>`
+            }
+            <div class="price">${item.salePrice}</div>
+        `;
+        
+        const invoiceHtml = `
+            ${item.invoiceImageUrl
+                ? `<img src="${item.invoiceImageUrl}" class="invoice-image" alt="Invoice" onerror="this.outerHTML='<div class=\\'image-placeholder invoice-image\\'>Chưa có hình</div>'">`
+                : `<div class="image-placeholder invoice-image">Chưa có hình</div>`
+            }
+            <div class="invoice-value">${item.invoice}</div>
+        `;
+
+        html += `<tr data-order-id="${item.id}">`;
+
+        // Date cell is always rendered for every row
+        html += `
+            <td>
+                <div class="order-date">
+                    <i data-lucide="calendar"></i>
+                    <div>
+                        <div>${item.date}</div>
+                        <div style="font-size: 12px; color: #64748b;">(${item.time})</div>
+                    </div>
+                </div>
+            </td>
+        `;
+
+        if (isFirstInGroup) {
+            const orderGroup = groupedOrders[key];
+            const rowspan = orderGroup.length;
+            processedGroups.add(key);
+
+            html += `
+                <td class="align-left" rowspan="${rowspan}">
+                    <div class="supplier-info">${item.supplier}</div>
+                    <div class="supplier-qty">Tổng SL: ${item.totalQty}</div>
+                </td>
+            `;
         }
 
-        const orderGroup = groupedOrders[key];
-        const rowspan = orderGroup.length;
-        processedGroups.add(key);
+        // Invoice cell is always rendered for every row
+        html += `<td><div class="price-cell">${invoiceHtml}</div></td>`;
 
-        orderGroup.forEach((item, index) => {
-            const purchasePriceHtml = `
-                ${item.purchasePriceImageUrl
-                    ? `<img src="${item.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
-                    : `<div class="image-placeholder price-image">Chưa có hình</div>`
-                }
-                <div class="price">${item.purchasePrice}</div>
-            `;
+        // The rest of the cells are added for every row
+        html += `
+            <td class="align-left"><div class="product-name">${item.productName}</div></td>
+            <td><span class="product-code">${item.productCode}</span></td>
+            <td><div class="variant">${item.variant}</div></td>
+            <td><div class="quantity">${item.quantity}</div></td>
+            <td><div class="price-cell">${purchasePriceHtml}</div></td>
+            <td><div class="price-cell">${salePriceHtml}</div></td>
+            <td class="align-left"><div style="color: #64748b; font-size: 14px;">${item.note || '-'}</div></td>
+            <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
+            <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
+            <td><div class="action-buttons"><button class="btn-delete" data-action="delete" title="Xóa đơn hàng"><i data-lucide="trash-2"></i></button><input type="checkbox" class="checkbox" data-action="select"></div></td>
+        `;
 
-            const salePriceHtml = `
-                ${item.productImageUrl
-                    ? `<img src="${item.productImageUrl}" class="price-image" alt="Product Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
-                    : `<div class="image-placeholder price-image">Chưa có hình</div>`
-                }
-                <div class="price">${item.salePrice}</div>
-            `;
-            
-            const invoiceHtml = `
-                ${item.invoiceImageUrl
-                    ? `<img src="${item.invoiceImageUrl}" class="invoice-image" alt="Invoice" onerror="this.outerHTML='<div class=\\'image-placeholder invoice-image\\'>Chưa có hình</div>'">`
-                    : `<div class="image-placeholder invoice-image">Chưa có hình</div>`
-                }
-                <div class="invoice-value">${item.invoice}</div>
-            `;
-
-            html += `<tr data-order-id="${item.id}">`;
-
-            if (index === 0) {
-                // First row of the group gets the rowspan cells
-                html += `
-                    <td rowspan="${rowspan}">
-                        <div class="order-date">
-                            <i data-lucide="calendar"></i>
-                            <div>
-                                <div>${item.date}</div>
-                                <div style="font-size: 12px; color: #64748b;">(${item.time})</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="align-left" rowspan="${rowspan}">
-                        <div class="supplier-info">${item.supplier}</div>
-                        <div class="supplier-qty">Tổng SL: ${item.totalQty}</div>
-                    </td>
-                    <td rowspan="${rowspan}"><div class="price-cell">${invoiceHtml}</div></td>
-                `;
-            }
-
-            // The rest of the cells are added for every row
-            html += `
-                <td class="align-left"><div class="product-name">${item.productName}</div></td>
-                <td><span class="product-code">${item.productCode}</span></td>
-                <td><div class="variant">${item.variant}</div></td>
-                <td><div class="quantity">${item.quantity}</div></td>
-                <td><div class="price-cell">${purchasePriceHtml}</div></td>
-                <td><div class="price-cell">${salePriceHtml}</div></td>
-                <td class="align-left"><div style="color: #64748b; font-size: 14px;">${item.note || '-'}</div></td>
-                <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
-                <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
-                <td><div class="action-buttons"><button class="btn-delete" data-action="delete" title="Xóa đơn hàng"><i data-lucide="trash-2"></i></button><input type="checkbox" class="checkbox" data-action="select"></div></td>
-            `;
-
-            html += `</tr>`;
-        });
+        html += `</tr>`;
     });
 
     tbody.innerHTML = html;
