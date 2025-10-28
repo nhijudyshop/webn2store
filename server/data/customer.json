@@ -1,0 +1,26 @@
+{
+  "0338648684": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0338648684",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0969854230": {
+    "Id": 516113,
+    "Name": "Hoa Vo",
+    "Street": "12B Thánh Mẫu, Phường 7, Thành phố Đà Lạt, Tỉnh Lâm Đồng",
+    "Phone": "0969854230",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0918536767": {
+    "Id": 563326,
+    "Name": "Thanh Tuyền",
+    "Street": "",
+    "Phone": "0918536767",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  }
+}
