@@ -85,7 +85,10 @@
     display: flex; align-items: center; justify-content: center;
 }
 .avatar-badge {
-    position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+    position: absolute; 
+    left: -12px; 
+    top: 50%; 
+    transform: translateY(-50%);
     background: #ef4444; color: #fff; font-size: 13px; font-weight: 700;
     padding: 3px 10px; border-radius: 12px; border: 2px solid white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2); white-space: nowrap; z-index: 10;
@@ -102,6 +105,7 @@
     margin-left: 6px;
     color: #334155;
     font-weight: 700;
+    display: none;
 }
 
 /* NEW: comment block on line 2, larger font */
@@ -130,7 +134,14 @@
 .inline-status.blacklist { background: #ef4444; }
 
 /* Legacy inline message (not used anymore) */
-.comment-message-inline { color: #374151; font-size: 16px; line-height: 1.4; word-wrap: break-word; flex: 1; }
+.comment-message-inline { 
+    color: #1f2937; 
+    font-size: 18px; 
+    line-height: 1.4; 
+    word-wrap: break-word; 
+    margin-left: 8px;
+    font-weight: 500;
+}
 
 .comment-time {
     position: absolute; top: 16px; right: 16px;
@@ -199,3 +210,11 @@
     .comment-time { position: static; margin-top: 6px; }
     .comment-actions { flex-wrap: wrap; }
 }
+
+/* Hàng icon + badge xám trên cùng một dòng */
+.comment-tools-row {
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+}
+.comment-tools-row .comment-icons { margin-right: 4px; }
