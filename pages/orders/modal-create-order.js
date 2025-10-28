@@ -5,6 +5,7 @@ import { productSuggestions } from './state.js';
 import { formatCurrency } from './ui.js';
 import { saveOrders, loadOrders } from './api.js';
 import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
+import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
 /**
  * Handles pasting an image from the clipboard into a dropzone.
@@ -26,6 +27,7 @@ function handlePaste(event) {
                 dropzone.innerHTML = '';
                 dropzone.appendChild(img);
                 dropzone.classList.add('has-image');
+                initImageLightbox(); // Re-initialize lightbox for new image
             };
             reader.readAsDataURL(file);
             
@@ -68,6 +70,7 @@ export function createOrder() {
         }
 
         window.lucide.createIcons();
+        initImageLightbox(); // Initialize lightbox for modal images
     }
 }
 
@@ -130,6 +133,7 @@ export function addProductRow() {
     updateRowNumbers();
     window.lucide.createIcons();
     updateTotals();
+    initImageLightbox(); // Re-initialize lightbox for new row images
 }
 
 export function deleteProductRow(event) {
@@ -139,6 +143,7 @@ export function deleteProductRow(event) {
         row.remove();
         updateTotals();
         updateRowNumbers();
+        initImageLightbox(); // Re-initialize lightbox after row deletion
     }
 }
 
@@ -204,6 +209,7 @@ export function cloneProductRow(event) {
     updateRowNumbers();
     updateTotals();
     window.lucide.createIcons();
+    initImageLightbox(); // Re-initialize lightbox for cloned row images
     window.showNotification("Đã nhân bản dòng sản phẩm", "success");
 }
 
@@ -388,6 +394,7 @@ export async function fetchProductAndPopulateRow(event) {
 
         window.showNotification(`Đã tải thông tin sản phẩm ${product.DefaultCode}`, "success");
         updateTotals();
+        initImageLightbox(); // Re-initialize lightbox after populating images
 
     } catch (error) {
         window.showNotification(`Lỗi: ${error.message}`, "error");

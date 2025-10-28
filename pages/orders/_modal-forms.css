@@ -74,26 +74,9 @@
     background: #eff6ff;
 }
 
-/* Allow overflow and bring to front when main image dropzone has an image and is hovered */
-.order-info-grid .image-dropzone.has-image:hover {
-    overflow: visible;
-    z-index: 100;
-}
-
-/* Zoom effect for image inside main invoice dropzone on hover */
+/* Remove hover zoom effect, now handled by JS lightbox */
 .order-info-grid .image-dropzone.has-image img:hover {
-    position: absolute;
-    width: 320px; /* Kích thước lớn hơn khi zoom */
-    height: 320px; /* Kích thước lớn hơn khi zoom */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .image-dropzone img {
@@ -238,19 +221,9 @@
     margin: 0 auto;
 }
 
+/* Remove hover zoom effect, now handled by JS lightbox */
 .product-table-wrapper .image-dropzone.has-image img:hover {
-    position: absolute;
-    width: 320px;
-    height: 320px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .product-table-wrapper .action-cell {

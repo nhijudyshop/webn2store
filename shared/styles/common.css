@@ -4,6 +4,9 @@
  * Version: 2.2.0
  */
 
+/* Import Image Lightbox Styles */
+@import url('../components/image-lightbox/image-lightbox.css');
+
 /* ===== RESET & GLOBAL ===== */
 * {
     margin: 0;

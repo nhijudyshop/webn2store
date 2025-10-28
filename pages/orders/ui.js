@@ -1,6 +1,7 @@
 // pages/orders/ui.js
 
 import { orders } from './state.js';
+import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
 export function getStatusText(status) {
     const statusMap = {
@@ -32,6 +33,7 @@ export function displayOrders(ordersToDisplay = orders) {
             </tr>
         `;
         window.lucide.createIcons();
+        initImageLightbox(); // Initialize lightbox for any new images
         return;
     }
 
@@ -144,6 +146,7 @@ export function displayOrders(ordersToDisplay = orders) {
 
     tbody.innerHTML = html;
     window.lucide.createIcons();
+    initImageLightbox(); // Initialize lightbox for all images in the table
 }
 
 export function updateStats() {

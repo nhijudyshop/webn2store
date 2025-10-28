@@ -1,5 +1,7 @@
 // pages/orders/modal-create-product/ui.js
 
+import { initImageLightbox } from '../../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
+
 function handlePasteProductModal(event) {
     const items = (event.clipboardData || event.originalEvent.clipboardData).items;
     const dropzone = event.currentTarget;
@@ -16,6 +18,7 @@ function handlePasteProductModal(event) {
                 dropzone.innerHTML = '';
                 dropzone.appendChild(img);
                 dropzone.classList.add('has-image');
+                initImageLightbox(); // Re-initialize lightbox for new image
             };
             reader.readAsDataURL(file);
             
@@ -76,11 +79,14 @@ export function addProductRowProductModal() {
     deleteBtn.addEventListener('click', () => {
         dropzone.innerHTML = '<i data-lucide="image"></i><span>Ctrl+V</span>';
         dropzone.classList.remove('has-image');
+        deleteBtn.style.display = 'none';
         window.lucide.createIcons();
+        initImageLightbox(); // Re-initialize lightbox after image deletion
     });
 
     updateRowNumbersProductModal();
     window.lucide.createIcons();
+    initImageLightbox(); // Re-initialize lightbox for new row images
 }
 
 export function openCreateProductModal() {
@@ -92,6 +98,7 @@ export function openCreateProductModal() {
             addProductRowProductModal();
         }
         window.lucide.createIcons();
+        initImageLightbox(); // Initialize lightbox for modal images
     }
 }
 

@@ -112,19 +112,9 @@
     z-index: 1; /* Ensure it's above other content when not hovered */
 }
 
+/* Remove hover zoom effect, now handled by JS lightbox */
 .invoice-image:hover {
-    position: absolute;
-    width: 320px; /* Kích thước nhất quán với modal */
-    height: 320px; /* Kích thước nhất quán với modal */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100; /* Bring to front */
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .invoice-value {
@@ -179,23 +169,12 @@
     overflow: visible; /* Allow content to overflow when zoomed */
 }
 
-/* Cập nhật kích thước và hiệu ứng zoom cho ảnh trong bảng */
+/* Remove hover zoom effect, now handled by JS lightbox */
 .price-cell .price-image:hover,
 .price-cell .image-placeholder.price-image:hover,
 .orders-table td:nth-child(3) .invoice-image:hover,
 .orders-table td:nth-child(3) .image-placeholder.invoice-image:hover {
-    position: absolute;
-    width: 320px; /* Kích thước nhất quán với modal */
-    height: 320px; /* Kích thước nhất quán với modal */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100; /* Đảm bảo ảnh hiển thị trên cùng */
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .price-image {
@@ -224,19 +203,9 @@
     z-index: 1; /* Ensure it's above other content when not hovered */
 }
 
+/* Remove hover zoom effect, now handled by JS lightbox */
 .image-placeholder:hover {
-    position: absolute;
-    width: 320px; /* Kích thước nhất quán với modal */
-    height: 320px; /* Kích thước nhất quán với modal */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100; /* Bring to front */
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .price-text {

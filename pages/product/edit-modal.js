@@ -5,6 +5,7 @@ import { currentProduct, originalProductPayload, setOriginalProductPayload, setC
 import { displayProductInfo, displayVariants } from './product-display.js';
 import { saveProductData } from './product-storage.js';
 import { editModalState, getCategoryFromAttributeId, updateVariantInput, openVariantSelector, variantData } from './variant-editor.js';
+import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
 // ===== Helper functions for variant generation (adapted from create-product modal) =====
 
@@ -139,6 +140,7 @@ export function handleImagePaste(event) {
                 dropzone.innerHTML = `<img src="${e.target.result}" alt="Pasted image">`;
                 dropzone.classList.add('has-image');
                 document.getElementById('deleteEditImageBtn').style.display = 'flex';
+                initImageLightbox(); // Re-initialize lightbox for new image
             };
             reader.readAsDataURL(file);
             event.preventDefault();
@@ -245,6 +247,7 @@ export function openEditModal() {
 
     document.getElementById('editProductModal').style.display = 'flex';
     window.lucide.createIcons();
+    initImageLightbox(); // Initialize lightbox for modal images
 }
 
 export function closeEditModal() {

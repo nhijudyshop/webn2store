@@ -25,19 +25,9 @@
     overflow: visible; /* Cho phép ảnh zoom tràn ra ngoài */
 }
 
+/* Remove hover zoom effect, now handled by JS lightbox */
 .product-info-image:hover {
-    position: absolute;
-    width: 320px; /* Kích thước nhất quán */
-    height: 320px; /* Kích thước nhất quán */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .image-placeholder {
@@ -54,19 +44,9 @@
     overflow: visible; /* Cho phép ảnh zoom tràn ra ngoài */
 }
 
+/* Remove hover zoom effect, now handled by JS lightbox */
 .image-placeholder:hover {
-    position: absolute;
-    width: 320px; /* Kích thước nhất quán */
-    height: 320px; /* Kích thước nhất quán */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    object-fit: contain;
-    border: 2px solid white;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    background-color: #fff;
+    /* No longer needed, JS will handle */
 }
 
 .product-info-details {

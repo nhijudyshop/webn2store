@@ -2,6 +2,7 @@
 
 import { formatCurrency, showEmptyState } from './product-utils.js';
 import { currentProduct, setCurrentProduct, setCurrentVariants } from './inventory-state.js';
+import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
 export function displayProductInfo(product) {
     const card = document.getElementById("productInfoCard");
@@ -42,6 +43,7 @@ export function displayProductInfo(product) {
     variantCount.textContent = product.ProductVariantCount || 0;
 
     card.classList.add("show");
+    initImageLightbox(); // Initialize lightbox for the product info image
 }
 
 export function displayVariants(variants) {
@@ -100,6 +102,7 @@ export function displayVariants(variants) {
 
     wrapper.innerHTML = html;
     window.lucide.createIcons(); // Re-initialize icons
+    initImageLightbox(); // Initialize lightbox for all variant images
 }
 
 export function clearData() {

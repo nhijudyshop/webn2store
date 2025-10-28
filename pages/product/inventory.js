@@ -7,6 +7,7 @@ import { clearData } from './product-display.js';
 import { loadProductSuggestions, updateSuggestions } from './suggestions.js';
 import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuantities, handleImagePaste } from './edit-modal.js';
 import { closeVariantSelector, handleVariantSelection, activeVariantInput } from './variant-editor.js';
+import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
 // ===== GLOBAL EXPORTS (for HTML onclicks) =====
 window.clearData = clearData;
@@ -57,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             editImageDropzone.classList.remove('has-image');
             deleteEditImageBtn.style.display = 'none';
             window.lucide.createIcons();
+            initImageLightbox(); // Re-initialize lightbox after image deletion
         });
     }
     
@@ -71,6 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             closeVariantSelector();
         }
     });
+
+    initImageLightbox(); // Initialize lightbox for all images on the page
 
     console.log("Inventory page initialized (modular).");
 });
