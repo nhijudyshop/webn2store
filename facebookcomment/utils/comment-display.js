@@ -112,12 +112,21 @@ function buildSessionPhoneBadge(orderInfo) {
     `;
 }
 
-function mapStatus(orderInfo) {
-    const raw = (orderInfo && (orderInfo.status || orderInfo.partnerStatus)) || 'normal';
-    const key = String(raw).toLowerCase();
-    if (key.includes('black')) return { label: 'Blacklist', cls: 'blacklist' };
-    if (key.includes('vip')) return { label: 'VIP', cls: 'vip' };
-    if (key.includes('warn') || key.includes('alert') || key.includes('cảnh')) return { label: 'Cảnh báo', cls: 'warning' };
+function extractPhonesFromText(text = "") {
+    if (!text) return [];
+    const matches = String(text).match(/0\d{9,10}/g);
+    if (!matches) return [];
+    return Array.from(new Set(matches));
+}
+
+function resolveStatusByPhone(message, appState) {
+    const phones = extractPhonesFromText(message);
+    for (const p of phones) {
+        const rec = appState?.customersMap?.get?.(p);
+        if (rec && rec.StatusText) {
+            return { label: rec.StatusText, cls: '' };
+        }
+    }
     return { label: 'Bình thường', cls: '' };
 }
 
@@ -141,7 +150,7 @@ export function createCommentElement(comment, isNew = false, appState) {
     const userId = comment.from?.id;
     const commentId = comment.id;
 
-    // Order info resolution
+    // giữ session badge từ ordersMap nếu có, nhưng trạng thái chuyển qua theo phone
     let orderInfo = null;
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
@@ -149,12 +158,13 @@ export function createCommentElement(comment, isNew = false, appState) {
         orderInfo = appState.ordersMap.get(userId);
     }
 
-    const status = mapStatus(orderInfo);
+    const status = resolveStatusByPhone(message, appState);
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
     const newClass = isNew ? "new" : "";
+    const phones = extractPhonesFromText(message).join(',');
 
     return `
-        <div class="comment-item ${newClass}">
+        <div class="comment-item ${newClass}" data-comment-id="${commentId}" data-phones="${phones}">
             ${avatarBlockHTML}
             <div class="comment-content">
                 <div class="comment-meta">
@@ -183,20 +193,19 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
     const highlightedName = highlightText(name, searchTerm);
     const highlightedMessage = highlightText(message, searchTerm);
 
-    // Order info
     let orderInfo = null;
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
     } else if (userId && appState.ordersMap.has(userId)) {
         orderInfo = appState.ordersMap.get(userId);
     }
-
-    const status = mapStatus(orderInfo);
+    const status = resolveStatusByPhone(message, appState);
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
     const newClass = isNew ? "new" : "";
+    const phones = extractPhonesFromText(message).join(',');
 
     return `
-        <div class="comment-item ${newClass}">
+        <div class="comment-item ${newClass}" data-comment-id="${commentId}" data-phones="${phones}">
             ${avatarBlockHTML}
             <div class="comment-content">
                 <div class="comment-meta">

@@ -13,6 +13,7 @@ const tposAuthRoutes = require("./routes/tpos-auth-routes");
 const variantRoutes = require("./routes/variant-routes");
 const authRoutes = require("./routes/auth-routes");
 const userManagementRoutes = require("./routes/user-management-routes"); // New
+const customersRoutes = require("./routes/customers-routes"); // New
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +37,7 @@ app.use("/api", tposAuthRoutes);
 app.use("/api", variantRoutes);
 app.use("/api", authRoutes);
 app.use("/api", userManagementRoutes); // New
+app.use("/api", customersRoutes); // New
 
 // Redirect root to the login page
 app.get('/', (req, res) => {

@@ -4,6 +4,7 @@ import { createCommentElement, createCommentElementWithHighlight, renderAllComme
 import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
 import { fetchOrders } from './order-data-manager.js';
 import { getToken, tposRequest } from '../../shared/api/tpos-api.js'; // Import getToken and tposRequest directly
+import { ensureCustomerStatusesForComments } from './customer-status-manager.js';
 
 /**
  * Filters and displays comments based on a search term.
@@ -74,6 +75,8 @@ export function filterAndDisplayComments(searchTerm, appState) {
         commentsList.innerHTML = html;
         // Re-initialize icons after rendering
         window.lucide.createIcons();
+        // Load/update StatusText theo phone cho kết quả lọc
+        ensureCustomerStatusesForComments(filtered, appState);
     }
 
     // Update search stats
@@ -145,6 +148,8 @@ export function processComments(data, appState) {
             if (allCommentsHTML) {
                 commentsList.innerHTML = allCommentsHTML;
                 window.lucide.createIcons();
+                // đảm bảo cập nhật trạng thái khách hàng
+                ensureCustomerStatusesForComments(data.data, appState);
             } else {
                 commentsList.innerHTML =
                     '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Chưa có comment nào</p></div>';
@@ -176,6 +181,8 @@ export function processComments(data, appState) {
 
                 commentsList.insertAdjacentHTML("afterbegin", newCommentsHTML);
                 window.lucide.createIcons();
+                // cập nhật trạng thái cho các comment mới
+                ensureCustomerStatusesForComments(newComments, appState);
 
                 commentsList.parentElement.scrollTop = 0;
 

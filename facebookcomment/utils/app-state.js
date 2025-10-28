@@ -1,3 +1,4 @@
+customer info.">
 // facebookcomment/utils/app-state.js
 
 /**
@@ -17,6 +18,7 @@ export const appState = {
     isFirstLoad: true,
     ordersMap: new Map(), // Maps commentId/userId to order details
     ordersFetched: false, // Flag to indicate if orders have been fetched for the current video
+    customersMap: new Map(), // Maps phone -> customer info (Id, Name, Street, Phone, Credit, StatusText)
     lastSession: {}, // Stores last saved session settings
     printers: [], // Stores printer configurations
     templateSettings: {}, // Stores print template settings
