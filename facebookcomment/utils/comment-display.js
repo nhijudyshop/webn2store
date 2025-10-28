@@ -49,27 +49,120 @@ export function highlightText(text, searchTerm) {
     if (!normalizedText.includes(normalizedSearch)) return text;
 
     const regex = new RegExp(
-        `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+        `(${searchTerm.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")})`,
         "gi",
     );
-    return text.replace(regex, '<span class="highlight">$1</span>');
+    return String(text).replace(regex, '<span class="highlight">$1</span>');
+}
+
+// Safe attribute escaping for onclick parameters
+function escapeAttr(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+/**
+ * Builds common visual blocks used by both render functions.
+ */
+function buildAvatarBlock(comment, name, orderInfo) {
+    let avatarHTML = "";
+    const userId = comment.from?.id;
+    const avatarUrl = comment.from?.picture?.data?.url;
+
+    if (avatarUrl) {
+        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    } else if (userId) {
+        avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    }
+
+    const avatarBadge = orderInfo && orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null
+        ? `<div class="avatar-badge">${orderInfo.sessionIndex}</div>`
+        : '';
+
+    return `
+        <div class="avatar">
+            ${avatarHTML}
+            <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
+            ${avatarBadge}
+        </div>
+    `;
+}
+
+function buildIconsRow() {
+    return `
+        <div class="comment-icons">
+            <i data-lucide="phone" class="comment-icon"></i>
+            <i data-lucide="message-circle" class="comment-icon messenger"></i>
+        </div>
+    `;
+}
+
+function buildSessionPhoneBadge(orderInfo) {
+    if (!orderInfo) return '';
+    const parts = [];
+    if (orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
+        parts.push(`#${orderInfo.sessionIndex}.`);
+    }
+    if (orderInfo.telephone) {
+        parts.push(orderInfo.telephone);
+    }
+    if (parts.length === 0) return '';
+    return `
+        <div class="comment-badges">
+            <span class="session-phone-badge">${parts.join(' ')}</span>
+        </div>
+    `;
+}
+
+function mapStatus(orderInfo) {
+    const raw = (orderInfo && (orderInfo.status || orderInfo.partnerStatus)) || 'normal';
+    const key = String(raw).toLowerCase();
+    if (key.includes('black')) return { label: 'Blacklist', cls: 'blacklist' };
+    if (key.includes('vip')) return { label: 'VIP', cls: 'vip' };
+    if (key.includes('warn') || key.includes('alert') || key.includes('cảnh')) return { label: 'Cảnh báo', cls: 'warning' };
+    return { label: 'Bình thường', cls: '' };
+}
+
+function buildActionsRow(comment, name, message, time, orderInfo) {
+    const userId = comment.from?.id || '';
+    const commentId = comment.id || '';
+    const status = mapStatus(orderInfo);
+
+    const safeName = escapeAttr(name);
+    const safeMessage = escapeAttr(message);
+    const safeTime = escapeAttr(time);
+    const safeUserId = escapeAttr(userId);
+    const safeCommentId = escapeAttr(commentId);
+
+    return `
+        <div class="comment-actions">
+            <button class="action-btn action-create-order" onclick="handleCreateOrder('${safeCommentId}','${safeName}','${safeMessage}','${safeTime}','${safeUserId}')">Tạo đơn hàng</button>
+            <button class="action-btn action-info" onclick="handleViewInfo('${safeUserId}')">Thông tin</button>
+            <button class="action-btn action-status ${status.cls}">${status.label}</button>
+        </div>
+    `;
 }
 
 /**
  * Creates the HTML element for a single comment.
- * @param {object} comment - The comment data.
- * @param {boolean} isNew - Whether the comment is new (for animation).
- * @param {object} appState - The global application state object.
- * @returns {string} The HTML string for the comment.
+ * Khớp ảnh: 
+ *   - Dòng 1: tên đậm + nội dung inline
+ *   - Dòng 2: icon điện thoại + messenger
+ *   - Dòng 3: badge xám "#<session>. <phone>"
+ *   - Dòng 4: các nút hành động
  */
 export function createCommentElement(comment, isNew = false, appState) {
     const name = comment.from?.name || "Unknown";
-    const message = comment.message || "(No message)";
+    const message = comment.message || "";
     const time = comment.created_time;
     const userId = comment.from?.id;
     const commentId = comment.id;
 
-    // Check if user has order
+    // Order info resolution
     let orderInfo = null;
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
@@ -77,78 +170,10 @@ export function createCommentElement(comment, isNew = false, appState) {
         orderInfo = appState.ordersMap.get(userId);
     }
 
-    // Avatar with badge
-    let avatarHTML = "";
-    const avatarUrl = comment.from?.picture?.data?.url;
-    
-    if (avatarUrl) {
-        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-    } else if (userId) {
-        avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-    }
-    
-    const avatarBadge = orderInfo ? `<div class="avatar-badge">${orderInfo.sessionIndex}</div>` : '';
-    
-    const avatarBlockHTML = `
-        <div class="avatar">
-            ${avatarHTML}
-            <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
-            ${avatarBadge}
-        </div>
-    `;
-
-    // Build phone next to name
-    let phoneInline = '';
-    if (orderInfo && orderInfo.telephone) {
-        phoneInline = `<span class="phone-inline phone-value">${orderInfo.telephone}</span>`;
-    }
-
-    // Session badge shown separately (only session index)
-    let sessionBadge = '';
-    if (orderInfo && orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
-        sessionBadge = `
-            <div class="comment-badges">
-                <span class="session-badge">#${orderInfo.sessionIndex}</span>
-            </div>
-        `;
-    }
-
-    // Customer details (address, partner name, etc.)
-    let customerDetailsHTML = '';
-    if (orderInfo) {
-        const details = [];
-
-        if (orderInfo.printCount) {
-            details.push(`
-                <div class="customer-detail-item" style="border-left-color: #10b981; background: #d1fae5;">
-                    <span class="icon">🛒</span>
-                    <span class="value" style="color: #047857;">${orderInfo.printCount}</span>
-                </div>
-            `);
-        }
-
-        if (orderInfo.address) {
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">📍</span>
-                    <span class="value">${orderInfo.address}</span>
-                </div>
-            `);
-        }
-
-        if (orderInfo.partnerName) {
-            details.push(`
-                <div class="customer-detail-item">
-                    <span class="icon">🤝</span>
-                    <span class="value">${orderInfo.partnerName}</span>
-                </div>
-            `);
-        }
-
-        if (details.length > 0) {
-            customerDetailsHTML = `<div class="comment-badges">${details.join('')}</div>`;
-        }
-    }
+    const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
+    const iconsRow = buildIconsRow();
+    const sessionPhoneBadge = buildSessionPhoneBadge(orderInfo);
+    const actionsRow = buildActionsRow(comment, name, message, time, orderInfo);
 
     const newClass = isNew ? "new" : "";
 
@@ -159,11 +184,11 @@ export function createCommentElement(comment, isNew = false, appState) {
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${name}</span>
-                    ${phoneInline}
+                    <span class="comment-message-inline">${message}</span>
                 </div>
-                <div class="comment-message">${message}</div>
-                ${sessionBadge}
-                ${customerDetailsHTML}
+                ${iconsRow}
+                ${sessionPhoneBadge}
+                ${actionsRow}
             </div>
         </div>
     `;
@@ -171,15 +196,10 @@ export function createCommentElement(comment, isNew = false, appState) {
 
 /**
  * Creates the HTML element for a single comment with search term highlighting.
- * @param {object} comment - The comment data.
- * @param {string} searchTerm - The search term to highlight.
- * @param {boolean} isNew - Whether the comment is new (for animation).
- * @param {object} appState - The global application state object.
- * @returns {string} The HTML string for the highlighted comment.
  */
 export function createCommentElementWithHighlight(comment, searchTerm, isNew = false, appState) {
     const name = comment.from?.name || "Unknown";
-    const message = comment.message || "(No message)";
+    const message = comment.message || "";
     const time = comment.created_time;
     const userId = comment.from?.id;
     const commentId = comment.id;
@@ -187,7 +207,7 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
     const highlightedName = highlightText(name, searchTerm);
     const highlightedMessage = highlightText(message, searchTerm);
 
-    // Check if user has order
+    // Order info
     let orderInfo = null;
     if (commentId && appState.ordersMap.has(commentId)) {
         orderInfo = appState.ordersMap.get(commentId);
@@ -195,44 +215,28 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         orderInfo = appState.ordersMap.get(userId);
     }
 
-    // Avatar with badge
-    let avatarHTML = "";
-    const avatarUrl = comment.from?.picture?.data?.url;
-    
-    if (avatarUrl) {
-        avatarHTML = `<img src="${avatarUrl}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-    } else if (userId) {
-        avatarHTML = `<img src="/api/avatar/${userId}?size=60" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
-    }
-    
-    const avatarBadge = orderInfo ? `<div class="avatar-badge">${highlightText(String(orderInfo.sessionIndex), searchTerm)}</div>` : '';
-    
-    const avatarBlockHTML = `
-        <div class="avatar">
-            ${avatarHTML}
-            <div class="avatar-fallback" style="${avatarUrl || userId ? 'display: none;' : ''}">${getInitials(name)}</div>
-            ${avatarBadge}
-        </div>
-    `;
+    const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
 
-    // Phone next to name (highlighted)
-    let phoneInline = '';
-    if (orderInfo && orderInfo.telephone) {
-        const highlightedPhone = highlightText(orderInfo.telephone, searchTerm);
-        phoneInline = `<span class="phone-inline phone-value">${highlightedPhone}</span>`;
+    // Build session + phone badge with highlights
+    let sessionPhoneBadge = '';
+    if (orderInfo) {
+        const parts = [];
+        if (orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
+            parts.push(`#${highlightText(String(orderInfo.sessionIndex), searchTerm)}.`);
+        }
+        if (orderInfo.telephone) {
+            parts.push(highlightText(orderInfo.telephone, searchTerm));
+        }
+        if (parts.length) {
+            sessionPhoneBadge = `
+                <div class="comment-badges">
+                    <span class="session-phone-badge">${parts.join(' ')}</span>
+                </div>
+            `;
+        }
     }
 
-    // Session badge shown separately (highlighted session only)
-    let sessionBadge = '';
-    if (orderInfo && orderInfo.sessionIndex !== undefined && orderInfo.sessionIndex !== null) {
-        const highlightedSession = highlightText(String(orderInfo.sessionIndex), searchTerm);
-        sessionBadge = `
-            <div class="comment-badges">
-                <span class="session-badge">#${highlightedSession}</span>
-            </div>
-        `;
-    }
-
+    const actionsRow = buildActionsRow(comment, name, message, time, orderInfo);
     const newClass = isNew ? "new" : "";
 
     return `
@@ -242,11 +246,11 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
                 <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
                 <div class="comment-header">
                     <span class="comment-author">${highlightedName}</span>
-                    ${phoneInline}
+                    <span class="comment-message-inline">${highlightedMessage}</span>
                 </div>
-                <div class="comment-message">${highlightedMessage}</div>
-                ${sessionBadge}
-                ${customerDetailsHTML}
+                ${buildIconsRow()}
+                ${sessionPhoneBadge}
+                ${actionsRow}
             </div>
         </div>
     `;
@@ -254,8 +258,6 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
 
 /**
  * Renders all comments currently in appState.allCommentsData.
- * @param {object} appState - The global application state object.
- * @param {function} renderPaginationControls - Function to render pagination controls.
  */
 export function renderAllComments(appState, renderPaginationControls) {
     const commentsList = document.getElementById("commentsList");
