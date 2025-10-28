@@ -22,5 +22,21 @@
     "Phone": "0918536767",
     "Credit": 0,
     "StatusText": "Bình thường"
+  },
+  "0789635752": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0789635752",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0935775355": {
+    "Id": 563335,
+    "Name": "Nguyễn Hồng",
+    "Street": "",
+    "Phone": "0935775355",
+    "Credit": 0,
+    "StatusText": "Bình thường"
   }
 }
