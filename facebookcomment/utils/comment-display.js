@@ -126,16 +126,9 @@ function buildActionsRow(comment, name, message, time, orderInfo) {
     const commentId = comment.id || '';
     const status = mapStatus(orderInfo);
 
-    const safeName = escapeAttr(name);
-    const safeMessage = escapeAttr(message);
-    const safeTime = escapeAttr(time);
-    const safeUserId = escapeAttr(userId);
-    const safeCommentId = escapeAttr(commentId);
-
+    // Chỉ hiển thị nút trạng thái
     return `
         <div class="comment-actions">
-            <button class="action-btn action-create-order" onclick="handleCreateOrder('${safeCommentId}','${safeName}','${safeMessage}','${safeTime}','${safeUserId}')">Tạo đơn hàng</button>
-            <button class="action-btn action-info" onclick="handleViewInfo('${safeUserId}')">Thông tin</button>
             <button class="action-btn action-status ${status.cls}">${status.label}</button>
         </div>
     `;
@@ -176,10 +169,6 @@ export function createCommentElement(comment, isNew = false, appState) {
                     <span class="comment-author">${name}</span>
                     <span class="comment-message-inline">${message}</span>
                 </div>
-                <div class="comment-tools-row">
-                    ${buildIconsRow()}
-                    ${buildSessionPhoneBadge(orderInfo)}
-                </div>
                 ${buildActionsRow(comment, name, message, time, orderInfo)}
             </div>
         </div>
@@ -218,10 +207,6 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
                 <div class="comment-header">
                     <span class="comment-author">${highlightedName}</span>
                     <span class="comment-message-inline">${highlightedMessage}</span>
-                </div>
-                <div class="comment-tools-row">
-                    ${buildIconsRow()}
-                    ${buildSessionPhoneBadge(orderInfo)}
                 </div>
                 ${buildActionsRow(comment, name, message, time, orderInfo)}
             </div>
