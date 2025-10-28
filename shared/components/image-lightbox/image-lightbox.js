@@ -13,6 +13,8 @@ export function initImageLightbox() {
         lightboxOverlay = document.createElement('div');
         lightboxOverlay.className = 'lightbox-overlay';
         lightboxOverlay.addEventListener('click', hideLightbox); // Hide on click anywhere on overlay
+        // Add mouseleave to the overlay itself to hide it
+        lightboxOverlay.addEventListener('mouseleave', hideLightbox); // NEW: Hide when mouse leaves the overlay
 
         lightboxImage = document.createElement('img');
         lightboxImage.className = 'lightbox-image';
@@ -33,8 +35,8 @@ export function initImageLightbox() {
     images.forEach(img => {
         // Ensure listeners are not added multiple times
         if (!img.dataset.lightboxListenerAdded) {
-            img.addEventListener('mouseover', showLightbox);
-            img.addEventListener('mouseout', hideLightbox);
+            img.addEventListener('mouseenter', showLightbox); // Changed to mouseenter
+            // img.addEventListener('mouseout', hideLightbox); // REMOVED: This caused flickering
             img.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -51,13 +53,13 @@ export function initImageLightbox() {
     placeholders.forEach(placeholder => {
         if (!placeholder.dataset.lightboxListenerAdded) {
             // For placeholders, we only show if they actually contain an img child
-            placeholder.addEventListener('mouseover', (event) => {
+            placeholder.addEventListener('mouseenter', (event) => { // Changed to mouseenter
                 const actualImg = event.currentTarget.querySelector('img');
                 if (actualImg && actualImg.src) {
                     showLightbox(event);
                 }
             });
-            placeholder.addEventListener('mouseout', hideLightbox);
+            // placeholder.addEventListener('mouseout', hideLightbox); // REMOVED: This caused flickering
             placeholder.dataset.lightboxListenerAdded = 'true';
         }
     });
