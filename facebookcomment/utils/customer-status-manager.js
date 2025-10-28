@@ -1,4 +1,4 @@
-import { tposRequest } from '../../shared/api/tpos-api.js';
+import { getToken } from '../../shared/api/tpos-api.js';
 
 /**
  * Chuẩn hóa số VN về dạng 0xxxxxxxxx từ nhiều format (+84/84/0 và có dấu cách/chấm/gạch nối)
@@ -52,14 +52,30 @@ export function extractPhonesFromText(text = "") {
  * @returns {Promise<object|null>}
  */
 export async function fetchCustomerByPhone(phone, appState) {
-  try {
-    const data = await tposRequest(`/api/customer?phone=${encodeURIComponent(phone)}`);
-    if (data?.success && data.data) {
-      appState.customersMap.set(phone, data.data);
-      return data.data;
+  const token = getToken();
+  if (!token) {
+    console.warn("Chưa có Bearer Token – không thể gọi /api/customer");
+    if (typeof window !== 'undefined' && window.showNotification) {
+      window.showNotification("Vui lòng nhập Bearer Token trước khi lấy trạng thái khách hàng", "error");
     }
-  } catch (e) {
-    console.error("fetchCustomerByPhone error:", e);
+    return null;
+  }
+  const url = `/api/customer?phone=${encodeURIComponent(phone)}`;
+  const headers = {
+    'accept': 'application/json, text/plain, */*',
+    'authorization': `Bearer ${token}`,
+    'content-type': 'application/json;charset=UTF-8'
+  };
+  const res = await fetch(url, { method: 'GET', headers });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    console.error("fetchCustomerByPhone HTTP error:", res.status, txt);
+    return null;
+  }
+  const data = await res.json();
+  if (data?.success && data.data) {
+    appState.customersMap.set(phone, data.data);
+    return data.data;
   }
   return null;
 }
