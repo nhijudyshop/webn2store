@@ -3,19 +3,21 @@
 import { appState } from './app-state.js';
 import { loadAccounts, loadVideos } from './facebook-ui-manager.js';
 import { filterAndDisplayComments, renderPaginationControls, goToPage } from './search-pagination-manager.js';
-import { renderAllComments } from './comment-display.js'; // Corrected import for renderAllComments
+import { renderAllComments } from './comment-display.js';
 import { restoreLastSession, clearLastSession } from './session-manager.js';
 import { refreshOrders } from './order-data-manager.js';
 import { handleCreateOrder, handleViewInfo } from './printer-template-manager.js';
 import { startFetching, stopFetching, clearComments } from './app-core-functions.js';
+import { applyCommentFontSize, applyCommentFontFamily, saveDisplaySettingsDirect, getDisplaySettings } from './settings/display-management.js';
 
 /**
  * Sets up all global event listeners for the application.
  */
 export function setupEventListeners() {
-    document.addEventListener("DOMContentLoaded", async () => {
+    // Wrap all init logic to run immediately if DOM is ready
+    const init = async () => {
         // Initialize Lucide icons
-        window.lucide.createIcons();
+        window.lucide && window.lucide.createIcons();
 
         // Load accounts on page load
         await loadAccounts(appState);
@@ -27,7 +29,6 @@ export function setupEventListeners() {
         document.getElementById("connectionMode").addEventListener("change", (event) => {
             appState.connectionMode = event.target.value;
             document.getElementById("refreshIntervalGroup").style.display = appState.connectionMode === "stream" ? "none" : "flex";
-            // If switching to polling, ensure pagination is rendered if not searching
             if (appState.connectionMode === "polling" && !appState.currentSearchTerm) {
                 renderPaginationControls(appState);
             } else {
@@ -49,7 +50,6 @@ export function setupEventListeners() {
                 clearSearchBtn.classList.add("show");
                 searchStats.classList.add("show");
             } else {
-                // If search term is cleared, re-render all comments
                 renderAllComments(appState, renderPaginationControls);
                 clearSearchBtn.classList.remove("show");
                 searchStats.classList.remove("show");
@@ -75,7 +75,7 @@ export function setupEventListeners() {
         window.handleViewInfo = handleViewInfo;
         window.goToPage = (pageNumber) => goToPage(pageNumber, appState);
 
-        // NEW: Toggle fullscreen for comments container
+        // Toggle fullscreen for comments container
         const fsBtn = document.getElementById("toggleFullscreenBtn");
         const commentsContainer = document.querySelector(".comments-container");
         if (fsBtn && commentsContainer) {
@@ -83,13 +83,54 @@ export function setupEventListeners() {
                 const isFull = commentsContainer.classList.toggle("fullscreen");
                 document.body.classList.toggle("no-scroll", isFull);
                 fsBtn.innerHTML = isFull ? '<i data-lucide="minimize-2"></i>' : '<i data-lucide="maximize-2"></i>';
-                // Re-init icons after changing innerHTML
                 window.lucide && window.lucide.createIcons();
             });
         }
 
+        // NEW: Font size and family controls in header
+        const smallerBtn = document.getElementById('fontSmallerBtn');
+        const largerBtn = document.getElementById('fontLargerBtn');
+        const familySelect = document.getElementById('fontFamilySelect');
+
+        const clampSize = (v) => Math.max(12, Math.min(32, v));
+
+        if (smallerBtn) {
+            smallerBtn.addEventListener('click', async () => {
+                const settings = getDisplaySettings();
+                const next = clampSize((settings.commentMessageFontSize || 18) - 1);
+                applyCommentFontSize(next);
+                await saveDisplaySettingsDirect({ commentMessageFontSize: next });
+            });
+        }
+        if (largerBtn) {
+            largerBtn.addEventListener('click', async () => {
+                const settings = getDisplaySettings();
+                const next = clampSize((settings.commentMessageFontSize || 18) + 1);
+                applyCommentFontSize(next);
+                await saveDisplaySettingsDirect({ commentMessageFontSize: next });
+            });
+        }
+        if (familySelect) {
+            // Initialize select from current settings
+            const s = getDisplaySettings();
+            if (typeof s.commentMessageFontFamily === 'string') {
+                familySelect.value = s.commentMessageFontFamily;
+            }
+            familySelect.addEventListener('change', async (e) => {
+                const family = e.target.value; // '' | 'serif' | 'monospace'
+                applyCommentFontFamily(family);
+                await saveDisplaySettingsDirect({ commentMessageFontFamily: family });
+            });
+        }
+
         console.log("Facebook Comments Viewer initialized");
-    });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
 }
 
 console.log("✅ App Event Listeners module loaded");
