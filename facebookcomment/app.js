@@ -4,6 +4,12 @@ import { appState } from './utils/app-state.js';
 import { setupEventListeners } from './utils/app-event-listeners.js';
 
 // Initialize event listeners
-setupEventListeners();
+export function initializeApp() {
+    setupEventListeners();
+    console.log("Main Facebook Comments Viewer app.js loaded.");
+}
 
-console.log("Main Facebook Comments Viewer app.js loaded.");
+// Auto-initialize if not being imported
+if (typeof window !== 'undefined') {
+    initializeApp();
+}
