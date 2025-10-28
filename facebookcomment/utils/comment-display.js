@@ -122,16 +122,8 @@ function mapStatus(orderInfo) {
 }
 
 function buildActionsRow(comment, name, message, time, orderInfo) {
-    const userId = comment.from?.id || '';
-    const commentId = comment.id || '';
-    const status = mapStatus(orderInfo);
-
-    // Chỉ hiển thị nút trạng thái
-    return `
-        <div class="comment-actions">
-            <button class="action-btn action-status ${status.cls}">${status.label}</button>
-        </div>
-    `;
+    // REMOVED: không còn hiển thị nút hành động ở hàng dưới
+    return '';
 }
 
 /**
@@ -157,6 +149,7 @@ export function createCommentElement(comment, isNew = false, appState) {
         orderInfo = appState.ordersMap.get(userId);
     }
 
+    const status = mapStatus(orderInfo);
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
     const newClass = isNew ? "new" : "";
 
@@ -164,12 +157,14 @@ export function createCommentElement(comment, isNew = false, appState) {
         <div class="comment-item ${newClass}">
             ${avatarBlockHTML}
             <div class="comment-content">
-                <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
+                <div class="comment-meta">
+                    <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
+                    <div class="status-badge ${status.cls}">${status.label}</div>
+                </div>
                 <div class="comment-header">
                     <span class="comment-author">${name}</span>
                     <span class="comment-message-inline">${message}</span>
                 </div>
-                ${buildActionsRow(comment, name, message, time, orderInfo)}
             </div>
         </div>
     `;
@@ -196,6 +191,7 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         orderInfo = appState.ordersMap.get(userId);
     }
 
+    const status = mapStatus(orderInfo);
     const avatarBlockHTML = buildAvatarBlock(comment, name, orderInfo);
     const newClass = isNew ? "new" : "";
 
@@ -203,12 +199,14 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         <div class="comment-item ${newClass}">
             ${avatarBlockHTML}
             <div class="comment-content">
-                <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
+                <div class="comment-meta">
+                    <div class="comment-time">${time ? formatTimeToGMT7(time) : ""}</div>
+                    <div class="status-badge ${status.cls}">${status.label}</div>
+                </div>
                 <div class="comment-header">
                     <span class="comment-author">${highlightedName}</span>
                     <span class="comment-message-inline">${highlightedMessage}</span>
                 </div>
-                ${buildActionsRow(comment, name, message, time, orderInfo)}
             </div>
         </div>
     `;
@@ -234,7 +232,9 @@ export function renderAllComments(appState, renderPaginationControls) {
         });
         commentsList.innerHTML = html;
         // Re-initialize icons after rendering
-        window.lucide.createIcons();
+        window.lucide?.createIcons?.();
+        // Đồng bộ độ rộng của status theo thời gian
+        requestAnimationFrame(syncStatusWidths);
     }
 
     document.getElementById("filteredComments").textContent =
@@ -247,4 +247,21 @@ export function renderAllComments(appState, renderPaginationControls) {
         document.getElementById("paginationControls").style.display = "none";
     }
     renderPaginationControls(appState);
+}
+
+// Đồng bộ chiều rộng status theo chiều rộng text thời gian
+function syncStatusWidths() {
+    const metas = document.querySelectorAll('.comment-item .comment-meta');
+    metas.forEach(meta => {
+        const timeEl = meta.querySelector('.comment-time');
+        const statusEl = meta.querySelector('.status-badge');
+        if (!timeEl || !statusEl) return;
+        // Reset để đo chính xác
+        statusEl.style.width = 'auto';
+        // Dùng requestAnimationFrame để đảm bảo DOM đã layout xong
+        const width = timeEl.offsetWidth;
+        if (width > 0) {
+            statusEl.style.width = width + 'px';
+        }
+    });
 }

@@ -144,9 +144,39 @@
 }
 
 .comment-time {
-    position: absolute; top: 16px; right: 16px;
-    font-size: 14px; color: #94a3b8; white-space: nowrap;
+    position: static;
+    font-size: 14px; 
+    color: #94a3b8; 
+    white-space: nowrap;
 }
+
+/* Khối meta nằm ở góc phải, xếp thời gian trên – status dưới */
+.comment-meta {
+    position: absolute; 
+    top: 16px; 
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+/* Thanh trạng thái cạnh thời gian (bằng chiều rộng text thời gian) */
+.status-badge {
+    display: block;
+    text-align: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: #8bc34a; /* default: Bình thường */
+}
+
+/* Màu biến thể theo trạng thái */
+.status-badge.warning { background: #f0ad4e; }
+.status-badge.vip { background: #f59e0b; }
+.status-badge.blacklist { background: #ef4444; }
 
 /* Icons row */
 .comment-icons { display: flex; align-items: center; gap: 8px; }
@@ -207,7 +237,11 @@
 @media (max-width: 768px) {
     .comment-item { flex-direction: column; }
     .avatar { align-self: flex-start; }
-    .comment-time { position: static; margin-top: 6px; }
+    .comment-meta {
+        position: static;
+        align-items: flex-start;
+        margin-top: 6px;
+    }
     .comment-actions { flex-wrap: wrap; }
 }
 
