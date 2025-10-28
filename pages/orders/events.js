@@ -47,8 +47,11 @@ async function handleTableActions(event) {
     const actionElement = target.closest('[data-action]');
     if (!actionElement) return;
 
+    const row = actionElement.closest('tr');
+    if (!row || !row.dataset.orderId) return;
+
     const action = actionElement.dataset.action;
-    const orderId = parseFloat(actionElement.closest('tr').dataset.orderId);
+    const orderId = row.dataset.orderId; // Use UUID string directly
 
     switch (action) {
         case 'edit':
