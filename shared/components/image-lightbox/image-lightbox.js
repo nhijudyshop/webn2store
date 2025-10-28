@@ -2,10 +2,11 @@
 
 let lightboxOverlay = null;
 let lightboxImage = null;
+let hideTimeout = null; // To store the timeout ID
 
 /**
  * Initializes the image lightbox functionality.
- * Attaches mouseover/mouseout listeners to all relevant image elements.
+ * Attaches mouseenter/mouseleave listeners to all relevant image elements.
  */
 export function initImageLightbox() {
     // Create lightbox elements once
@@ -13,12 +14,15 @@ export function initImageLightbox() {
         lightboxOverlay = document.createElement('div');
         lightboxOverlay.className = 'lightbox-overlay';
         lightboxOverlay.addEventListener('click', hideLightbox); // Hide on click anywhere on overlay
-        // Add mouseleave to the overlay itself to hide it
-        lightboxOverlay.addEventListener('mouseleave', hideLightbox); // NEW: Hide when mouse leaves the overlay
+        // REMOVED: lightboxOverlay.addEventListener('mouseleave', hideLightbox); // This was problematic
 
         lightboxImage = document.createElement('img');
         lightboxImage.className = 'lightbox-image';
         lightboxOverlay.appendChild(lightboxImage);
+
+        // NEW: Add mouseenter/mouseleave listeners to the lightbox image itself
+        lightboxImage.addEventListener('mouseenter', cancelHide);
+        lightboxImage.addEventListener('mouseleave', delayedHideLightbox);
 
         document.body.appendChild(lightboxOverlay);
     }
@@ -35,8 +39,8 @@ export function initImageLightbox() {
     images.forEach(img => {
         // Ensure listeners are not added multiple times
         if (!img.dataset.lightboxListenerAdded) {
-            img.addEventListener('mouseenter', showLightbox); // Changed to mouseenter
-            // img.addEventListener('mouseout', hideLightbox); // REMOVED: This caused flickering
+            img.addEventListener('mouseenter', showLightbox);
+            img.addEventListener('mouseleave', delayedHideLightbox); // Put mouseleave back on the image
             img.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -53,13 +57,13 @@ export function initImageLightbox() {
     placeholders.forEach(placeholder => {
         if (!placeholder.dataset.lightboxListenerAdded) {
             // For placeholders, we only show if they actually contain an img child
-            placeholder.addEventListener('mouseenter', (event) => { // Changed to mouseenter
+            placeholder.addEventListener('mouseenter', (event) => {
                 const actualImg = event.currentTarget.querySelector('img');
                 if (actualImg && actualImg.src) {
                     showLightbox(event);
                 }
             });
-            // placeholder.addEventListener('mouseout', hideLightbox); // REMOVED: This caused flickering
+            placeholder.addEventListener('mouseleave', delayedHideLightbox); // Put mouseleave back on the placeholder
             placeholder.dataset.lightboxListenerAdded = 'true';
         }
     });
@@ -67,25 +71,25 @@ export function initImageLightbox() {
 
 /**
  * Shows the lightbox with the hovered image.
- * @param {Event} event - The mouseover event.
+ * @param {Event} event - The mouseenter event.
  */
 function showLightbox(event) {
+    cancelHide(); // Clear any pending hide timeouts
+
     const target = event.currentTarget;
     let imgSrc = '';
 
     if (target.tagName === 'IMG') {
         imgSrc = target.src;
     } else if (target.classList.contains('image-placeholder')) {
-        // If it's a placeholder div, check for an actual image inside
         const imgChild = target.querySelector('img');
         if (imgChild && imgChild.src) {
             imgSrc = imgChild.src;
         } else {
-            // If no image inside, don't show lightbox
             return;
         }
     } else {
-        return; // Not an image or a recognized placeholder
+        return;
     }
 
     if (imgSrc) {
@@ -100,14 +104,30 @@ function showLightbox(event) {
 function hideLightbox() {
     lightboxOverlay.classList.remove('show');
     lightboxImage.src = ''; // Clear image source
+    hideTimeout = null; // Clear the timeout ID
+}
+
+/**
+ * Delays hiding the lightbox.
+ */
+function delayedHideLightbox() {
+    cancelHide(); // Clear any existing hide timeout
+    hideTimeout = setTimeout(hideLightbox, 200); // Hide after 200ms
+}
+
+/**
+ * Cancels any pending hide lightbox timeout.
+ */
+function cancelHide() {
+    if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+    }
 }
 
 // Auto-initialize when the DOM is ready
 document.addEventListener('DOMContentLoaded', initImageLightbox);
 
 // Re-initialize after dynamic content changes (e.g., adding new rows to tables)
-// This is a simple approach; a more robust solution might involve MutationObserver
-window.addEventListener('load', initImageLightbox); // For initial load
-window.addEventListener('resize', initImageLightbox); // In case elements are re-rendered on resize
-// You might need to call initImageLightbox() explicitly after adding new dynamic content
-// e.g., after addProductRow(), displayOrders(), displayVariants()
+window.addEventListener('load', initImageLightbox);
+window.addEventListener('resize', initImageLightbox);
