@@ -64,13 +64,36 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    overflow: hidden;
+    overflow: hidden; /* Default state for main image dropzone */
     flex-shrink: 0;
+    position: relative; /* Ensure positioning context for absolute children */
 }
 .image-dropzone:hover {
     border-color: #3b82f6;
     color: #3b82f6;
     background: #eff6ff;
+}
+
+/* Allow overflow and bring to front when main image dropzone has an image and is hovered */
+.order-info-grid .image-dropzone.has-image:hover {
+    overflow: visible;
+    z-index: 100;
+}
+
+/* Zoom effect for image inside main invoice dropzone on hover */
+.order-info-grid .image-dropzone.has-image img:hover {
+    position: absolute;
+    width: 320px; /* Kích thước lớn hơn khi zoom */
+    height: 320px; /* Kích thước lớn hơn khi zoom */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    object-fit: contain;
+    border: 2px solid white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    background-color: #fff;
 }
 
 .image-dropzone img {
