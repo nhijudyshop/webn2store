@@ -1,5 +1,6 @@
 // facebookcomment/utils/comment-display.js
 import { normalizeVietnamese } from '../../shared/utils/text-utils.js';
+import { ensureCustomerStatusesForComments } from './customer-status-manager.js';
 
 /**
  * Gets the initials from a given name.
@@ -112,11 +113,29 @@ function buildSessionPhoneBadge(orderInfo) {
     `;
 }
 
+function normalizeVNPhone(raw = "") {
+    const digits = String(raw).replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("84")) {
+        const tail = digits.slice(2);
+        if (tail.length === 9 || tail.length === 10) return "0" + tail;
+    }
+    if (digits.startsWith("0") && (digits.length === 10 || digits.length === 11)) {
+        return digits;
+    }
+    return "";
+}
+
 function extractPhonesFromText(text = "") {
     if (!text) return [];
-    const matches = String(text).match(/0\d{9,10}/g);
-    if (!matches) return [];
-    return Array.from(new Set(matches));
+    const set = new Set();
+    const candidates = String(text).match(/(\+?84|84|0)[\d\.\-\s\(\)]{8,20}/g) || [];
+    const compact = String(text).match(/0\d{9,10}/g) || [];
+    [...candidates, ...compact].forEach(raw => {
+        const n = normalizeVNPhone(raw);
+        if (n) set.add(n);
+    });
+    return Array.from(set);
 }
 
 function resolveStatusByPhone(message, appState) {
@@ -244,6 +263,8 @@ export function renderAllComments(appState, renderPaginationControls) {
         window.lucide?.createIcons?.();
         // Đồng bộ độ rộng của status theo thời gian
         requestAnimationFrame(syncStatusWidths);
+        // Sau khi render, đảm bảo lấy trạng thái cho TẤT CẢ comments đang hiển thị
+        ensureCustomerStatusesForComments(appState.allCommentsData, appState);
     }
 
     document.getElementById("filteredComments").textContent =
