@@ -78,13 +78,22 @@ export function setupEventListeners() {
         // Toggle fullscreen for comments container
         const fsBtn = document.getElementById("toggleFullscreenBtn");
         const commentsContainer = document.querySelector(".comments-container");
-        if (fsBtn && commentsContainer) {
-            fsBtn.addEventListener("click", () => {
-                const isFull = commentsContainer.classList.toggle("fullscreen");
+
+        if (fsBtn || commentsContainer) {
+            // Global function so HTML onclick can also call it safely
+            window.toggleCommentsFullscreen = () => {
+                const container = document.querySelector(".comments-container");
+                const btn = document.getElementById("toggleFullscreenBtn");
+                if (!container || !btn) return;
+                const isFull = container.classList.toggle("fullscreen");
                 document.body.classList.toggle("no-scroll", isFull);
-                fsBtn.innerHTML = isFull ? '<i data-lucide="minimize-2"></i>' : '<i data-lucide="maximize-2"></i>';
+                btn.innerHTML = isFull ? '<i data-lucide="minimize-2"></i>' : '<i data-lucide="maximize-2"></i>';
                 window.lucide && window.lucide.createIcons();
-            });
+            };
+
+            if (fsBtn && commentsContainer) {
+                fsBtn.addEventListener("click", window.toggleCommentsFullscreen);
+            }
         }
 
         // NEW: Font size and family controls in header
