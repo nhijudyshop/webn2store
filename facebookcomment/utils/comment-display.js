@@ -153,39 +153,6 @@ export function createCommentElement(comment, isNew = false, appState) {
         }
     }
 
-    // Status badge (Bình thường, VIP, Blacklist)
-    let statusBadge = 'Bình thường';
-    let statusClass = 'normal';
-    if (orderInfo && orderInfo.partnerStatus) {
-        const status = orderInfo.partnerStatus.toLowerCase();
-        if (status === 'vip') {
-            statusBadge = 'VIP';
-            statusClass = 'vip';
-        } else if (status === 'blacklist') {
-            statusBadge = 'Blacklist';
-            statusClass = 'blacklist';
-        }
-    }
-
-    // Action buttons with text
-    const actionsHTML = `
-        <div class="comment-actions">
-            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')">
-                Tạo đơn hàng
-            </button>
-            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')">
-                Thông tin
-            </button>
-            <button class="action-btn action-message">
-                Tin nhắn
-                <i data-lucide="chevron-down"></i>
-            </button>
-            <button class="action-btn action-status ${statusClass}">
-                ${statusBadge}
-            </button>
-        </div>
-    `;
-
     const newClass = isNew ? "new" : "";
 
     return `
@@ -200,7 +167,6 @@ export function createCommentElement(comment, isNew = false, appState) {
                 ${iconsHTML}
                 ${sessionPhoneBadge}
                 ${customerDetailsHTML}
-                ${actionsHTML}
             </div>
         </div>
     `;
@@ -310,39 +276,6 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
         }
     }
 
-    // Status badge (Bình thường, VIP, Blacklist)
-    let statusBadge = 'Bình thường';
-    let statusClass = 'normal';
-    if (orderInfo && orderInfo.partnerStatus) {
-        const status = orderInfo.partnerStatus.toLowerCase();
-        if (status === 'vip') {
-            statusBadge = 'VIP';
-            statusClass = 'vip';
-        } else if (status === 'blacklist') {
-            statusBadge = 'Blacklist';
-            statusClass = 'blacklist';
-        }
-    }
-
-    // Action buttons with text
-    const actionsHTML = `
-        <div class="comment-actions">
-            <button class="action-btn action-create-order" onclick="window.handleCreateOrder('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}', '${userId || ""}')">
-                Tạo đơn hàng
-            </button>
-            <button class="action-btn action-info" onclick="window.handleViewInfo('${commentId}', '${name.replace(/'/g, "\\'")}', '${message.replace(/'/g, "\\'")}', '${time || ""}')">
-                Thông tin
-            </button>
-            <button class="action-btn action-message">
-                Tin nhắn
-                <i data-lucide="chevron-down"></i>
-            </button>
-            <button class="action-btn action-status ${statusClass}">
-                ${statusBadge}
-            </button>
-        </div>
-    `;
-
     const newClass = isNew ? "new" : "";
 
     return `
@@ -357,7 +290,6 @@ export function createCommentElementWithHighlight(comment, searchTerm, isNew = f
                 ${iconsHTML}
                 ${sessionPhoneBadge}
                 ${customerDetailsHTML}
-                ${actionsHTML}
             </div>
         </div>
     `;
