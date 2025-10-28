@@ -35,23 +35,35 @@ export function displayOrders(ordersToDisplay = orders) {
         return;
     }
 
-    // Group orders by a composite key to identify unique order instances
-    const groupedOrders = ordersToDisplay.reduce((acc, order) => {
-        const key = `${order.supplier}-${order.rawDate}`; // Unique key for an order instance
-        if (!acc[key]) {
-            acc[key] = [];
-        }
-        acc[key].push(order);
-        return acc;
-    }, {});
-
     let html = '';
-    const processedGroups = new Set();
+    
+    // First pass: Prepare data with rowspan information for consecutive supplier groups
+    const processedOrders = [];
+    for (let i = 0; i < ordersToDisplay.length; i++) {
+        const item = { ...ordersToDisplay[i] }; // Clone to add properties
+        item.isFirstInConsecutiveSupplierGroup = false;
+        item.supplierRowspan = 1; // Default rowspan
 
-    ordersToDisplay.forEach(item => {
-        const key = `${item.supplier}-${item.rawDate}`;
-        const isFirstInGroup = !processedGroups.has(key);
-        
+        if (i === 0 || item.supplier !== ordersToDisplay[i-1].supplier) {
+            // This is the start of a new consecutive supplier group
+            item.isFirstInConsecutiveSupplierGroup = true;
+            
+            // Calculate rowspan for this new group
+            let count = 0;
+            for (let j = i; j < ordersToDisplay.length; j++) {
+                if (ordersToDisplay[j].supplier === item.supplier) {
+                    count++;
+                } else {
+                    break; // Stop counting when supplier changes
+                }
+            }
+            item.supplierRowspan = count;
+        }
+        processedOrders.push(item);
+    }
+
+    // Second pass: Render HTML based on the processed data
+    processedOrders.forEach(item => {
         const purchasePriceHtml = `
             ${item.purchasePriceImageUrl
                 ? `<img src="${item.purchasePriceImageUrl}" class="price-image" alt="Purchase Price Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
@@ -63,7 +75,7 @@ export function displayOrders(ordersToDisplay = orders) {
         const salePriceHtml = `
             ${item.productImageUrl
                 ? `<img src="${item.productImageUrl}" class="price-image" alt="Product Image" onerror="this.outerHTML='<div class=\\'image-placeholder price-image\\'>Chưa có hình</div>'">`
-                : `<div class="image-placeholder price-image">Chưa có hình</div>`
+                : `<div class="image-placeholder price-image\\'>Chưa có hình</div>`
             }
             <div class="price">${item.salePrice}</div>
         `;
@@ -71,14 +83,14 @@ export function displayOrders(ordersToDisplay = orders) {
         const invoiceHtml = `
             ${item.invoiceImageUrl
                 ? `<img src="${item.invoiceImageUrl}" class="invoice-image" alt="Invoice" onerror="this.outerHTML='<div class=\\'image-placeholder invoice-image\\'>Chưa có hình</div>'">`
-                : `<div class="image-placeholder invoice-image">Chưa có hình</div>`
+                : `<div class="image-placeholder invoice-image\\'>Chưa có hình</div>`
             }
             <div class="invoice-value">${item.invoice}</div>
         `;
 
         html += `<tr data-order-id="${item.id}">`;
 
-        // Date cell is always rendered for every row
+        // Date cell (always present for every row)
         html += `
             <td>
                 <div class="order-date">
@@ -91,30 +103,27 @@ export function displayOrders(ordersToDisplay = orders) {
             </td>
         `;
 
-        if (isFirstInGroup) {
-            const orderGroup = groupedOrders[key];
-            const rowspan = orderGroup.length;
-            processedGroups.add(key);
-
+        // Supplier cell (only rendered if it's the first in its consecutive group)
+        if (item.isFirstInConsecutiveSupplierGroup) {
             html += `
-                <td class="align-left" rowspan="${rowspan}">
+                <td class="align-left" rowspan="${item.supplierRowspan}">
                     <div class="supplier-info">${item.supplier}</div>
                     <div class="supplier-qty">Tổng SL: ${item.totalQty}</div>
                 </td>
             `;
         }
 
-        // Invoice cell is always rendered for every row
+        // Invoice cell (always present for every row)
         html += `<td><div class="price-cell">${invoiceHtml}</div></td>`;
 
-        // The rest of the cells are added for every row
+        // The rest of the cells (always present for every row)
         html += `
             <td class="align-left"><div class="product-name">${item.productName}</div></td>
             <td><span class="product-code">${item.productCode}</span></td>
             <td><div class="variant">${item.variant}</div></td>
             <td><div class="quantity">${item.quantity}</div></td>
             <td><div class="price-cell">${purchasePriceHtml}</div></td>
-            <td><div class="price-cell">${salePriceHtml}</div></td>
+            <td><div class="price-cell">${salePriceHtml}</div></div></td>
             <td class="align-left"><div style="color: #64748b; font-size: 14px;">${item.note || '-'}</div></td>
             <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
             <td><button class="btn-edit" data-action="edit" title="Chỉnh sửa đơn hàng"><i data-lucide="edit"></i></button></td>
