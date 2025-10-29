@@ -373,7 +373,7 @@ export async function saveProductChanges(event) {
                 console.log("📦 Posting updated inventory payload:", finalStockPayload);
                 await tposRequest(
                     '/StockChangeProductQty/ODataService.PostChangeQtyProduct',
-                    { method: 'POST', body: { model: finalStockPayload } }
+                    { method: 'POST', body: { value: finalStockPayload } }
                 );
                 console.log("✅ Inventory update request sent.");
             } else {
