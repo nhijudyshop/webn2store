@@ -65,13 +65,31 @@ tbody tr:hover {
     border-radius: 8px;
     object-fit: cover;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: relative; /* Thêm để căn giữa ảnh zoom */
-    z-index: 1; /* Đảm bảo ảnh hiển thị trên cùng khi không hover */
+    /* Removed position: relative and z-index: 1 as they are not needed for the image itself */
 }
 
 /* Remove hover zoom effect, now handled by JS lightbox */
 .product-image:hover {
     /* No longer needed, JS will handle */
+}
+
+.image-placeholder { /* Updated styles for generic image placeholders */
+    width: 60px; /* Match product-image width */
+    height: 60px; /* Match product-image height */
+    border-radius: 8px;
+    border: 2px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #94a3b8;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    text-align: center;
+    /* Removed position: relative and z-index: 1 */
+    font-weight: 600;
+    line-height: 1.2; /* Adjust line-height for better text wrapping */
+    padding: 5px; /* Add some padding */
+    box-sizing: border-box; /* Ensure padding is included in width/height */
 }
 
 .product-code {

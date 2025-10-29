@@ -25,10 +25,10 @@ export function displayProductInfo(product) {
             newElement.src = product.ImageUrl;
             newElement.alt = product.Name || "Product";
             newElement.onerror = function() {
-                this.outerHTML = `<div id="productInfoImage" class="product-info-image image-placeholder">Chưa có hình</div>`;
+                this.outerHTML = `<div id="productInfoImage" class="product-info-image-placeholder">Chưa có hình</div>`; // Use new placeholder class
             };
         } else {
-            newElement.className = 'product-info-image image-placeholder';
+            newElement.className = 'product-info-image-placeholder'; // Only apply new placeholder class
             newElement.textContent = 'Chưa có hình';
         }
         currentImageElement.replaceWith(newElement);
@@ -80,9 +80,9 @@ export function displayVariants(variants) {
                             ${currentProduct?.ImageUrl 
                                 ? `<img src="${currentProduct.ImageUrl}" 
                                      class="product-image" 
-                                     onerror="this.outerHTML = '<div class=\\'product-image image-placeholder\\'>Chưa có hình</div>';"
+                                     onerror="this.outerHTML = '<div class=\\'image-placeholder\\'>Chưa có hình</div>';"
                                      alt="${variant.Name}">`
-                                : `<div class="product-image image-placeholder">Chưa có hình</div>`
+                                : `<div class="image-placeholder">Chưa có hình</div>` // Only apply image-placeholder class
                             }
                         </td>
                         <td><strong>${variant.NameGet || variant.Name || "-"}</strong></td>

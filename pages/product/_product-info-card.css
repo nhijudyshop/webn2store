@@ -21,8 +21,7 @@
     object-fit: cover;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
-    position: relative; /* Thêm để căn giữa ảnh zoom */
-    overflow: visible; /* Cho phép ảnh zoom tràn ra ngoài */
+    /* Removed position: relative and overflow: visible */
 }
 
 /* Remove hover zoom effect, now handled by JS lightbox */
@@ -30,7 +29,10 @@
     /* No longer needed, JS will handle */
 }
 
-.image-placeholder {
+.product-info-image-placeholder { /* NEW CLASS for the main product info image placeholder */
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,8 +42,10 @@
     font-size: 14px;
     text-align: center;
     box-shadow: none;
-    position: relative; /* Thêm để căn giữa ảnh zoom */
-    overflow: visible; /* Cho phép ảnh zoom tràn ra ngoài */
+    flex-shrink: 0;
+    line-height: 1.4;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* Remove hover zoom effect, now handled by JS lightbox */
