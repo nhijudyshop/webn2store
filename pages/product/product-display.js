@@ -89,7 +89,7 @@ export function displayVariants(variants) {
                         <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>
                         <td>${variant.ProductTmplId}</td>
                         <td class="price-cell">${formatCurrency(variant.PriceVariant || variant.ListPrice)}</td>
-                        <td>${formatCurrency(variant.StandardPrice)}</td>
+                        <td><div class="price-cell">${formatCurrency(variant.StandardPrice)}</div></td>
                         <td class="qty-cell qty-available">${variant.QtyAvailable || 0}</td>
                         <td class="qty-cell qty-forecast">${variant.VirtualAvailable || 0}</td>
                     </tr>
