@@ -119,10 +119,12 @@ export function recalculateTotalQuantities() {
     let totalVirtual = 0;
 
     variantRows.forEach(row => {
-        const qtyDisplay = row.querySelectorAll('td .value-display')[0];
-        const virtualDisplay = row.querySelectorAll('td .value-display')[1];
-        if (qtyDisplay) totalQty += parseInt(qtyDisplay.textContent, 10) || 0;
-        if (virtualDisplay) totalVirtual += parseInt(virtualDisplay.textContent, 10) || 0;
+        const qtyInput = row.querySelector('input.quantity-input[data-field="QtyAvailable"]');
+        const virtualInput = row.querySelector('input.quantity-input[data-field="VirtualAvailable"]');
+        const qtyVal = parseInt(qtyInput?.value ?? '0', 10) || 0;
+        const virtualVal = parseInt(virtualInput?.value ?? '0', 10) || 0;
+        totalQty += qtyVal;
+        totalVirtual += virtualVal;
     });
 
     document.getElementById('editQtyAvailable').textContent = totalQty;
@@ -255,6 +257,11 @@ export function openEditModal() {
     }
     recalculateTotalQuantities();
 
+    // ADDED: lắng nghe thay đổi để tự tính lại tổng số lượng
+    variantsTbody.querySelectorAll('input.quantity-input').forEach(inp => {
+        inp.addEventListener('input', recalculateTotalQuantities);
+    });
+
     // Logic for disabling variant editing
     const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
     const editVariantsInput = document.getElementById('editVariants');
@@ -371,7 +378,62 @@ export async function saveProductChanges(event) {
             });
         }
 
-        // Send the update request
+        // ADDED: cập nhật số lượng biến thể qua chuỗi API TPOS nếu có thay đổi
+        const editedQtyMap = {};
+        const variantById = new Map((currentProduct.ProductVariants || []).map(v => [v.Id, v]));
+        variantsTbody?.querySelectorAll('tr').forEach(row => {
+            const id = parseInt(row.dataset.variantId, 10);
+            const qtyInput = row.querySelector('input.quantity-input[data-field="QtyAvailable"]');
+            if (!Number.isNaN(id) && qtyInput) {
+                const newQty = parseInt(qtyInput.value, 10);
+                const origQty = parseInt(variantById.get(id)?.QtyAvailable ?? 0, 10);
+                if (!Number.isNaN(newQty) && newQty !== origQty) {
+                    editedQtyMap[id] = newQty < 0 ? 0 : newQty; // không cho âm
+                }
+            }
+        });
+
+        if (Object.keys(editedQtyMap).length > 0) {
+            window.showNotification("🔄 Đang cập nhật số lượng biến thể trên TPOS...", "info");
+
+            // B1: lấy payload mẫu
+            const tmplId = currentProduct.Id; // ProductTmplId
+            const defaultPayload = await tposRequest(
+                "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.DefaultGetAll?$expand=ProductTmpl,Product,Location",
+                { method: "POST", body: { model: { ProductTmplId: tmplId } } }
+            );
+
+            const templateModels = Array.isArray(defaultPayload?.model) ? defaultPayload.model : [];
+            // Lọc theo các SP Con cần đổi số lượng
+            const modelsToChange = templateModels
+                .filter(m => editedQtyMap[m.ProductId] !== undefined)
+                .map(m => ({ ...m, NewQuantity: editedQtyMap[m.ProductId] }));
+
+            if (modelsToChange.length === 0) {
+                console.warn("Không tìm thấy mẫu phù hợp để cập nhật số lượng.");
+            } else {
+                // B2: gửi payload thay đổi để nhận danh sách Id
+                const postResp = await tposRequest(
+                    "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.PostChangeQtyProduct?$expand=ProductTmpl,Product,Location",
+                    { method: "POST", body: { model: modelsToChange } }
+                );
+
+                const ids = Array.isArray(postResp?.value) ? postResp.value.map(i => i.Id).filter(id => typeof id === 'number') : [];
+                if (ids.length === 0) {
+                    throw new Error("Không nhận được Id thay đổi số lượng từ TPOS.");
+                }
+
+                // B3: commit thay đổi số lượng
+                await tposRequest(
+                    "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.ChangeProductQtyIds",
+                    { method: "POST", body: { ids } }
+                );
+
+                window.showNotification("✅ Đã cập nhật số lượng biến thể thành công!", "success");
+            }
+        }
+
+        // Send the update request (tên, giá, ảnh, cấu trúc biến thể nếu cho phép)
         await tposRequest('/api/products/update', { method: 'POST', body: payload });
         console.log("✅ Product update request sent.");
 
