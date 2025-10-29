@@ -280,109 +280,47 @@ export async function saveProductChanges(event) {
     window.lucide.createIcons();
 
     try {
-        // --- Logic for updating product info (name, price, variants, etc.) ---
         const payload = JSON.parse(JSON.stringify(originalProductPayload));
-        let productInfoChanged = false;
 
+        // Update basic fields
         const newName = document.getElementById('editProductName').value;
         const newListPrice = parseFloat(document.getElementById('editListPrice').value) || 0;
-        const newPurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
-
-        if (payload.Name !== newName) { payload.Name = newName; productInfoChanged = true; }
-        if (payload.ListPrice !== newListPrice) { payload.ListPrice = newListPrice; productInfoChanged = true; }
-        if (payload.PurchasePrice !== newPurchasePrice) { 
-            payload.PurchasePrice = newPurchasePrice; 
-            payload.StandardPrice = newPurchasePrice;
-            productInfoChanged = true; 
-        }
+        payload.Name = newName;
+        payload.PurchasePrice = parseFloat(document.getElementById('editPurchasePrice').value) || 0;
+        payload.ListPrice = newListPrice;
+        payload.StandardPrice = payload.PurchasePrice;
 
         const imgElement = document.querySelector('#editImageDropzone img');
         if (imgElement && imgElement.src.startsWith('data:image')) {
             payload.Image = await getImageAsBase64(imgElement);
             payload.ImageUrl = null;
             if (payload.Images) payload.Images = [];
-            productInfoChanged = true;
         }
 
+        // Check if we can update variants
         const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
+
         if (!hasStock) {
-            const newAttributeLines = buildAttributeLines(editModalState);
-            // A simple way to check for changes in variant structure
-            if (JSON.stringify(payload.AttributeLines.map(l => l.AttributeId).sort()) !== JSON.stringify(newAttributeLines.map(l => l.AttributeId).sort()) ||
-                JSON.stringify(payload.AttributeLines.flatMap(l => l.Values.map(v => v.Id)).sort()) !== JSON.stringify(newAttributeLines.flatMap(l => l.Values.map(v => v.Id)).sort())) {
-                console.log("🔄 Variant structure changed, regenerating variants...");
-                payload.AttributeLines = newAttributeLines;
-                payload.ProductVariants = buildProductVariants(newName, newListPrice, editModalState);
-                productInfoChanged = true;
-            }
+            console.log("🔄 No stock found, regenerating variants based on new attributes...");
+            payload.AttributeLines = buildAttributeLines(editModalState);
+            payload.ProductVariants = buildProductVariants(newName, newListPrice, editModalState);
+        } else {
+            console.log("📦 Stock found, skipping variant structure update.");
         }
 
-        if (productInfoChanged) {
-            console.log("ℹ️ Product info changed, sending update request...");
-            if (payload.ProductVariants) {
-                payload.ProductVariants.forEach(v => {
-                    delete v.QtyAvailable;
-                    delete v.VirtualAvailable;
-                });
-            }
-            await tposRequest('/api/products/update', { method: 'POST', body: payload });
-            console.log("✅ Product info update request sent.");
-        }
-
-        // --- Logic for updating inventory quantities ---
-        const quantityUpdates = [];
-        const variantRows = document.querySelectorAll('#editVariantsTableBody tr');
-        variantRows.forEach(row => {
-            const variantId = parseInt(row.dataset.variantId, 10);
-            const originalVariant = currentProduct.ProductVariants.find(v => v.Id === variantId);
-            
-            const newQtyAvailable = parseInt(row.querySelector('input[data-field="QtyAvailable"]').value, 10);
-            
-            if (originalVariant && originalVariant.QtyAvailable !== newQtyAvailable) {
-                quantityUpdates.push({ variantId, newQty: newQtyAvailable });
-            }
-        });
-
-        if (quantityUpdates.length > 0) {
-            console.log("🔄 Detected quantity changes, starting inventory update...", quantityUpdates);
-
-            // Step 1: Get the stock change payload structure
-            const stockPayloadTemplate = await tposRequest(
-                '/StockChangeProductQty/ODataService.DefaultGetAll?$expand=ProductTmpl,Product,Location',
-                { method: 'POST', body: { model: { ProductTmplId: currentProduct.Id } } }
-            );
-
-            if (!stockPayloadTemplate || !stockPayloadTemplate.value) {
-                throw new Error("Không thể lấy cấu trúc payload để cập nhật tồn kho.");
-            }
-
-            const finalStockPayload = stockPayloadTemplate.value;
-            let changesMade = false;
-
-            // Step 2: Modify the payload with new quantities
-            finalStockPayload.forEach(item => {
-                const updateInfo = quantityUpdates.find(u => u.variantId === item.ProductId);
-                if (updateInfo) {
-                    item.NewQuantity = updateInfo.newQty;
-                    changesMade = true;
-                }
+        // ALWAYS remove quantity fields from variants to prevent accidental updates
+        if (payload.ProductVariants) {
+            payload.ProductVariants.forEach(v => {
+                delete v.QtyAvailable;
+                delete v.VirtualAvailable;
             });
-
-            // Step 3: Post the updated payload
-            if (changesMade) {
-                console.log("📦 Posting updated inventory payload:", finalStockPayload);
-                await tposRequest(
-                    '/StockChangeProductQty/ODataService.PostChangeQtyProduct',
-                    { method: 'POST', body: { value: finalStockPayload } }
-                );
-                console.log("✅ Inventory update request sent.");
-            } else {
-                console.warn("⚠️ Quantity changes detected, but no matching variants found in stock payload.");
-            }
         }
 
-        // --- Fetch fresh data and update UI ---
-        console.log("🔄 Fetching fresh product data to reflect all changes...");
+        // Send the update request
+        await tposRequest('/api/products/update', { method: 'POST', body: payload });
+        console.log("✅ Product update request sent.");
+
+        // Fetch fresh data from TPOS to confirm changes and update UI
         const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
         
         setOriginalProductPayload(updatedProductData);
