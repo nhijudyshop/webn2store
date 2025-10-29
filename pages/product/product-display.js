@@ -85,7 +85,7 @@ export function displayVariants(variants) {
                                 : `<div class="product-image image-placeholder">Chưa có hình</div>`
                             }
                         </td>
-                        <td><strong>${variant.Name || "-"}</strong></td>
+                        <td><strong>${variant.NameGet || variant.Name || "-"}</strong></td>
                         <td><span class="product-code">${variant.DefaultCode || "-"}</span></td>
                         <td>${variant.ProductTmplId}</td>
                         <td class="price-cell">${formatCurrency(variant.PriceVariant || variant.ListPrice)}</td>
