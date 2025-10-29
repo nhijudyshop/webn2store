@@ -10,7 +10,7 @@ import { closeVariantSelector, handleVariantSelection, activeVariantInput } from
 import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 import { quantityTransferState } from './edit-modal/state.js'; // NEW: Import quantityTransferState
 import { currentProduct } from './inventory-state.js'; // NEW: Import currentProduct
-import { updateTransferQuantitiesDisplay } from './edit-modal/ui-manager.js'; // Import for updating display
+import { updateTransferQuantitiesDisplay, populateTransferVariantSelect } from './edit-modal/ui-manager.js'; // Import for updating display
 
 // ===== GLOBAL EXPORTS (for HTML onclicks) =====
 window.clearData = clearData;
@@ -121,32 +121,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("Inventory page initialized (modular).");
 });
-
-// Helper function for populating transfer variant selects (needed here for the change listeners)
-function populateTransferVariantSelect(selectElement, excludeVariantId = null) {
-    selectElement.innerHTML = '<option value="">-- Chọn biến thể --</option>';
-    if (currentProduct && currentProduct.ProductVariants) {
-        currentProduct.ProductVariants.forEach(variant => {
-            if (variant.Id !== excludeVariantId) {
-                const option = document.createElement('option');
-                option.value = variant.Id;
-                option.textContent = variant.NameGet || variant.Name;
-                selectElement.appendChild(option);
-            }
-        });
-    }
-}
-
-// Helper function for updating transfer quantities display (needed here for the change listeners)
-function updateTransferQuantitiesDisplay() {
-    const qty1El = document.getElementById('transferQty1');
-    const qty2El = document.getElementById('transferQty2');
-    const saveBtn = document.getElementById('saveQuantityTransferBtn');
-
-    if (qty1El) qty1El.textContent = quantityTransferState.currentQty1;
-    if (qty2El) qty2El.textContent = quantityTransferState.currentQty2;
-
-    const changed = quantityTransferState.currentQty1 !== quantityTransferState.initialQty1 ||
-                    quantityTransferState.currentQty2 !== quantityTransferState.initialQty2;
-    if (saveBtn) saveBtn.disabled = !changed;
-}
