@@ -229,7 +229,7 @@ router.post("/products/insert", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);
         const productData = req.body;
-        const url = "https://tomato.tpos.vn/odata/ProductTemplate/ODataService.InsertV2?$expand=ProductVariants,UOM,UOMPO";
+        const url = "https://tomato.tpos.vn/odata/ProductTemplate/ODataService.InsertV2?$expand=ProductVariants,UOM,UOMCateg,Categ,UOMPO,POSCateg,Taxes,SupplierTaxes,Product_Teams,Images,UOMView,Distributor,Importer,Producer,OriginCountry,ProductVariants($expand=UOM,Categ,UOMPO,POSCateg,AttributeValues)";
 
         console.log(`🚀 Creating new product on TPOS: ${productData.Name}`);
 
@@ -268,7 +268,73 @@ router.post("/products/update", async (req, res) => {
     }
 });
 
-// New proxy endpoint for updating stock quantity
+// NEW: Proxy endpoint for Step 1 of 3-step stock update: Get Payload Template
+router.post("/stock-change-get-template", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const payload = req.body; // Should contain { "model": { "ProductTmplId": 109565 } }
+        const url = "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.DefaultGetAll?$expand=ProductTmpl,Product,Location";
+
+        console.log(`📦 Getting stock change template for ProductTmplId: ${payload.model.ProductTmplId}`);
+
+        const response = await axios.post(url, payload, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log("✅ Stock change template fetched successfully.");
+        res.json(response.data);
+    } catch (error) {
+        console.error("❌ Error fetching stock change template from TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ success: false, error: "Failed to get stock change template", details: error.response?.data });
+    }
+});
+
+// NEW: Proxy endpoint for Step 2 of 3-step stock update: Post Changed Quantities
+router.post("/stock-change-post-qty", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const payload = req.body; // Should be the modified template from Step 1
+        const url = "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.PostChangeQtyProduct?$expand=ProductTmpl,Product,Location";
+
+        console.log(`📝 Posting changed quantities to TPOS.`);
+
+        const response = await axios.post(url, payload, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log("✅ Changed quantities posted successfully.");
+        res.json(response.data);
+    } catch (error) {
+        console.error("❌ Error posting changed quantities to TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ success: false, error: "Failed to post changed quantities", details: error.response?.data });
+    }
+});
+
+// NEW: Proxy endpoint for Step 3 of 3-step stock update: Execute Change
+router.post("/stock-change-execute", async (req, res) => {
+    try {
+        const authHeader = getAuthHeader(req);
+        const payload = req.body; // Should contain { "ids": [id1, id2, ...] }
+        const url = "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.ChangeProductQtyIds";
+
+        console.log(`🚀 Executing stock change for IDs: ${payload.ids.join(', ')}`);
+
+        const response = await axios.post(url, payload, {
+            headers: getProxyHeaders(authHeader),
+        });
+
+        console.log("✅ Stock change executed successfully.");
+        res.json(response.data);
+    } catch (error) {
+        console.error("❌ Error executing stock change on TPOS:", error.response ? error.response.data : error.message);
+        const status = error.response ? error.response.status : 500;
+        res.status(status).json({ success: false, error: "Failed to execute stock change", details: error.response?.data });
+    }
+});
+
+// OLD: Proxy endpoint for updating stock quantity (now deprecated by new 3-step process)
 router.post("/stock/update", async (req, res) => {
     try {
         const authHeader = getAuthHeader(req);

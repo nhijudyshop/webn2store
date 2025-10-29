@@ -1,39 +1,73 @@
 // pages/product/services/quantity-update-service.js
 
 import { tposRequest } from '../../../shared/api/tpos-api.js';
+import { currentProduct } from '../inventory-state.js'; // Import currentProduct to get ProductTmplId
 
 /**
- * Updates variant quantities on TPOS using the 3-step wizard process.
- * @param {number} productTemplateId - The ID of the product template.
+ * Updates variant quantities on TPOS using the new 3-step OData process.
  * @param {Object.<number, number>} changedQtyMap - A map of {variantId: newQuantity}.
  * @returns {Promise<void>}
  */
-export async function updateVariantQuantitiesIfChanged(productTemplateId, changedQtyMap) {
+export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
     if (Object.keys(changedQtyMap).length === 0) {
         console.log("⏭️ No quantity changes detected, skipping update.");
         return;
     }
 
-    console.log(`📦 Updating quantities for product template ${productTemplateId} with changes:`, changedQtyMap);
+    if (!currentProduct || !currentProduct.Id) {
+        throw new Error("Không tìm thấy thông tin sản phẩm cha (ProductTmplId) để cập nhật số lượng.");
+    }
 
-    for (const variantId in changedQtyMap) {
-        const newQuantity = changedQtyMap[variantId];
-        try {
-            // Step 1: Get the wizard ID
-            const wizardUrl = "/api/stock/update"; // Proxy endpoint for stock.inventory/change_product_qty/0
-            const wizardPayload = { productId: parseInt(variantId, 10), newQuantity: newQuantity };
-            
-            console.log(`🚀 Requesting stock change for variant ${variantId} to ${newQuantity}`);
-            const response = await tposRequest(wizardUrl, { method: 'POST', body: wizardPayload });
+    console.log(`📦 Updating quantities for product template ${currentProduct.Id} with changes:`, changedQtyMap);
 
-            if (!response.success) {
-                throw new Error(response.error || "Failed to update stock via proxy.");
-            }
-            console.log(`✅ Stock update successful for variant ${variantId}.`);
+    try {
+        // Step 1: Get Payload Template
+        const getTemplatePayload = { "model": { "ProductTmplId": currentProduct.Id } };
+        const templateResponse = await tposRequest('/api/stock-change-get-template', {
+            method: 'POST',
+            body: getTemplatePayload
+        });
 
-        } catch (error) {
-            console.error(`❌ Error updating stock for variant ${variantId}:`, error);
-            throw new Error(`Lỗi cập nhật số lượng cho biến thể ${variantId}: ${error.message}`);
+        if (!templateResponse || !Array.isArray(templateResponse.value) || templateResponse.value.length === 0) {
+            throw new Error("Không thể lấy mẫu payload cập nhật số lượng từ TPOS.");
         }
+
+        // The template response contains an array of objects, each representing a variant.
+        // We need to find the specific variant(s) and update their NewQuantity.
+        const modifiedTemplate = templateResponse.value.map(item => {
+            const variantId = item.Product.Id;
+            if (changedQtyMap.hasOwnProperty(variantId)) {
+                return {
+                    ...item,
+                    NewQuantity: changedQtyMap[variantId]
+                };
+            }
+            return item;
+        });
+
+        // Step 2: Post Changed Quantities
+        const postQtyResponse = await tposRequest('/api/stock-change-post-qty', {
+            method: 'POST',
+            body: { value: modifiedTemplate } // Wrap the array in a 'value' property as per TPOS OData standard
+        });
+
+        if (!postQtyResponse || !Array.isArray(postQtyResponse.value) || postQtyResponse.value.length === 0) {
+            throw new Error("Không thể đăng tải số lượng đã thay đổi lên TPOS.");
+        }
+
+        const idsToExecute = postQtyResponse.value.map(item => item.Id);
+
+        // Step 3: Execute Change
+        const executePayload = { "ids": idsToExecute };
+        await tposRequest('/api/stock-change-execute', {
+            method: 'POST',
+            body: executePayload
+        });
+
+        console.log(`✅ Stock update successful for product template ${currentProduct.Id}.`);
+
+    } catch (error) {
+        console.error(`❌ Error updating stock for product template ${currentProduct.Id}:`, error);
+        throw new Error(`Lỗi cập nhật số lượng: ${error.message || "Lỗi không xác định."}`);
     }
 }
