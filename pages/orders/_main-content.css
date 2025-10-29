@@ -1,8 +1,44 @@
-/* Main Content Area - The white card */
+/* ===== MAIN CONTENT AREA ===== */
 .main-content-area {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    padding: 25px;
-    margin-top: 20px; /* Space from the header */
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+    padding: 32px;
+    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Decorative gradient overlay */
+.main-content-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .main-content-area {
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 16px;
+    }
 }

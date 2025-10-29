@@ -1,4 +1,6 @@
-/* ===== ORDERS PAGE STYLES (MODULAR) ===== */
+/* ===== ORDERS PAGE STYLES (MODULAR & MODERN) ===== */
+
+/* Import all modular CSS files */
 @import url('./_modal-base.css');
 @import url('./_modal-forms.css');
 @import url('./_variant-selector.css');
@@ -10,3 +12,42 @@
 @import url('./_filters.css');
 @import url('./_orders-table.css');
 @import url('./_responsive.css');
+
+/* ===== GLOBAL ENHANCEMENTS ===== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom selection color */
+::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: #1e293b;
+}
+
+::-moz-selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: #1e293b;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 3px solid rgba(102, 126, 234, 0.5);
+    outline-offset: 2px;
+}
+
+/* Disable focus outline for mouse users */
+*:focus:not(:focus-visible) {
+    outline: none;
+}

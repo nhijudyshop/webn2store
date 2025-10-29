@@ -1,0 +1,41 @@
+https://tomato.tpos.vn/odata/SaleOnline_Order/ODataService.GetView?&%24top=20&%24orderby=DateCreated+desc&%24filter=(DateCreated+ge+2025-09-28T17%3A00%3A00%2B00%3A00+and+DateCreated+le+2025-10-29T16%3A59%3A59%2B00%3A00)&%24count=true
+
+https://tomato.tpos.vn/odata/SaleOnline_Order/ODataService.GetView?&%24top=20&%24skip=20&%24orderby=DateCreated+desc&%24filter=(DateCreated+ge+2025-09-28T17%3A00%3A00%2B00%3A00+and+DateCreated+le+2025-10-29T16%3A59%3A59%2B00%3A00)&%24count=true
+
+tạo 1 file html làm bảng như hình (có input ngày khoảng ngày theo gmt+7), dữ liệu ở bảng là get vào với khoảng ngày đã điền (nhớ convert đúng định dạng payload nhập liệu), nhớ làm paging bảng, link 1 là trang 1, link 2 là trang 2
+link 1: "https://tomato.tpos.vn/odata/SaleOnline_Order/ODataService.GetView?&%24top=20&%24orderby=DateCreated+desc&%24filter=(DateCreated+ge+2025-09-28T17%3A00%3A00%2B00%3A00+and+DateCreated+le+2025-10-29T16%3A59%3A59%2B00%3A00)&%24count=true"
+link 2: "https://tomato.tpos.vn/odata/SaleOnline_Order/ODataService.GetView?&%24top=20&%24skip=20&%24orderby=DateCreated+desc&%24filter=(DateCreated+ge+2025-09-28T17%3A00%3A00%2B00%3A00+and+DateCreated+le+2025-10-29T16%3A59%3A59%2B00%3A00)&%24count=true"
+response1.json là của link 1
+response2.json là của link 2
+mỗi hàng của bảng đều lưu full giá trị của json tương ứng nhưng hiển thị 1 vài cái dưới đây:
+Cột STT là SessionIndex
+Cột mã: Code, LiveCampaignName, Tags
+Cột kênh: WarehouseName
+Cột tên: Name, PartnerStatusText
+Cột điện thoại: Telephone, NameNetwork
+Cột  địa chỉ: Address
+ Cột tổng tiền: TotalAmount
+Cột tổng số lượng: TotalQuantity
+Cột trạng thái: StatusText
+Cột nhân viên: CreateByName
+Cột ngày tạo: DateCreated
+
+với header (nhớ pass cors)
+ accept:application/json, text/plain, */*
+authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDbGllbnRJZCI6InRtdFdlYkFwcCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZmMwZjQ0MzktOWNmNi00ZDg4LWE4YzctNzU5Y2E4Mjk1MTQyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im52MjAiLCJEaXNwbGF5TmFtZSI6IlTDuiIsIkF2YXRhclVybCI6IiIsIlNlY3VyaXR5U3RhbXAiOiI2NmQxNWRjMC03MTY3LTQzYjMtYTliNC00MjA2Yjk1NWM5YTIiLCJDb21wYW55SWQiOiIxIiwiVGVuYW50SWQiOiJ0b21hdG8udHBvcy52biIsIlJvbGVJZHMiOiI0MmZmYzk5Yi1lNGY2LTQwMDAtYjcyOS1hZTNmMDAyOGEyODksNmExZDAwMDAtNWQxYS0wMDE1LTBlNmMtMDhkYzM3OTUzMmU5LDc2MzlhMDQ4LTdjZmUtNDBiNS1hNDFkLWFlM2YwMDNiODlkZiw4YmM4ZjQ1YS05MWY4LTQ5NzMtYjE4Mi1hZTNmMDAzYWI4NTUsYTljMjAwMDAtNWRiNi0wMDE1LTQ1YWItMDhkYWIxYmZlMjIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlF14bqjbiBMw70gTWFpIiwiQ8OSSSIsIkNTS0ggLSBMw6BpIiwiS2hvIFBoxrDhu5tjLSBLaeG7h3QiLCJRdeG6o24gTMO9IEtobyAtIEJvIl0sImp0aSI6ImM0MTI0NmE0LTMxNGQtNDg0Zi1iZWIzLTg1MDY3NGNjMTBmMiIsImlhdCI6IjE3NjE2MzY4NzciLCJuYmYiOjE3NjE2MzY4NzcsImV4cCI6MTc2MjkzMjg3NywiaXNzIjoiaHR0cHM6Ly90b21hdG8udHBvcy52biIsImF1ZCI6Imh0dHBzOi8vdG9tYXRvLnRwb3Mudm4saHR0cHM6Ly90cG9zLnZuIn0.SqQ5LPylN1mZN7oQwOGRxZiVZQqaezmxL3k1dIukLVM
+accept-encoding:gzip, deflate, br
+accept-language:vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7
+content-type:application/json;charset=UTF-8
+origin:https://tomato.tpos.vn
+referer:https://tomato.tpos.vn/
+sec-ch-ua:"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"
+sec-ch-ua-mobile:?0
+sec-ch-ua-platform:"Windows"
+sec-fetch-dest:empty
+sec-fetch-mode:cors
+sec-fetch-site:same-origin
+tposappversion:5.10.26.1
+user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+x-request-id:{{$guid}}
+x-requested-with: XMLHttpRequest
+

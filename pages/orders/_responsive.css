@@ -1,33 +1,341 @@
-/* Responsive */
+/* ===== RESPONSIVE STYLES ===== */
+
+@media (max-width: 1024px) {
+    .main-content-area {
+        padding: 24px;
+    }
+    
+    .order-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .product-table-wrapper {
+        overflow-x: auto;
+    }
+}
+
 @media (max-width: 768px) {
+    /* Header */
     .orders-header {
         flex-direction: column;
         gap: 16px;
+        padding: 20px 0;
+    }
+    
+    .orders-header .header-content {
+        margin-right: 0;
+    }
+    
+    .header-content h1 {
+        font-size: 24px;
+    }
+    
+    .header-content p {
+        font-size: 14px;
+    }
+    
+    .btn-create-order {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        justify-content: center;
+        margin-top: 16px;
     }
 
+    /* Main Content */
+    .main-content-area {
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 16px;
+    }
+
+    /* Stats Grid */
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        padding: 20px;
     }
 
+    /* Navigation Tabs */
+    .nav-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px;
+        gap: 6px;
+    }
+    
+    .nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .tab-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    /* Section Header */
     .section-header {
         flex-direction: column;
         align-items: stretch;
+        padding: 20px 0;
+        gap: 16px;
     }
 
     .export-buttons {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+    
+    .btn-export {
+        width: 100%;
         justify-content: center;
     }
 
+    /* Filters */
+    .filters-section {
+        padding: 20px 0;
+    }
+    
+    .date-filters {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
     .filter-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 16px;
     }
 
     .search-box {
         min-width: auto;
+        width: 100%;
+    }
+    
+    .quick-filter,
+    .status-filter {
+        width: 100%;
+    }
+    
+    .quick-filter select,
+    .status-filter select {
+        width: 100%;
     }
 
-    .date-filters {
+    /* Orders Table */
+    .orders-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+    }
+    
+    .orders-table table {
+        min-width: 1000px;
+    }
+    
+    .orders-table thead th,
+    .orders-table tbody td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        padding: 12px;
+    }
+    
+    .modal-content {
+        height: 98vh;
+        border-radius: 16px;
+        max-width: 100%;
+    }
+    
+    .modal-header,
+    .modal-footer {
+        padding: 16px 20px;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .modal-header .btn-clear,
+    .modal-header .btn-close {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .modal-footer {
+        flex-wrap: wrap;
+    }
+    
+    .modal-footer button {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    /* Form Grid */
+    .order-info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    /* Product List */
+    .product-list-section {
+        padding: 16px;
+        margin-top: 20px;
+    }
+    
+    .product-list-header {
         flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .btn-select-from-inventory {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .product-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Order Summary */
+    .order-summary {
+        max-width: 100%;
+        padding: 16px;
+    }
+    
+    .summary-row {
+        font-size: 14px;
+    }
+    
+    .summary-row.total {
+        font-size: 18px;
+    }
+
+    /* Variant Selector */
+    .variant-selector-panel {
+        width: 95%;
+        max-width: 500px;
+    }
+    
+    .variant-selector-body {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .header-content h1 {
+        font-size: 20px;
+    }
+    
+    .header-content p {
+        font-size: 13px;
+    }
+    
+    .btn-create-order {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    .main-content-area {
+        padding: 16px;
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .stat-value {
+        font-size: 20px;
+    }
+    
+    .tab-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    .modal-content {
+        height: 100vh;
+        border-radius: 0;
+    }
+    
+    .modal-overlay {
+        padding: 0;
+    }
+}
+
+/* Landscape tablets and small desktops */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .order-info-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Large desktops */
+@media (min-width: 1440px) {
+    .main-content-area {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .orders-header {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn-create-order,
+    .export-buttons,
+    .filters-section,
+    .nav-tabs,
+    .action-buttons {
+        display: none !important;
+    }
+    
+    .main-content-area {
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .orders-table {
+        page-break-inside: auto;
+    }
+    
+    .orders-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
     }
 }

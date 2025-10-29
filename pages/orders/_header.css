@@ -1,60 +1,106 @@
-/* Header */
+/* ===== HEADER STYLES ===== */
 .orders-header {
-    /* Removed flex properties as button is now fixed */
     margin-bottom: 32px;
-    padding: 24px 0;
+    padding: 32px 0;
+    position: relative;
 }
 
 .orders-header .header-content {
-    /* Add margin-right to make space for the fixed button */
-    margin-right: 150px; /* Adjust as needed for button width + spacing */
+    margin-right: 180px;
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .header-content h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #ffffff; /* Changed to white for better contrast */
-    margin: 0 0 8px 0;
+    font-size: 36px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-content p {
-    font-size: 16px;
-    color: #e0e0e0; /* Changed to a lighter grey for better contrast */
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.9);
     margin: 0;
+    font-weight: 400;
+    letter-spacing: 0.2px;
 }
 
-/* Styles for the fixed 'Create Order' button */
+/* Fixed 'Create Order' Button */
 .btn-create-order {
     position: fixed;
-    top: 20px; /* Aligns with body padding */
-    right: 20px; /* Aligns with body padding */
-    z-index: 1001; /* Ensure it's above other content */
+    top: 24px;
+    right: 24px;
+    z-index: 1001;
     
-    /* Keep existing button styles */
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    letter-spacing: 0.3px;
+}
+
+.btn-create-order i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
 }
 
 .btn-create-order:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
 }
 
-/* Responsive adjustments for header content */
+.btn-create-order:hover i {
+    transform: rotate(90deg);
+}
+
+.btn-create-order:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .orders-header .header-content {
-        margin-right: 0; /* Remove margin on small screens */
+    .orders-header {
+        padding: 24px 0;
     }
-    /* The fixed button will naturally overlap less or be positioned fine */
+    
+    .orders-header .header-content {
+        margin-right: 0;
+    }
+    
+    .header-content h1 {
+        font-size: 28px;
+    }
+    
+    .header-content p {
+        font-size: 15px;
+    }
+    
+    .btn-create-order {
+        top: 16px;
+        right: 16px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
 }

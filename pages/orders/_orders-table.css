@@ -1,264 +1,341 @@
-/* Orders Table */
+/* ===== ORDERS TABLE ===== */
 .orders-table {
-    overflow-x: auto; /* Keep for fallback, but aim to avoid */
+    overflow-x: auto;
+    border-radius: 12px;
+    margin-top: 24px;
 }
 
 .orders-table table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Ensure columns respect specified widths */
+    table-layout: fixed;
+    background: white;
 }
 
 .orders-table thead th,
 .orders-table tbody td {
-    padding: 12px 8px; /* Reduced padding for more space */
+    padding: 14px 10px;
     text-align: center;
     vertical-align: middle;
     border-bottom: 1px solid #f1f5f9;
-    word-wrap: break-word; /* Allow long text to wrap */
-    overflow: hidden; /* Hide overflow if content is too large */
-    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .orders-table thead th {
-    background: #f8fafc;
-    font-weight: 600;
-    color: #475569;
-    font-size: 12px; /* Slightly smaller font for headers */
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    font-weight: 700;
+    color: #64748b;
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #e2e8f0;
-    white-space: normal; /* Allow header text to wrap */
+    letter-spacing: 0.8px;
+    border-bottom: 3px solid #e2e8f0;
+    white-space: normal;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .orders-table tbody td {
     color: #334155;
-    font-size: 13px; /* Slightly smaller font for content */
-    overflow: visible; /* Allow content to overflow when zoomed */
+    font-size: 13px;
+    overflow: visible;
+    transition: background-color 0.2s ease;
+}
+
+.orders-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.orders-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Column Widths */
-.orders-table th:nth-child(1), .orders-table td:nth-child(1) { width: 90px; } /* Ngày đặt */
-.orders-table th:nth-child(2), .orders-table td:nth-child(2) { width: 110px; } /* Nhà cung cấp */
-.orders-table th:nth-child(3), .orders-table td:nth-child(3) { width: 90px; } /* Hóa đơn (VND) */
-.orders-table th:nth-child(4), .orders-table td:nth-child(4) { width: 160px; } /* Tên sản phẩm */
-.orders-table th:nth-child(5), .orders-table td:nth-child(5) { width: 90px; } /* Mã sản phẩm */
-.orders-table th:nth-child(6), .orders-table td:nth-child(6) { width: 110px; } /* Biến thể */
-.orders-table th:nth-child(7), .orders-table td:nth-child(7) { width: 50px; } /* Số lượng */
-.orders-table th:nth-child(8), .orders-table td:nth-child(8) { width: 90px; } /* Giá mua (VND) */
-.orders-table th:nth-child(9), .orders-table td:nth-child(9) { width: 90px; } /* Giá bán (VND) */
-.orders-table th:nth-child(10), .orders-table td:nth-child(10) { width: 110px; } /* Ghi chú */
-.orders-table th:nth-child(11), .orders-table td:nth-child(11) { width: 90px; } /* Trạng thái */
-.orders-table th:nth-child(12), .orders-table td:nth-child(12) { width: 50px; } /* Chỉnh sửa ĐH */
-.orders-table th:nth-child(13), .orders-table td:nth-child(13) { width: 70px; } /* Thao tác */
+.orders-table th:nth-child(1), .orders-table td:nth-child(1) { width: 95px; }
+.orders-table th:nth-child(2), .orders-table td:nth-child(2) { width: 115px; }
+.orders-table th:nth-child(3), .orders-table td:nth-child(3) { width: 95px; }
+.orders-table th:nth-child(4), .orders-table td:nth-child(4) { width: 165px; }
+.orders-table th:nth-child(5), .orders-table td:nth-child(5) { width: 95px; }
+.orders-table th:nth-child(6), .orders-table td:nth-child(6) { width: 115px; }
+.orders-table th:nth-child(7), .orders-table td:nth-child(7) { width: 55px; }
+.orders-table th:nth-child(8), .orders-table td:nth-child(8) { width: 95px; }
+.orders-table th:nth-child(9), .orders-table td:nth-child(9) { width: 95px; }
+.orders-table th:nth-child(10), .orders-table td:nth-child(10) { width: 115px; }
+.orders-table th:nth-child(11), .orders-table td:nth-child(11) { width: 95px; }
+.orders-table th:nth-child(12), .orders-table td:nth-child(12) { width: 55px; }
+.orders-table th:nth-child(13), .orders-table td:nth-child(13) { width: 75px; }
 
-
-/* Separator for different suppliers */
+/* Supplier Separator */
 .orders-table .supplier-separator {
-    height: 1px; /* Make the row very thin */
+    height: 1px;
     padding: 0;
     background-color: transparent;
-    border-bottom: 2px dashed #cbd5e1; /* Dashed line */
+    border-bottom: 2px dashed #cbd5e1;
 }
 
-/* Table specific styles */
+/* Table Specific Styles */
 .order-date {
     display: flex;
-    flex-direction: column; /* Stack date and time */
+    flex-direction: column;
     align-items: center;
-    gap: 4px; /* Reduced gap */
+    gap: 6px;
     font-size: 13px;
     justify-content: center;
 }
 
 .order-date i {
-    color: #6b7280;
-    width: 14px; /* Smaller icon */
-    height: 14px;
+    color: #667eea;
+    width: 16px;
+    height: 16px;
 }
 
 .supplier-info {
-    font-size: 13px; /* Slightly smaller font */
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: #1e293b;
 }
 
 .supplier-qty {
-    font-size: 11px; /* Smaller font */
-    color: #64748b;
-    margin-top: 2px;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 3px;
+    font-weight: 600;
 }
 
 .invoice-info {
     display: flex;
-    flex-direction: column; /* Stack image and value */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .invoice-images {
     display: flex;
-    gap: 4px;
+    gap: 6px;
 }
 
 .invoice-image {
-    width: 50px; /* Smaller image */
-    height: 50px; /* Smaller image */
-    border-radius: 6px;
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #e2e8f0;
-    position: relative; /* Enable positioning for zoom */
-    z-index: 1; /* Ensure it's above other content when not hovered */
+    border: 2px solid #e2e8f0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Remove hover zoom effect, now handled by JS lightbox */
 .invoice-image:hover {
-    /* No longer needed, JS will handle */
+    transform: scale(1.05);
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .invoice-value {
-    font-weight: 600;
-    color: #059669;
-    font-size: 13px; /* Smaller font */
+    font-weight: 700;
+    color: #10b981;
+    font-size: 14px;
 }
 
 .product-name {
-    font-weight: 600;
+    font-weight: 700;
     color: #1e293b;
-    font-size: 13px; /* Smaller font */
-    line-height: 1.4;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .product-code {
-    font-family: monospace;
-    background: #f1f5f9;
-    padding: 2px 4px; /* Reduced padding */
-    border-radius: 4px;
-    font-size: 11px; /* Smaller font */
-    color: #3b82f6;
-    font-weight: 600;
-    white-space: normal; /* Allow code to wrap */
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #667eea;
+    font-weight: 700;
+    white-space: normal;
+    border: 1px solid #cbd5e1;
 }
 
 .variant {
     color: #64748b;
-    font-size: 12px; /* Smaller font */
-    white-space: normal; /* Allow variant to wrap */
+    font-size: 12px;
+    white-space: normal;
+    font-weight: 500;
 }
 
 .quantity {
-    font-weight: 600;
+    font-weight: 700;
     color: #1e293b;
     text-align: center;
-    font-size: 13px; /* Smaller font */
+    font-size: 14px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
 }
 
 .price {
-    font-weight: 600;
-    color: #059669;
-    font-size: 13px; /* Smaller font */
+    font-weight: 700;
+    color: #10b981;
+    font-size: 14px;
 }
 
 .price-cell {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    position: relative; /* Add position relative to parent for absolute positioning of zoomed image */
-    overflow: visible; /* Allow content to overflow when zoomed */
-}
-
-/* Remove hover zoom effect, now handled by JS lightbox */
-.price-cell .price-image:hover,
-.price-cell .image-placeholder.price-image:hover,
-.orders-table td:nth-child(3) .invoice-image:hover,
-.orders-table td:nth-child(3) .image-placeholder.invoice-image:hover {
-    /* No longer needed, JS will handle */
+    gap: 6px;
+    position: relative;
+    overflow: visible;
 }
 
 .price-image {
-    width: 50px; /* Smaller image */
-    height: 50px; /* Smaller image */
-    border-radius: 6px;
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #e2e8f0;
-    position: relative; /* Enable positioning for zoom */
-    z-index: 1; /* Ensure it's above other content when not hovered */
+    border: 2px solid #e2e8f0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.price-image:hover {
+    transform: scale(1.05);
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .image-placeholder {
-    width: 50px; /* Smaller placeholder */
-    height: 50px; /* Smaller placeholder */
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    border: 2px dashed #cbd5e1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px; /* Smaller font for placeholder text */
+    font-size: 10px;
     color: #94a3b8;
-    background-color: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     text-align: center;
-    position: relative; /* Enable positioning for zoom */
-    z-index: 1; /* Ensure it's above other content when not hovered */
-}
-
-/* Remove hover zoom effect, now handled by JS lightbox */
-.image-placeholder:hover {
-    /* No longer needed, JS will handle */
+    position: relative;
+    z-index: 1;
+    font-weight: 600;
 }
 
 .price-text {
-    font-size: 11px; /* Smaller font */
+    font-size: 11px;
     color: #64748b;
+    font-weight: 600;
 }
 
 .status-badge {
     display: inline-block;
-    padding: 3px 8px; /* Reduced padding */
-    border-radius: 10px; /* Smaller border-radius */
-    font-size: 11px; /* Smaller font */
-    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap; /* Prevent status badge from wrapping */
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .status-waiting {
-    background: #dbeafe;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #1e40af;
+    border: 1px solid #93c5fd;
 }
 
 .status-delivered {
-    background: #dcfce7;
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
     color: #166534;
+    border: 1px solid #86efac;
 }
 
 .status-cancelled {
-    background: #fee2e2;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
     color: #dc2626;
+    border: 1px solid #fca5a5;
 }
 
 .action-buttons {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px; /* Reduced gap */
+    gap: 6px;
 }
 
 .btn-edit, .btn-delete {
-    width: 28px; /* Smaller buttons */
-    height: 28px; /* Smaller buttons */
-    padding: 0; /* Remove padding */
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-edit {
+    color: #667eea;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-delete {
+    color: #ef4444;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn-edit i, .btn-delete i {
-    width: 16px; /* Smaller icons */
+    width: 16px;
     height: 16px;
+    font-size: 16px;
 }
 
 .checkbox {
-    width: 16px; /* Smaller checkbox */
-    height: 16px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+    accent-color: #667eea;
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .orders-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .orders-table thead th,
+    .orders-table tbody td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
 }
