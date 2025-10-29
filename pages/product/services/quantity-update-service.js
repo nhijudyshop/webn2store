@@ -32,7 +32,7 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
             throw new Error("Không thể lấy mẫu payload cập nhật số lượng từ TPOS.");
         }
 
-        // The template response contains an array of objects, each representing a variant.
+        // The template response contains an an array of objects, each representing a variant.
         // We need to find the specific variant(s) and update their NewQuantity.
         const modifiedTemplate = templateResponse.value.map(item => {
             const variantId = item.Product.Id;
@@ -49,9 +49,10 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
         });
 
         // Step 2: Post Changed Quantities
+        // CORRECTED: Use "model" key instead of "value"
         const postQtyResponse = await tposRequest('/api/stock-change-post-qty', {
             method: 'POST',
-            body: { value: modifiedTemplate } // Wrap the array in a 'value' property as per TPOS OData standard
+            body: { model: modifiedTemplate } // Corrected to use 'model'
         });
 
         if (!postQtyResponse || !Array.isArray(postQtyResponse.value) || postQtyResponse.value.length === 0) {
