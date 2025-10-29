@@ -1,7 +1,7 @@
 [
   {
     "id": 109565,
-    "timestamp": "2025-10-29T06:03:10.469Z",
+    "timestamp": "2025-10-29T06:51:24.667Z",
     "productCode": "TEST55",
     "productName": "Test55",
     "product": {
@@ -15,7 +15,7 @@
       "ListPrice": 1000,
       "DiscountSale": 0,
       "DiscountPurchase": 0,
-      "PurchasePrice": 0,
+      "PurchasePrice": 200,
       "StandardPrice": 0,
       "SaleOK": true,
       "PurchaseOK": true,
@@ -28,8 +28,8 @@
       "IsProductVariant": false,
       "EAN13": null,
       "DefaultCode": "TEST55",
-      "QtyAvailable": 0,
-      "VirtualAvailable": 0,
+      "QtyAvailable": 3,
+      "VirtualAvailable": 3,
       "OutgoingQty": 0,
       "IncomingQty": 0,
       "PropertyCostMethod": null,
@@ -72,7 +72,7 @@
       "EnableAll": false,
       "ComboPurchased": null,
       "TaxAmount": null,
-      "Version": 5873,
+      "Version": 5875,
       "VariantFirstId": null,
       "VariantFistId": null,
       "ZaloProductId": null,
@@ -491,8 +491,8 @@
           "UOMId": 1,
           "UOMName": null,
           "UOMPOId": 1,
-          "QtyAvailable": 0,
-          "VirtualAvailable": 0,
+          "QtyAvailable": 3,
+          "VirtualAvailable": 3,
           "OutgoingQty": null,
           "IncomingQty": null,
           "NameGet": "[TEST55D] Test55 (Đen)",
@@ -512,7 +512,7 @@
           "PurchasePrice": null,
           "DiscountSale": null,
           "DiscountPurchase": null,
-          "StandardPrice": 0,
+          "StandardPrice": 3333,
           "Weight": 0,
           "Volume": null,
           "OldPrice": null,
@@ -775,7 +775,7 @@
         }
       ]
     },
-    "savedAt": "13:03:10 29/10/2025"
+    "savedAt": "13:51:24 29/10/2025"
   },
   {
     "id": 106011,
