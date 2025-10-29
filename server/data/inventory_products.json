@@ -1,7 +1,7 @@
 [
   {
     "id": 109565,
-    "timestamp": "2025-10-29T13:28:29.619Z",
+    "timestamp": "2025-10-29T13:40:40.612Z",
     "productCode": "TEST55",
     "productName": "Test55",
     "product": {
@@ -67,7 +67,7 @@
       "EnableAll": false,
       "ComboPurchased": null,
       "TaxAmount": null,
-      "Version": 5950,
+      "Version": 5952,
       "VariantFirstId": null,
       "VariantFistId": null,
       "ZaloProductId": null,
@@ -339,7 +339,7 @@
           "VirtualAvailable": 0,
           "OutgoingQty": null,
           "IncomingQty": null,
-          "NameGet": "[TEST55T] Test55 (DDeen)",
+          "NameGet": "[TEST55T] Test55 (Đỏ) zzzz",
           "POSCategId": null,
           "Price": null,
           "Barcode": "TEST55T",
@@ -765,7 +765,7 @@
         }
       ]
     },
-    "savedAt": "20:28:29 29/10/2025"
+    "savedAt": "20:40:40 29/10/2025"
   },
   {
     "id": 106011,
