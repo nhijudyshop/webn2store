@@ -203,23 +203,23 @@ export function openEditModal() {
             value="${typeof variant.PriceVariant === 'number' ? variant.PriceVariant : (typeof variant.ListPrice === 'number' ? variant.ListPrice : 0)}"
           />
         </td>
-        <td> <!-- ADDED <td> tag here -->
+        <td>
           <input 
             type="number" 
             class="quantity-input" 
             data-field="QtyAvailable"
             value="${variant.QtyAvailable || 0}"
-            disabled
           />
-        </td> <!-- ADDED </td> tag here -->
-        <td> <!-- ADDED <td> tag here -->
+        </td>
+        <td>
           <input 
             type="number" 
             class="quantity-input" 
             data-field="VirtualAvailable"
             value="${variant.VirtualAvailable || 0}"
+            disabled
           />
-        </td> <!-- ADDED </td> tag here -->
+        </td>
       `;
       variantsTbody.appendChild(row);
     });
