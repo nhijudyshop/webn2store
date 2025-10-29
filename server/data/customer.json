@@ -38,5 +38,213 @@
     "Phone": "0935775355",
     "Credit": 0,
     "StatusText": "Bình thường"
+  },
+  "0768156330": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0768156330",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0966510467": {
+    "Id": 563327,
+    "Name": "Bạch Ngọc Thiên",
+    "Street": "",
+    "Phone": "0966510467",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0941569181": {
+    "Id": 562344,
+    "Name": "Thị Tuyết",
+    "Street": "Ap 5a xa truong xuan huyen thap muoii dong thap",
+    "Phone": "0941569181",
+    "Credit": 0,
+    "StatusText": "Bom hàng"
+  },
+  "0902318171": {
+    "Id": 556421,
+    "Name": "Cherry Loan",
+    "Street": "260A Khu Vực 1, Thị trấn Đức Hòa, Huyện Đức Hòa, Tỉnh Long An",
+    "Phone": "0902318171",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0366004506": {
+    "Id": 563076,
+    "Name": "Thuy Danh",
+    "Street": "Ấp 7 Chợ, Xã Đông Thái, Huyện An Biên, Tỉnh Kiên Giang",
+    "Phone": "0366004506",
+    "Credit": 265000,
+    "StatusText": "Bình thường"
+  },
+  "0792112295": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0792112295",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0911621985": {
+    "Id": 542585,
+    "Name": "Hiền Trần",
+    "Street": "Số nhà 6 ngõ 106 ngách 4 trường chinh phường lãm hà kiến an Hải Phòng",
+    "Phone": "0911621985",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0808960527": {
+    "Id": 426160,
+    "Name": "Thương Bui Hoài",
+    "Street": "7/5 Đường Dương Tự Quán, Phường An Lạc A, Quận Bình Tân, Thành phố Hồ Chí Minh",
+    "Phone": "0808960527",
+    "Credit": 0,
+    "StatusText": "Bom hàng"
+  },
+  "0978982277": {
+    "Id": 563234,
+    "Name": "Lài Nguyễn",
+    "Street": "",
+    "Phone": "0978982277",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0965295257": {
+    "Id": 542576,
+    "Name": "Huong Tran",
+    "Street": "ấp ninh an xã bàu năng huyện dương minh châu tây ninh",
+    "Phone": "0965295257",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0902346655": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0902346655",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0813455444": {
+    "Id": 186934,
+    "Name": "Nguyễn Phúc",
+    "Street": "",
+    "Phone": "0813455444",
+    "Credit": 0,
+    "StatusText": "Bom hàng"
+  },
+  "0878777773": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0878777773",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0934319309": {
+    "Id": 563343,
+    "Name": "Hồng Phượng",
+    "Street": "",
+    "Phone": "0934319309",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0337766772": {
+    "Id": 516964,
+    "Name": "Quỳnh Liên",
+    "Street": "Phường Mỹ Hòa, Thành phố Long Xuyên, Tỉnh An Giang",
+    "Phone": "0337766772",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0976872940": {
+    "Id": 560910,
+    "Name": "Thao Thao",
+    "Street": "1115/14 TỈNH LỘ 43, PHƯỜNG BÌNH CHIỂU, THỦ ĐỨC",
+    "Phone": "0976872940",
+    "Credit": 510000,
+    "StatusText": "Cảnh báo"
+  },
+  "0919524924": {
+    "Id": 144084,
+    "Name": "Lan Hồ",
+    "Street": "đầu cầu mương kinh-xã phú thọ- phú tân- an giang",
+    "Phone": "0919524924",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0902325292": {
+    "Id": 563346,
+    "Name": "Van Linh",
+    "Street": "",
+    "Phone": "0902325292",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0948777656": {
+    "Id": 545271,
+    "Name": "Vy Thai",
+    "Street": "ẤP MỸ QUÝ , TT MỸ LƯU , CHỢ MỚI , AN GIANG",
+    "Phone": "0948777656",
+    "Credit": 0,
+    "StatusText": "Bom hàng"
+  },
+  "0916407407": {
+    "Id": 563348,
+    "Name": "Anna Bella",
+    "Street": "",
+    "Phone": "0916407407",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0788801898": {
+    "Id": 558313,
+    "Name": "Kim Ngân Bùi",
+    "Street": "145/28 đường 12 bình hưng hoà bình tân hcm",
+    "Phone": "0788801898",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0924967034": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0924967034",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0704401029": {
+    "Id": 389665,
+    "Name": "Alice Lê",
+    "Street": "19/4 Ấp Bàu Sim Đường Số 10, Xã Tân Thông Hội, Huyện Củ Chi, Thành phố Hồ Chí Minh",
+    "Phone": "0704401029",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0906969218": {
+    "Id": 559019,
+    "Name": "Ngọc Huỳnh",
+    "Street": "576/141/7 Đoàn Văn Bơ, Phường 14, Quận 4, Thành phố Hồ Chí Minh",
+    "Phone": "0906969218",
+    "Credit": 0,
+    "StatusText": "Bình thường"
+  },
+  "0846477775": {
+    "Id": null,
+    "Name": "",
+    "Street": "",
+    "Phone": "0846477775",
+    "Credit": 0,
+    "StatusText": "Khách lạ"
+  },
+  "0989029786": {
+    "Id": 563352,
+    "Name": "Hoa Lê",
+    "Street": "",
+    "Phone": "0989029786",
+    "Credit": 0,
+    "StatusText": "Bình thường"
   }
 }
