@@ -10,6 +10,7 @@ import { closeVariantSelector, handleVariantSelection, activeVariantInput } from
 import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 import { quantityTransferState } from './edit-modal/state.js'; // NEW: Import quantityTransferState
 import { currentProduct } from './inventory-state.js'; // NEW: Import currentProduct
+import { updateTransferQuantitiesDisplay } from './edit-modal/ui-manager.js'; // Import for updating display
 
 // ===== GLOBAL EXPORTS (for HTML onclicks) =====
 window.clearData = clearData;
@@ -112,6 +113,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleTransferQuantityChange(variantIndex, delta);
         });
     });
+
+    // NEW: Event listener for the "Lưu chuyển đổi số lượng" button
+    document.getElementById('saveQuantityTransferBtn')?.addEventListener('click', saveQuantityTransfer);
 
     initImageLightbox(); // Initialize lightbox for all images on the page
 
