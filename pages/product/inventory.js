@@ -76,6 +76,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    // Event listeners for quantity transfer buttons
+    document.getElementById('transferVariant1')?.addEventListener('change', (e) => {
+        const variantId = parseInt(e.target.value, 10);
+        quantityTransferState.variant1 = currentProduct.ProductVariants.find(v => v.Id === variantId);
+        quantityTransferState.initialQty1 = quantityTransferState.variant1?.QtyAvailable || 0;
+        quantityTransferState.currentQty1 = quantityTransferState.initialQty1;
+        
+        // Repopulate select2 to exclude selected variant1
+        populateTransferVariantSelect(document.getElementById('transferVariant2'), variantId);
+        // Reset variant2 if it was the same as variant1
+        if (quantityTransferState.variant2?.Id === variantId) {
+            quantityTransferState.variant2 = null;
+            document.getElementById('transferVariant2').value = "";
+            quantityTransferState.initialQty2 = 0;
+            quantityTransferState.currentQty2 = 0;
+        }
+        updateTransferQuantitiesDisplay();
+    });
+
+    document.getElementById('transferVariant2')?.addEventListener('change', (e) => {
+        const variantId = parseInt(e.target.value, 10);
+        quantityTransferState.variant2 = currentProduct.ProductVariants.find(v => v.Id === variantId);
+        quantityTransferState.initialQty2 = quantityTransferState.variant2?.QtyAvailable || 0;
+        quantityTransferState.currentQty2 = quantityTransferState.initialQty2;
+        updateTransferQuantitiesDisplay();
+    });
+
+    document.querySelectorAll('.qty-controls .btn-qty-control').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const variantIndex = parseInt(e.currentTarget.dataset.variantIndex, 10);
+            const delta = parseInt(e.currentTarget.dataset.delta, 10);
+            handleTransferQuantityChange(variantIndex, delta);
+        });
+    });
+
     initImageLightbox(); // Initialize lightbox for all images on the page
 
     console.log("Inventory page initialized (modular).");
