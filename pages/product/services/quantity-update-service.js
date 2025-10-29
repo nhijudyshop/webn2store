@@ -36,13 +36,19 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
         // We need to find the specific variant(s) and update their NewQuantity.
         const modifiedTemplate = templateResponse.value.map(item => {
             const variantId = item.Product.Id;
-            if (changedQtyMap.hasOwnProperty(variantId)) {
-                return {
-                    ...item,
-                    NewQuantity: changedQtyMap[variantId]
-                };
+            const newItem = { ...item }; // Create a mutable copy
+
+            // Remove QtyAvailable and VirtualAvailable from the nested Product object
+            // as they are not meant to be sent back in this step.
+            if (newItem.Product) {
+                delete newItem.Product.QtyAvailable;
+                delete newItem.Product.VirtualAvailable;
             }
-            return item;
+            
+            if (changedQtyMap.hasOwnProperty(variantId)) {
+                newItem.NewQuantity = changedQtyMap[variantId];
+            }
+            return newItem;
         });
 
         // Step 2: Post Changed Quantities
