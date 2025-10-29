@@ -38,12 +38,8 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
             const variantId = item.Product.Id;
             const newItem = { ...item }; // Create a mutable copy
 
-            // Remove QtyAvailable and VirtualAvailable from the nested Product object
-            // as they are not meant to be sent back in this step.
-            if (newItem.Product) {
-                delete newItem.Product.QtyAvailable;
-                delete newItem.Product.VirtualAvailable;
-            }
+            // Do NOT remove QtyAvailable and VirtualAvailable from the nested Product object.
+            // NewQuantity is set at the top level of newItem.
             
             if (changedQtyMap.hasOwnProperty(variantId)) {
                 newItem.NewQuantity = changedQtyMap[variantId];
