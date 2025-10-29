@@ -306,11 +306,13 @@ export async function saveProductChanges(event) {
         payload.ListPrice = newListPrice;
         payload.StandardPrice = payload.PurchasePrice;
 
+        let imageUpdated = false;
         const imgElement = document.querySelector('#editImageDropzone img');
         if (imgElement && imgElement.src.startsWith('data:image')) {
             payload.Image = await getImageAsBase64(imgElement);
             payload.ImageUrl = null;
             if (payload.Images) payload.Images = [];
+            imageUpdated = true;
         }
 
         // LẤY TÊN BIẾN THỂ ĐÃ SỬA VÀ ÁP DỤNG VÀO PAYLOAD (không đụng đến số lượng)
@@ -393,9 +395,39 @@ export async function saveProductChanges(event) {
             });
         }
 
-        // Send the update request (tên/giá/hình ảnh, KHÔNG gửi số lượng qua payload này)
-        await tposRequest('/api/products/update', { method: 'POST', body: payload });
-        console.log("✅ Product update request sent.");
+        // Xác định có thay đổi ngoài số lượng hay không
+        const topLevelChanged =
+            (newName !== (currentProduct.Name || '')) ||
+            (payload.PurchasePrice !== (currentProduct.PurchasePrice || 0)) ||
+            (newListPrice !== (currentProduct.ListPrice || 0)) ||
+            imageUpdated;
+
+        const variantEditsExist = (currentProduct.ProductVariants || []).some(v => {
+            const nameEdited = editedNames[v.Id];
+            const priceEdited = editedPrices[v.Id];
+            const currentName = v.NameGet || v.Name || '';
+            const currentPrice = (typeof v.PriceVariant === 'number' ? v.PriceVariant :
+                                  (typeof v.ListPrice === 'number' ? v.ListPrice : 0));
+            const nameChanged = (nameEdited !== undefined) && (nameEdited !== currentName);
+            const priceChanged = (priceEdited !== undefined) && (priceEdited !== currentPrice);
+            return nameChanged || priceChanged;
+        });
+
+        // Nếu không có tồn (đang tái tạo biến thể) thì chắc chắn cần cập nhật
+        const requiresProductUpdate = !hasStock || topLevelChanged || variantEditsExist;
+
+        // Gửi cập nhật tên/giá/hình ảnh nếu cần; nếu lỗi, vẫn tiếp tục xử lý số lượng
+        if (requiresProductUpdate) {
+            try {
+                await tposRequest('/api/products/update', { method: 'POST', body: payload });
+                console.log("✅ Product update request sent.");
+            } catch (e) {
+                console.warn("⚠️ Không thể cập nhật tên/giá qua API nội bộ:", e);
+                window.showNotification("Không thể cập nhật tên/giá sản phẩm (API nội bộ chưa sẵn sàng). Vẫn tiếp tục cập nhật số lượng.", "warning");
+            }
+        } else {
+            console.log("ℹ️ Chỉ thay đổi số lượng. Bỏ qua /api/products/update.");
+        }
 
         // Nếu có biến thể đổi số lượng, thực hiện quy trình 3 bước
         if (Object.keys(changedQtyMap).length > 0) {
