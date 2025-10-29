@@ -44,52 +44,30 @@ export async function saveProductChanges(event) {
       imageUpdated = true;
     }
 
-    // Collect variant edits
+    // Collect variant name and price edits from the table (for existing variants)
     const variantsTbody = document.getElementById('editVariantsTableBody');
-
     const editedNames = {};
-    variantsTbody?.querySelectorAll('tr').forEach(row => {
-      const id = parseInt(row.dataset.variantId, 10);
-      const input = row.querySelector('.variant-name-input');
-      if (!Number.isNaN(id) && input) {
-        editedNames[id] = input.value.trim();
-      }
-    });
-
     const editedPrices = {};
+
     variantsTbody?.querySelectorAll('tr').forEach(row => {
       const id = parseInt(row.dataset.variantId, 10);
+      const nameInput = row.querySelector('.variant-name-input');
       const priceInput = row.querySelector('.price-input');
-      if (!Number.isNaN(id) && priceInput) {
-        const val = parseFloat(priceInput.value);
-        if (!Number.isNaN(val)) {
-          editedPrices[id] = val;
+      
+      if (!Number.isNaN(id)) {
+        if (nameInput) {
+          editedNames[id] = nameInput.value.trim();
+        }
+        if (priceInput) {
+          const val = parseFloat(priceInput.value);
+          if (!Number.isNaN(val)) {
+            editedPrices[id] = val;
+          }
         }
       }
     });
 
-    const editedQtyMap = {};
-    variantsTbody?.querySelectorAll('tr').forEach(row => {
-      const id = parseInt(row.dataset.variantId, 10);
-      const qtyInput = row.querySelector('input.quantity-input[data-field="QtyAvailable"]');
-      if (!Number.isNaN(id) && qtyInput) {
-        const val = parseFloat(qtyInput.value);
-        if (!Number.isNaN(val)) {
-          editedQtyMap[id] = val;
-        }
-      }
-    });
-
-    const changedQtyMap = {};
-    (currentProduct.ProductVariants || []).forEach(v => {
-      const newQty = editedQtyMap[v.Id];
-      const oldQty = v.QtyAvailable || 0;
-      if (newQty !== undefined && newQty !== oldQty) {
-        changedQtyMap[v.Id] = newQty;
-      }
-    });
-
-    // Variant structure update if no stock
+    // Check if we can update variants structure (only if no stock)
     const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
 
     if (!hasStock) {
@@ -97,7 +75,8 @@ export async function saveProductChanges(event) {
       payload.AttributeLines = buildAttributeLines(editModalState);
       payload.ProductVariants = buildProductVariants(newName, newListPrice, editModalState);
     } else {
-      console.log("📦 Stock found, skipping variant structure update.");
+      console.log("📦 Stock found, applying only variant name/price edits.");
+      // Apply edited names and prices to existing variants in payload
       if (payload.ProductVariants) {
         payload.ProductVariants = payload.ProductVariants.map(v => {
           const nameEdited = editedNames[v.Id];
@@ -113,7 +92,8 @@ export async function saveProductChanges(event) {
       }
     }
 
-    // Prevent quantity accidental updates
+    // IMPORTANT: Always remove quantity fields from variants in the payload
+    // to prevent accidental updates when saving general info.
     if (payload.ProductVariants) {
       payload.ProductVariants.forEach(v => {
         delete v.QtyAvailable;
@@ -121,53 +101,13 @@ export async function saveProductChanges(event) {
       });
     }
 
-    // Determine if non-quantity changes exist
-    const topLevelChanged =
-      (newName !== (currentProduct.Name || '')) ||
-      (payload.PurchasePrice !== (currentProduct.PurchasePrice || 0)) ||
-      (newListPrice !== (currentProduct.ListPrice || 0)) ||
-      imageUpdated;
-
-    const variantEditsExist = (currentProduct.ProductVariants || []).some(v => {
-      const nameEdited = editedNames[v.Id];
-      const priceEdited = editedPrices[v.Id];
-      const currentName = v.NameGet || v.Name || '';
-      const currentPrice = (typeof v.PriceVariant === 'number' ? v.PriceVariant :
-                            (typeof v.ListPrice === 'number' ? v.ListPrice : 0));
-      const nameChanged = (nameEdited !== undefined) && (nameEdited !== currentName);
-      const priceChanged = (priceEdited !== undefined) && (priceEdited !== currentPrice);
-      return nameChanged || priceChanged;
-    });
-
-    const requiresProductUpdate = !hasStock || topLevelChanged || variantEditsExist;
-
-    // Try update product (name/price/image), independent of quantity flow
-    if (requiresProductUpdate) {
-      try {
-        await tposRequest('/api/products/update', { method: 'POST', body: payload });
-        console.log("✅ Product update request sent.");
-      } catch (e) {
-        console.warn("⚠️ Không thể cập nhật tên/giá qua API nội bộ:", e);
-        window.showNotification("Không thể cập nhật tên/giá sản phẩm (API nội bộ chưa sẵn sàng). Vẫn tiếp tục cập nhật số lượng.", "warning");
-      }
-    } else {
-      console.log("ℹ️ Chỉ thay đổi số lượng. Bỏ qua /api/products/update.");
-    }
-
-    // Always run last: quantity updates via 3-step flow
-    if (Object.keys(changedQtyMap).length > 0) {
-      try {
-        window.showNotification("Đang cập nhật số lượng biến thể...", "info");
-        await updateVariantQuantitiesIfChanged(currentProduct.Id, changedQtyMap);
-        window.showNotification("Đã cập nhật số lượng biến thể!", "success");
-      } catch (e) {
-        console.error("Lỗi cập nhật số lượng biến thể:", e);
-        window.showNotification("Lỗi khi cập nhật số lượng biến thể: " + (e?.message || e), "error");
-      }
-    }
+    // Send the update request for product metadata and variant structure/names/prices
+    await tposRequest('/api/products/update', { method: 'POST', body: payload });
+    console.log("✅ Product metadata and variant info updated successfully.");
 
     // Refresh UI with latest data
     const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
+    
     setOriginalProductPayload(updatedProductData);
     setCurrentProduct(updatedProductData);
     setCurrentVariants(updatedProductData.ProductVariants || []);
@@ -176,14 +116,14 @@ export async function saveProductChanges(event) {
     await saveProductData(updatedProductData);
 
     closeEditModal();
-    window.showNotification("Đã cập nhật sản phẩm thành công!", "success");
+    window.showNotification("Đã cập nhật thông tin sản phẩm thành công!", "success");
 
   } catch (error) {
-    window.showNotification("Lỗi khi cập nhật sản phẩm: " + error.message, "error");
+    window.showNotification("Lỗi khi cập nhật thông tin sản phẩm: " + error.message, "error");
     console.error("Update error:", error);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = 'Lưu thay đổi';
+    btn.innerHTML = '<i data-lucide="save"></i> Lưu thay đổi';
     window.lucide.createIcons();
   }
 }
@@ -235,7 +175,7 @@ export async function saveQuantityTransfer() {
   }
 
   try {
-    await updateVariantQuantitiesIfChanged(currentProduct.Id, quantityTransferState.changedQtyMap);
+    await updateVariantQuantitiesIfChanged(quantityTransferState.changedQtyMap); // Pass only the map
     window.showNotification("Đã chuyển đổi số lượng thành công!", "success");
     
     // Refresh product data and UI
