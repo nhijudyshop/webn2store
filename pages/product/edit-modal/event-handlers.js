@@ -1,6 +1,6 @@
 // pages/product/edit-modal/event-handlers.js
 
-import { tposRequest, getProductByCode } from '../../shared/api/tpos-api.js';
+import { tposRequest, getProductByCode } from '../../../shared/api/tpos-api.js'; // Corrected path
 import { currentProduct, originalProductPayload, setOriginalProductPayload, setCurrentProduct, setCurrentVariants } from '../inventory-state.js';
 import { displayProductInfo, displayVariants } from '../product-display.js';
 import { saveProductData } from '../product-storage.js';
