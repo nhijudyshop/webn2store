@@ -9,6 +9,7 @@ import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuan
 import { closeVariantSelector, handleVariantSelection, activeVariantInput } from './variant-editor.js';
 import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 import { quantityTransferState } from './edit-modal/state.js'; // NEW: Import quantityTransferState
+import { currentProduct } from './inventory-state.js'; // NEW: Import currentProduct
 
 // ===== GLOBAL EXPORTS (for HTML onclicks) =====
 window.clearData = clearData;
