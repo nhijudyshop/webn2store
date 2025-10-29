@@ -34,7 +34,9 @@ function formatDateForApi(date, isEnd = false) {
     }
     // Convert to UTC by subtracting 7 hours (for GMT+7)
     const utcDate = new Date(d.getTime() - 7 * 60 * 60 * 1000);
-    return utcDate.toISOString().replace('.000Z', '+00:00').replace('.999Z', '+00:00');
+    // Return standard ISO 8601 format (e.g., "2025-10-28T17:00:00.000Z")
+    // This format is robust and widely accepted by OData services.
+    return utcDate.toISOString();
 }
 
 function formatDisplayDate(isoString) {
