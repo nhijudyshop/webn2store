@@ -403,7 +403,14 @@ export async function saveProductChanges(event) {
                 { method: "POST", body: { model: { ProductTmplId: tmplId } } }
             );
 
-            const templateModels = Array.isArray(defaultPayload?.model) ? defaultPayload.model : [];
+            const templateModels = Array.isArray(defaultPayload?.model)
+                ? defaultPayload.model
+                : (Array.isArray(defaultPayload?.value) ? defaultPayload.value : []);
+
+            if (templateModels.length === 0) {
+                console.warn("DefaultGetAll không trả về dữ liệu hợp lệ (model/value rỗng). Payload:", defaultPayload);
+            }
+
             // Lọc theo các SP Con cần đổi số lượng
             const modelsToChange = templateModels
                 .filter(m => editedQtyMap[m.ProductId] !== undefined)
