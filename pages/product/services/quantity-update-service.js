@@ -32,14 +32,16 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
             throw new Error("Không thể lấy mẫu payload cập nhật số lượng từ TPOS.");
         }
 
-        // The template response contains an an array of objects, each representing a variant.
+        // The template response contains an array of objects, each representing a variant.
         // We need to find the specific variant(s) and update their NewQuantity.
         const modifiedTemplate = templateResponse.value.map(item => {
             const variantId = item.Product.Id;
             const newItem = { ...item }; // Create a mutable copy
 
+            // Explicitly set LocationId to 12 as per the correct payload example
+            newItem.LocationId = 12; 
+            
             // Preserve QtyAvailable and VirtualAvailable in the nested Product object
-            // as per the user's provided payload structure.
             // No deletion is needed here.
             
             if (changedQtyMap.hasOwnProperty(variantId)) {
@@ -49,7 +51,6 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
         });
 
         // Step 2: Post Changed Quantities
-        // CORRECTED: Use "model" key instead of "value"
         const postQtyResponse = await tposRequest('/api/stock-change-post-qty', {
             method: 'POST',
             body: { model: modifiedTemplate } // Corrected to use 'model'
