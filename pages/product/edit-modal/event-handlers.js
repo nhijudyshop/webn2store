@@ -1,14 +1,14 @@
 // pages/product/edit-modal/event-handlers.js
 
-import { tposRequest, getProductByCode } from '../../../shared/api/tpos-api.js'; // Corrected path
+import { tposRequest, getProductByCode } from '../../../shared/api/tpos-api.js';
 import { currentProduct, originalProductPayload, setOriginalProductPayload, setCurrentProduct, setCurrentVariants } from '../inventory-state.js';
 import { displayProductInfo, displayVariants } from '../product-display.js';
 import { saveProductData } from '../product-storage.js';
 import { editModalState } from '../variant-editor.js';
 
-import { getImageAsBase64 } from '../utils/image-utils.js';
-import { buildAttributeLines, buildProductVariants } from '../services/variant-generation.js';
-import { updateVariantQuantitiesIfChanged } from '../services/quantity-update-service.js';
+import { getImageAsBase64 } from '../utils/image-utils.js'; // Corrected path
+import { buildAttributeLines, buildProductVariants } from '../services/variant-generation.js'; // Corrected path
+import { updateVariantQuantitiesIfChanged } from '../services/quantity-update-service.js'; // Corrected path
 import { quantityTransferState } from './state.js';
 import { closeEditModal, updateTransferQuantitiesDisplay, renderQuantityTransferTab } from './ui-manager.js';
 

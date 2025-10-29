@@ -2,8 +2,8 @@
 
 import { currentProduct, originalProductPayload } from '../inventory-state.js';
 import { editModalState, getCategoryFromAttributeId, updateVariantInput, openVariantSelector, variantData } from '../variant-editor.js';
-import { initImageLightbox } from '../../../shared/components/image-lightbox/image-lightbox.js'; // Corrected path
-import { getImageAsBase64 } from '../utils/image-utils.js';
+import { initImageLightbox } from '../../../shared/components/image-lightbox/image-lightbox.js';
+import { getImageAsBase64 } from '../utils/image-utils.js'; // Corrected path
 import { quantityTransferState } from './state.js';
 
 export function recalculateTotalQuantities() {
@@ -15,7 +15,7 @@ export function recalculateTotalQuantities() {
     const qtyInput = row.querySelector('input.quantity-input[data-field="QtyAvailable"]');
     const virtualInput = row.querySelector('input.quantity-input[data-field="VirtualAvailable"]');
     if (qtyInput) totalQty += parseInt(qtyInput.value, 10) || 0;
-    if (virtualInput) totalVirtual += parseInt(virtualInput.textContent, 10) || 0;
+    if (virtualInput) totalVirtual += parseInt(virtualInput.value, 10) || 0;
   });
 
   document.getElementById('editQtyAvailable').textContent = totalQty;
