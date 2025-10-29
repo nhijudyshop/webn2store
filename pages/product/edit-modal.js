@@ -429,14 +429,19 @@ export async function saveProductChanges(event) {
             console.log("ℹ️ Chỉ thay đổi số lượng. Bỏ qua /api/products/update.");
         }
 
-        // Nếu có biến thể đổi số lượng, thực hiện quy trình 3 bước
+        // ——— LUÔN CHẠY SAU CÙNG: cập nhật số lượng biến thể ———
         if (Object.keys(changedQtyMap).length > 0) {
-            window.showNotification("Đang cập nhật số lượng biến thể...", "info");
-            await updateVariantQuantitiesIfChanged(currentProduct.Id, changedQtyMap);
-            window.showNotification("Đã cập nhật số lượng biến thể!", "success");
+            try {
+                window.showNotification("Đang cập nhật số lượng biến thể...", "info");
+                await updateVariantQuantitiesIfChanged(currentProduct.Id, changedQtyMap);
+                window.showNotification("Đã cập nhật số lượng biến thể!", "success");
+            } catch (e) {
+                console.error("Lỗi cập nhật số lượng biến thể:", e);
+                window.showNotification("Lỗi khi cập nhật số lượng biến thể: " + (e?.message || e), "error");
+            }
         }
 
-        // Fetch fresh data from TPOS to confirm changes and update UI
+        // Fetch fresh data from TPOS để đồng bộ UI
         const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
         
         setOriginalProductPayload(updatedProductData);
@@ -476,10 +481,17 @@ async function updateVariantQuantitiesIfChanged(productTmplId, changedMap) {
     const updatedModel = model.map(item => {
         const newQty = changedMap[item.ProductId];
         if (newQty !== undefined) {
-            return { ...item, NewQuantity: newQty };
+            return { ...item, NewQuantity: Number.isFinite(newQty) ? newQty : 0 };
         }
         return item;
-    });
+    })
+    // Chỉ giữ lại những dòng thực sự có thay đổi số lượng
+    .filter(item => item.NewQuantity !== undefined);
+
+    // Nếu không có dòng nào thay đổi thì bỏ qua
+    if (!updatedModel.length) {
+        return;
+    }
 
     // Bước 2: Gửi payload đã chỉnh vào PostChangeQtyProduct
     const postResp = await tposRequest(
