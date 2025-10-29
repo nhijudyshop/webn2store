@@ -227,6 +227,15 @@ export function openEditModal() {
                 <td>
                     <input 
                         type="number" 
+                        class="price-input" 
+                        data-field="PriceVariant"
+                        step="any"
+                        value="${typeof variant.PriceVariant === 'number' ? variant.PriceVariant : (typeof variant.ListPrice === 'number' ? variant.ListPrice : 0)}"
+                    />
+                </td>
+                <td>
+                    <input 
+                        type="number" 
                         class="quantity-input" 
                         data-field="QtyAvailable"
                         value="${variant.QtyAvailable || 0}"
@@ -315,6 +324,19 @@ export async function saveProductChanges(event) {
             }
         });
 
+        // LẤY GIÁ BIẾN THỂ ĐÃ SỬA VÀ ÁP DỤNG VÀO PAYLOAD (PriceVariant)
+        const editedPrices = {};
+        variantsTbody?.querySelectorAll('tr').forEach(row => {
+            const id = parseInt(row.dataset.variantId, 10);
+            const priceInput = row.querySelector('.price-input');
+            if (!Number.isNaN(id) && priceInput) {
+                const val = parseFloat(priceInput.value);
+                if (!Number.isNaN(val)) {
+                    editedPrices[id] = val;
+                }
+            }
+        });
+
         // Check if we can update variants
         const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
 
@@ -325,15 +347,16 @@ export async function saveProductChanges(event) {
         } else {
             console.log("📦 Stock found, skipping variant structure update.");
 
-            // Áp dụng tên biến thể đã chỉnh sửa lên payload hiện có
-            if (payload.ProductVariants && Object.keys(editedNames).length > 0) {
+            // Áp dụng các tên và giá biến thể đã chỉnh sửa lên payload hiện có
+            if (payload.ProductVariants) {
                 payload.ProductVariants = payload.ProductVariants.map(v => {
-                    if (editedNames[v.Id]) {
-                        const newVariantName = editedNames[v.Id];
-                        if (newVariantName) {
-                            // Chỉ cập nhật NameGet theo yêu cầu
-                            v.NameGet = newVariantName;
-                        }
+                    const nameEdited = editedNames[v.Id];
+                    const priceEdited = editedPrices[v.Id];
+                    if (nameEdited) {
+                        v.NameGet = nameEdited; // chỉ cập nhật NameGet
+                    }
+                    if (priceEdited !== undefined) {
+                        v.PriceVariant = priceEdited; // cập nhật giá biến thể
                     }
                     return v;
                 });
