@@ -1,7 +1,7 @@
 [
   {
     "id": 109565,
-    "timestamp": "2025-10-29T13:43:57.577Z",
+    "timestamp": "2025-10-29T15:36:10.501Z",
     "productCode": "TEST55",
     "productName": "Test55",
     "product": {
@@ -28,8 +28,8 @@
       "IsProductVariant": false,
       "EAN13": null,
       "DefaultCode": "TEST55",
-      "QtyAvailable": 6,
-      "VirtualAvailable": 6,
+      "QtyAvailable": 16,
+      "VirtualAvailable": 16,
       "OutgoingQty": 0,
       "IncomingQty": 0,
       "PropertyCostMethod": null,
@@ -67,7 +67,7 @@
       "EnableAll": false,
       "ComboPurchased": null,
       "TaxAmount": null,
-      "Version": 5952,
+      "Version": 5969,
       "VariantFirstId": null,
       "VariantFistId": null,
       "ZaloProductId": null,
@@ -335,8 +335,8 @@
           "UOMId": 1,
           "UOMName": null,
           "UOMPOId": 1,
-          "QtyAvailable": 0,
-          "VirtualAvailable": 0,
+          "QtyAvailable": 8,
+          "VirtualAvailable": 8,
           "OutgoingQty": null,
           "IncomingQty": null,
           "NameGet": "[TEST55T] Test55 (Đỏ) zzzz",
@@ -346,13 +346,13 @@
           "Image": null,
           "ImageUrl": null,
           "Thumbnails": [],
-          "PriceVariant": 5555,
+          "PriceVariant": 888,
           "SaleOK": true,
           "PurchaseOK": true,
           "DisplayAttributeValues": "Màu: Hồng Đậm",
           "LstPrice": 0,
           "Active": true,
-          "ListPrice": 5555,
+          "ListPrice": 888,
           "PurchasePrice": null,
           "DiscountSale": null,
           "DiscountPurchase": null,
@@ -481,8 +481,8 @@
           "UOMId": 1,
           "UOMName": null,
           "UOMPOId": 1,
-          "QtyAvailable": 4,
-          "VirtualAvailable": 4,
+          "QtyAvailable": 6,
+          "VirtualAvailable": 6,
           "OutgoingQty": null,
           "IncomingQty": null,
           "NameGet": "[TEST55D] Test55 (Đen)",
@@ -765,7 +765,7 @@
         }
       ]
     },
-    "savedAt": "20:43:57 29/10/2025"
+    "savedAt": "22:36:10 29/10/2025"
   },
   {
     "id": 106011,
