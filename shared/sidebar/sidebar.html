@@ -41,14 +41,14 @@
                 <i data-lucide="settings"></i>
                 <span>Cài đặt</span>
             </a>
-            <a href="#" class="nav-item" data-page="users" data-path="/pages/users/users.html" data-roles="admin">
+            <a href="/pages/users/users.html" class="nav-item" data-page="users" data-path="/pages/users/users.html" data-roles="admin">
                 <i data-lucide="users"></i>
-                <span>Quản lý User</span>
+                <span>Quản lý Users</span>
             </a>
-            <div class="nav-item" onclick="showNotification('Đang phát triển', 'info')" data-roles="admin,manager,mod">
-                <i data-lucide="bar-chart-3"></i>
-                <span>Thống kê</span>
-            </div>
+            <a href="/pages/sale-online-orders/index.html" class="nav-item" data-page="sale-online-orders" data-path="/pages/sale-online-orders/index.html" data-roles="admin,manager">
+                <i data-lucide="file-text"></i>
+                <span>Báo cáo đơn Online</span>
+            </a>
         </div>
 
         <div class="nav-section">
@@ -63,4 +63,23 @@
             </div>
         </div>
     </nav>
+    <div class="sidebar-footer">
+        <div class="footer-content">
+            <div class="footer-title">Các chức năng khác</div>
+            <ul class="footer-list">
+                <li class="nav-item">
+                    <a href="/pages/users/users.html">
+                        <i data-lucide="users"></i>
+                        <span>Quản lý Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/sale-online-orders/index.html">
+                        <i data-lucide="file-text"></i>
+                        <span>Báo cáo đơn Online</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

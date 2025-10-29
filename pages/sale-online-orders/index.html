@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Báo cáo đơn hàng Online</title>
+    <script src="/shared/auth/auth-guard.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/shared/styles/common.css" />
+    <link rel="stylesheet" href="/pages/sale-online-orders/styles.css" />
+</head>
+<body>
+    <!-- Sidebar will be loaded by sidebar.js -->
+
+    <div class="container">
+        <header class="header">
+            <h1>📊 Báo cáo đơn hàng Online</h1>
+        </header>
+
+        <div class="filters">
+            <div class="form-group">
+                <label for="startDate">Từ ngày:</label>
+                <input type="date" id="startDate" />
+            </div>
+            <div class="form-group">
+                <label for="endDate">Đến ngày:</label>
+                <input type="date" id="endDate" />
+            </div>
+            <div class="form-group">
+                <button id="fetchButton" class="btn btn-primary">
+                    <i data-lucide="search"></i> Tải báo cáo
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <!-- Stats will be rendered here -->
+        </div>
+
+        <div class="table-container">
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Thao tác</th>
+                        <th>STT</th>
+                        <th>Mã</th>
+                        <th>Kênh</th>
+                        <th>Tên</th>
+                        <th>Điện thoại</th>
+                        <th>Địa chỉ</th>
+                        <th>Tổng tiền</th>
+                        <th>SL</th>
+                        <th>Trạng thái</th>
+                        <th>Nhân viên</th>
+                        <th>Ngày tạo</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be rendered here -->
+                </tbody>
+            </table>
+            <div id="loader" class="loader" style="display: none;">Đang tải...</div>
+        </div>
+
+        <div class="pagination-controls" id="paginationControls">
+            <button id="prevPageBtn" disabled><i data-lucide="chevron-left"></i> Trang trước</button>
+            <span id="pageInfo"></span>
+            <button id="nextPageBtn" disabled>Trang sau <i data-lucide="chevron-right"></i></button>
+        </div>
+    </div>
+
+    <script src="/shared/sidebar/sidebar.js"></script>
+    <script type="module" src="/pages/sale-online-orders/app.js"></script>
+</body>
+</html>
