@@ -70,7 +70,7 @@ export function activateModalTab(tabId) {
   window.lucide.createIcons();
 }
 
-function populateTransferVariantSelect(selectElement, excludeVariantId = null) {
+export function populateTransferVariantSelect(selectElement, excludeVariantId = null) {
   selectElement.innerHTML = '<option value="">-- Chọn biến thể --</option>';
   if (currentProduct && currentProduct.ProductVariants) {
     currentProduct.ProductVariants.forEach(variant => {
