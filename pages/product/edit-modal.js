@@ -337,6 +337,28 @@ export async function saveProductChanges(event) {
             }
         });
 
+        // PHÁT HIỆN SỐ LƯỢNG BIẾN THỂ THAY ĐỔI (QtyAvailable) ĐỂ GỌI QUY TRÌNH 3 BƯỚC
+        const editedQtyMap = {};
+        variantsTbody?.querySelectorAll('tr').forEach(row => {
+            const id = parseInt(row.dataset.variantId, 10);
+            const qtyInput = row.querySelector('input.quantity-input[data-field="QtyAvailable"]');
+            if (!Number.isNaN(id) && qtyInput) {
+                const val = parseFloat(qtyInput.value);
+                if (!Number.isNaN(val)) {
+                    editedQtyMap[id] = val;
+                }
+            }
+        });
+
+        const changedQtyMap = {};
+        (currentProduct.ProductVariants || []).forEach(v => {
+            const newQty = editedQtyMap[v.Id];
+            const oldQty = v.QtyAvailable || 0;
+            if (newQty !== undefined && newQty !== oldQty) {
+                changedQtyMap[v.Id] = newQty;
+            }
+        });
+
         // Check if we can update variants
         const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
 
@@ -371,9 +393,16 @@ export async function saveProductChanges(event) {
             });
         }
 
-        // Send the update request
+        // Send the update request (tên/giá/hình ảnh, KHÔNG gửi số lượng qua payload này)
         await tposRequest('/api/products/update', { method: 'POST', body: payload });
         console.log("✅ Product update request sent.");
+
+        // Nếu có biến thể đổi số lượng, thực hiện quy trình 3 bước
+        if (Object.keys(changedQtyMap).length > 0) {
+            window.showNotification("Đang cập nhật số lượng biến thể...", "info");
+            await updateVariantQuantitiesIfChanged(currentProduct.Id, changedQtyMap);
+            window.showNotification("Đã cập nhật số lượng biến thể!", "success");
+        }
 
         // Fetch fresh data from TPOS to confirm changes and update UI
         const updatedProductData = await getProductByCode(currentProduct.DefaultCode);
@@ -396,4 +425,46 @@ export async function saveProductChanges(event) {
         btn.innerHTML = 'Lưu thay đổi';
         window.lucide.createIcons();
     }
+}
+
+// Thực hiện quy trình đổi số lượng qua 3 bước của TPOS
+async function updateVariantQuantitiesIfChanged(productTmplId, changedMap) {
+    // Bước 1: Lấy payload mẫu theo ProductTmplId
+    const template = await tposRequest(
+        "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.DefaultGetAll?$expand=ProductTmpl,Product,Location",
+        { method: "POST", body: { model: { ProductTmplId: productTmplId } } }
+    );
+
+    const model = template?.model || template?.value || [];
+    if (!Array.isArray(model) || model.length === 0) {
+        throw new Error("Không nhận được payload mẫu đổi số lượng từ TPOS.");
+    }
+
+    // Cập nhật NewQuantity theo các biến thể đã thay đổi
+    const updatedModel = model.map(item => {
+        const newQty = changedMap[item.ProductId];
+        if (newQty !== undefined) {
+            return { ...item, NewQuantity: newQty };
+        }
+        return item;
+    });
+
+    // Bước 2: Gửi payload đã chỉnh vào PostChangeQtyProduct
+    const postResp = await tposRequest(
+        "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.PostChangeQtyProduct?$expand=ProductTmpl,Product,Location",
+        { method: "POST", body: { model: updatedModel } }
+    );
+
+    // Thu thập tất cả Id từ response
+    const src = postResp?.value || postResp?.model || postResp;
+    const ids = Array.isArray(src) ? src.map(x => x?.Id).filter(Boolean) : (src?.ids || []);
+    if (!ids.length) {
+        throw new Error("Không lấy được danh sách Id để xác nhận đổi số lượng.");
+    }
+
+    // Bước 3: Gửi ids vào ChangeProductQtyIds để xác nhận
+    await tposRequest(
+        "https://tomato.tpos.vn/odata/StockChangeProductQty/ODataService.ChangeProductQtyIds",
+        { method: "POST", body: { ids } }
+    );
 }
