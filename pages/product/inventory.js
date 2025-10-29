@@ -5,7 +5,7 @@ import { autoLoadSavedData, clearSavedData, exportToJSON, importFromJSON, handle
 import { searchProduct } from './product-api.js';
 import { clearData } from './product-display.js';
 import { loadProductSuggestions, updateSuggestions } from './suggestions.js';
-import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuantities, handleImagePaste } from './edit-modal.js';
+import { openEditModal, closeEditModal, saveProductChanges, recalculateTotalQuantities, handleImagePaste } from './edit-modal-controller.js';
 import { closeVariantSelector, handleVariantSelection, activeVariantInput } from './variant-editor.js';
 import { initImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.js'; // Import lightbox initializer
 
