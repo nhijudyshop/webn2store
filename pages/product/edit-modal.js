@@ -215,7 +215,14 @@ export function openEditModal() {
             const row = document.createElement('tr');
             row.dataset.variantId = variant.Id;
             row.innerHTML = `
-                <td style="text-align: left;">${variant.Name}</td>
+                <td style="text-align: left;">
+                    <input 
+                        type="text" 
+                        class="variant-name-input" 
+                        value="${variant.Name || ''}" 
+                        style="width: 100%;"
+                    />
+                </td>
                 <td><span class="product-code">${variant.DefaultCode || '-'}</span></td>
                 <td>
                     <input 
@@ -297,6 +304,17 @@ export async function saveProductChanges(event) {
             if (payload.Images) payload.Images = [];
         }
 
+        // LẤY TÊN BIẾN THỂ ĐÃ SỬA VÀ ÁP DỤNG VÀO PAYLOAD (không đụng đến số lượng)
+        const variantsTbody = document.getElementById('editVariantsTableBody');
+        const editedNames = {};
+        variantsTbody?.querySelectorAll('tr').forEach(row => {
+            const id = parseInt(row.dataset.variantId, 10);
+            const input = row.querySelector('.variant-name-input');
+            if (!Number.isNaN(id) && input) {
+                editedNames[id] = input.value.trim();
+            }
+        });
+
         // Check if we can update variants
         const hasStock = currentProduct.ProductVariants && currentProduct.ProductVariants.some(v => (v.QtyAvailable || 0) > 0 || (v.VirtualAvailable || 0) > 0);
 
@@ -306,6 +324,20 @@ export async function saveProductChanges(event) {
             payload.ProductVariants = buildProductVariants(newName, newListPrice, editModalState);
         } else {
             console.log("📦 Stock found, skipping variant structure update.");
+
+            // Áp dụng tên biến thể đã chỉnh sửa lên payload hiện có
+            if (payload.ProductVariants && Object.keys(editedNames).length > 0) {
+                payload.ProductVariants = payload.ProductVariants.map(v => {
+                    if (editedNames[v.Id]) {
+                        const newVariantName = editedNames[v.Id];
+                        if (newVariantName) {
+                            v.Name = newVariantName;
+                            v.NameGet = newVariantName; // đồng bộ tên hiển thị
+                        }
+                    }
+                    return v;
+                });
+            }
         }
 
         // ALWAYS remove quantity fields from variants to prevent accidental updates
