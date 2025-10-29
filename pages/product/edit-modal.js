@@ -217,8 +217,22 @@ export function openEditModal() {
             row.innerHTML = `
                 <td style="text-align: left;">${variant.Name}</td>
                 <td><span class="product-code">${variant.DefaultCode || '-'}</span></td>
-                <td><div class="value-display" style="justify-content: center;">${variant.QtyAvailable || 0}</div></td>
-                <td><div class="value-display" style="justify-content: center;">${variant.VirtualAvailable || 0}</div></td>
+                <td>
+                    <input 
+                        type="number" 
+                        class="quantity-input" 
+                        data-field="QtyAvailable"
+                        value="${variant.QtyAvailable || 0}"
+                    />
+                </td>
+                <td>
+                    <input 
+                        type="number" 
+                        class="quantity-input" 
+                        data-field="VirtualAvailable"
+                        value="${variant.VirtualAvailable || 0}"
+                    />
+                </td>
             `;
             variantsTbody.appendChild(row);
         });
