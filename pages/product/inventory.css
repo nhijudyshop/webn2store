@@ -19,3 +19,192 @@
     padding: 25px;
     margin-top: 20px; /* Space from the header */
 }
+
+/* --- Edit Product Modal Tabs --- */
+.modal-tabs-nav {
+    display: flex;
+    gap: 8px;
+    margin-left: 20px; /* Align with modal header h2 */
+    border-bottom: 2px solid #f1f5f9;
+    flex-grow: 1;
+    justify-content: flex-start;
+    align-items: flex-end;
+    position: relative;
+    bottom: -2px; /* Overlap border */
+}
+
+.modal-tab-button {
+    padding: 10px 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+
+.modal-tab-button:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.modal-tab-button.active {
+    background: white;
+    border-color: #e2e8f0;
+    border-bottom-color: white;
+    color: #667eea;
+    box-shadow: 0 -4px 8px rgba(102, 126, 234, 0.1);
+    z-index: 1;
+}
+
+.modal-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-tab-content.active {
+    display: block;
+}
+
+/* --- Quantity Transfer Tab Specific Styles --- */
+.quantity-transfer-section {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.transfer-description {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.transfer-variants-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.transfer-variant-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.transfer-variant-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.transfer-variant-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.transfer-variant-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.transfer-variant-card .value-display {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: #667eea;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.qty-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-qty-control {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-qty-control:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-qty-control:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.transfer-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 24px;
+}
+
+.transfer-separator i {
+    width: 32px;
+    height: 32px;
+}
+
+/* Responsive for new tab */
+@media (max-width: 768px) {
+    .modal-header .modal-tabs-nav {
+        margin-left: 0;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .modal-tab-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    .transfer-variants-grid {
+        grid-template-columns: 1fr;
+    }
+    .transfer-separator {
+        transform: rotate(90deg);
+        margin: 10px 0;
+    }
+}

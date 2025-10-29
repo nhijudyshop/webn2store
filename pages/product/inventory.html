@@ -141,73 +141,137 @@
             <div class="modal-content" style="max-width: 800px;">
                 <div class="modal-header">
                     <h2>Chỉnh sửa sản phẩm</h2>
+                    <div class="modal-tabs-nav">
+                        <button class="modal-tab-button active" data-tab="general-info">
+                            <i data-lucide="info"></i> Thông tin chung
+                        </button>
+                        <button class="modal-tab-button" data-tab="quantity-transfer">
+                            <i data-lucide="arrow-left-right"></i> Chuyển đổi số lượng
+                        </button>
+                    </div>
                     <button class="btn-close" onclick="closeEditModal()"><i data-lucide="x"></i></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editProductForm">
-                        <div class="form-group">
-                            <label for="editProductName">Tên sản phẩm</label>
-                            <input type="text" id="editProductName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Hình ảnh</label>
-                            <div class="image-cell" style="position: relative; width: 80px;">
-                                <div id="editImageDropzone" class="image-dropzone" tabindex="0">
-                                    <i data-lucide="image"></i><span>Ctrl+V</span>
+                    <!-- General Info Tab Content -->
+                    <div class="modal-tab-content active" id="general-info">
+                        <form id="editProductForm">
+                            <div class="form-group">
+                                <label for="editProductName">Tên sản phẩm</label>
+                                <input type="text" id="editProductName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Hình ảnh</label>
+                                <div class="image-cell" style="position: relative; width: 80px;">
+                                    <div id="editImageDropzone" class="image-dropzone" tabindex="0">
+                                        <i data-lucide="image"></i><span>Ctrl+V</span>
+                                    </div>
+                                    <button type="button" id="deleteEditImageBtn" class="btn-delete-image" style="display: none;"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
                                 </div>
-                                <button type="button" id="deleteEditImageBtn" class="btn-delete-image" style="display: none;"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editVariants">Biến thể</label>
-                            <input type="text" id="editVariants" class="variant-input" placeholder="Chọn hoặc chỉnh sửa biến thể" readonly>
-                        </div>
-                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="editPurchasePrice">Giá mua</label>
-                                <input type="number" id="editPurchasePrice" step="any">
                             </div>
                             <div class="form-group">
-                                <label for="editListPrice">Giá bán</label>
-                                <input type="number" id="editListPrice" step="any">
+                                <label for="editVariants">Biến thể</label>
+                                <input type="text" id="editVariants" class="variant-input" placeholder="Chọn hoặc chỉnh sửa biến thể" readonly>
                             </div>
-                        </div>
-                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label>Tổng SL thực tế</label>
-                                <div id="editQtyAvailable" class="value-display"></div>
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label for="editPurchasePrice">Giá mua</label>
+                                    <input type="number" id="editPurchasePrice" step="any">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editListPrice">Giá bán</label>
+                                    <input type="number" id="editListPrice" step="any">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Tổng SL dự báo</label>
-                                <div id="editVirtualAvailable" class="value-display"></div>
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label>Tổng SL thực tế</label>
+                                    <div id="editQtyAvailable" class="value-display"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tổng SL dự báo</label>
+                                    <div id="editVirtualAvailable" class="value-display"></div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Variants Edit Section -->
-                        <div class="variants-edit-section">
-                            <h4>Chỉnh sửa số lượng biến thể</h4>
-                            <div class="product-table-wrapper">
-                                <table id="editVariantsTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Tên biến thể</th>
-                                            <th>Mã SP Con</th>
-                                            <th>Giá</th>
-                                            <th>SL Thực tế</th>
-                                            <th>SL Dự báo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="editVariantsTableBody">
-                                        <!-- Variant rows will be injected here by JS -->
-                                    </tbody>
-                                </table>
+                            <!-- Variants Edit Section -->
+                            <div class="variants-edit-section">
+                                <h4>Chỉnh sửa số lượng biến thể</h4>
+                                <div class="product-table-wrapper">
+                                    <table id="editVariantsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Tên biến thể</th>
+                                                <th>Mã SP Con</th>
+                                                <th>Giá</th>
+                                                <th>SL Thực tế</th>
+                                                <th>SL Dự báo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="editVariantsTableBody">
+                                            <!-- Variant rows will be injected here by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Quantity Transfer Tab Content -->
+                    <div class="modal-tab-content" id="quantity-transfer">
+                        <div class="quantity-transfer-section">
+                            <p class="transfer-description">
+                                Chọn hai biến thể để chuyển đổi số lượng giữa chúng.
+                                Khi số lượng của một biến thể tăng, biến thể kia sẽ giảm tương ứng.
+                            </p>
+
+                            <div class="transfer-variants-grid">
+                                <div class="transfer-variant-card">
+                                    <h3>Biến thể 1</h3>
+                                    <div class="form-group">
+                                        <label for="transferVariant1">Chọn biến thể:</label>
+                                        <select id="transferVariant1" class="transfer-variant-select"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số lượng hiện tại:</label>
+                                        <div id="transferQty1" class="value-display">0</div>
+                                    </div>
+                                    <div class="qty-controls">
+                                        <button class="btn-qty-control" data-variant-index="1" data-delta="-1"><i data-lucide="minus"></i></button>
+                                        <button class="btn-qty-control" data-variant-index="1" data-delta="1"><i data-lucide="plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="transfer-separator">
+                                    <i data-lucide="arrow-left-right"></i>
+                                </div>
+
+                                <div class="transfer-variant-card">
+                                    <h3>Biến thể 2</h3>
+                                    <div class="form-group">
+                                        <label for="transferVariant2">Chọn biến thể:</label>
+                                        <select id="transferVariant2" class="transfer-variant-select"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số lượng hiện tại:</label>
+                                        <div id="transferQty2" class="value-display">0</div>
+                                    </div>
+                                    <div class="qty-controls">
+                                        <button class="btn-qty-control" data-variant-index="2" data-delta="-1"><i data-lucide="minus"></i></button>
+                                        <button class="btn-qty-control" data-variant-index="2" data-delta="1"><i data-lucide="plus"></i></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeEditModal()">Hủy</button>
-                    <button type="submit" form="editProductForm" class="btn-primary" id="saveChangesBtn">Lưu thay đổi</button>
+                    <button type="button" class="btn-primary" id="saveQuantityTransferBtn" style="display: none;">
+                        <i data-lucide="save"></i> Lưu chuyển đổi số lượng
+                    </button>
+                    <button type="submit" form="editProductForm" class="btn-primary" id="saveChangesBtn">
+                        <i data-lucide="save"></i> Lưu thay đổi
+                    </button>
                 </div>
             </div>
         </div>
