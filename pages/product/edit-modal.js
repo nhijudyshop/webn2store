@@ -403,26 +403,14 @@ export async function saveProductChanges(event) {
                 { method: "POST", body: { model: { ProductTmplId: tmplId } } }
             );
 
-            // Ưu tiên dùng defaultPayload.model (đúng chuẩn payload mẫu); fallback sang defaultPayload.value nếu server trả về dạng khác
-            const templateModels = Array.isArray(defaultPayload?.model)
-                ? defaultPayload.model
-                : (Array.isArray(defaultPayload?.value) ? defaultPayload.value : []);
-
-            if (templateModels.length === 0) {
-                console.warn("DefaultGetAll không trả về dữ liệu mẫu hợp lệ (model/value rỗng). Payload:", defaultPayload);
-            }
-
-            // Lọc theo SP Con cần đổi số lượng; hỗ trợ cả trường ProductId hoặc nested Product.Id
+            const templateModels = Array.isArray(defaultPayload?.model) ? defaultPayload.model : [];
+            // Lọc theo các SP Con cần đổi số lượng
             const modelsToChange = templateModels
-                .map(m => {
-                    const pid = m.ProductId ?? m.Product?.Id ?? null;
-                    return { pid, m };
-                })
-                .filter(({ pid }) => pid !== null && editedQtyMap[pid] !== undefined)
-                .map(({ pid, m }) => ({ ...m, NewQuantity: editedQtyMap[pid] }));
+                .filter(m => editedQtyMap[m.ProductId] !== undefined)
+                .map(m => ({ ...m, NewQuantity: editedQtyMap[m.ProductId] }));
 
             if (modelsToChange.length === 0) {
-                console.warn("Không tìm thấy mẫu phù hợp để cập nhật số lượng (không khớp ProductId).");
+                console.warn("Không tìm thấy mẫu phù hợp để cập nhật số lượng.");
             } else {
                 // B2: gửi payload thay đổi để nhận danh sách Id
                 const postResp = await tposRequest(
