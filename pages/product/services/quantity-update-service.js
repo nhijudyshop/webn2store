@@ -38,9 +38,12 @@ export async function updateVariantQuantitiesIfChanged(changedQtyMap) {
             const variantId = item.Product.Id;
             const newItem = { ...item }; // Create a mutable copy
 
-            // Dựa trên payload mẫu bạn cung cấp, các trường QtyAvailable và VirtualAvailable
-            // bên trong đối tượng Product không cần phải xóa.
-            // Chúng là một phần của cấu trúc Product và không ảnh hưởng đến NewQuantity.
+            // Remove QtyAvailable and VirtualAvailable from the nested Product object
+            // as they are not meant to be sent back in this step.
+            if (newItem.Product) {
+                delete newItem.Product.QtyAvailable;
+                delete newItem.Product.VirtualAvailable;
+            }
             
             if (changedQtyMap.hasOwnProperty(variantId)) {
                 newItem.NewQuantity = changedQtyMap[variantId];
