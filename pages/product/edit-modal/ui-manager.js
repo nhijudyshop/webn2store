@@ -209,7 +209,7 @@ export function openEditModal() {
             class="quantity-input" 
             data-field="QtyAvailable"
             value="${variant.QtyAvailable || 0}"
-            disabled <!-- RE-DISABLED HERE -->
+            disabled
           />
         </td>
         <td>
