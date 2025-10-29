@@ -219,7 +219,7 @@ export function openEditModal() {
                     <input 
                         type="text" 
                         class="variant-name-input" 
-                        value="${variant.Name || ''}" 
+                        value="${variant.NameGet || variant.Name || ''}" 
                         style="width: 100%;"
                     />
                 </td>
@@ -331,8 +331,8 @@ export async function saveProductChanges(event) {
                     if (editedNames[v.Id]) {
                         const newVariantName = editedNames[v.Id];
                         if (newVariantName) {
-                            v.Name = newVariantName;
-                            v.NameGet = newVariantName; // đồng bộ tên hiển thị
+                            // Chỉ cập nhật NameGet theo yêu cầu
+                            v.NameGet = newVariantName;
                         }
                     }
                     return v;
